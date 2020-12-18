@@ -154,6 +154,7 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
                   padding: EdgeInsets.only(
                     top: 1,
                     left: 25,
+
                   ),
                   child: Center(
                     child: Text(
