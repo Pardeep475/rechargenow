@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "262930404202",
+    "project_id": "rechargenow-14b39",
+    "storage_bucket": "rechargenow-14b39.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262930404202:android:57813810b6ac6720fa0b13",
+        "android_client_info": {
+          "package_name": "mobile.rechargenow.recharge_now"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "262930404202-dul9dusaa8ht3svd1209qd0924ccprjb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4NomczJtNq-io1GQ0eTLJjBlNJqzUtz4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "262930404202-dul9dusaa8ht3svd1209qd0924ccprjb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "262930404202-eo4f9f4iff1nvuivqr864fhn0u6ph4ai.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "mobile.rechargenow.rechargeNow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
