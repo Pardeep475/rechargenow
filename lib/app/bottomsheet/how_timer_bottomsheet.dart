@@ -148,7 +148,6 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
                           fontWeight: FontWeight.w800,
                           color: Color(0xff686868)),
                     ),
-
                   ),
 
                 ),
