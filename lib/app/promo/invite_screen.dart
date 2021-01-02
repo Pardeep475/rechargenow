@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/svg.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,7 +37,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
       child: Column(
         children: <Widget>[
           appBarView(
-              name: "INVITE FRIENDS",
+              name: AppLocalizations.of(context).translate('INVITE FRIENDS'),
               context: context,
               callback: () {
                 Navigator.pop(context);
@@ -63,7 +64,8 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                       top: screenPadding,
                       right: screenPadding),
                   child: Text(
-                    "Invite a friend & get a bonus",
+                    AppLocalizations.of(context).translate('Invite a friend and get a bonus'),
+                    textAlign: TextAlign.center,
                     style: sliderTitleTextStyle,
                   ),
                 ),
@@ -71,7 +73,7 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
                   margin: EdgeInsets.only(
                       left: screenPadding, top: 5, right: screenPadding),
                   child: Text(
-                    "Just send this code to a friend and invite him or her RechargeNow. As soon as he borrows the first Powerbank, you two will receive a bonus of 5,00€.",
+                    AppLocalizations.of(context).translate('invite description'),
                     style: subTitleTextStyle,
                     textAlign: TextAlign.center,
                   ),
@@ -84,14 +86,15 @@ class _InviteFriendsScreenState extends State<InviteFriendsScreen> {
             margin: EdgeInsets.only(
                 left: screenPadding, top: 8, right: screenPadding),
             child: Text(
-              "SHARE FRIENDSHIP CODE",
+              AppLocalizations.of(context).translate('SHARE FRIENDSHIP CODE'),
+              textAlign: TextAlign.center,
               style: addCardTextStyle,
             ),
           ),
           Container(
               margin: EdgeInsets.only(
                   left: screenPadding, top: 20, right: screenPadding),
-              child: buttonView(text: "HJKDJFKJD", callback: () {
+              child: buttonView(text: prefs.get('usercode').toString(), callback: () {
                 Share.share("Download die App „RechargeNow“ und lade dein Smartphone unterwegs! Gib den Promo-Code "+prefs.get('usercode').toString()+" ein und erhalte nach der ersten Powerbank Nutzung 5€ auf dein Wallet!");
               })),
           SizedBox(

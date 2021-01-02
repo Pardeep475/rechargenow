@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'package:recharge_now/utils/Dimens.dart';
 
 String fontFamily = "Montserrat";
 
-double screenPadding = 30;
+double screenPadding = Dimens.thirtyThree;
 
-TextStyle textStyle = const TextStyle(
+TextStyle textStyle = TextStyle(
     color: const Color(0XFFFFFFFF),
-    fontSize: 16.0,
+    fontSize: Dimens.sixteen,
     fontWeight: FontWeight.normal);
 
 ThemeData appTheme = new ThemeData(
@@ -17,9 +17,9 @@ ThemeData appTheme = new ThemeData(
 
 Color textFieldColor = const Color.fromRGBO(255, 255, 255, 0.1);
 
-TextStyle buttonTextStyle = const TextStyle(
+TextStyle buttonTextStyle = TextStyle(
     color: const Color.fromRGBO(255, 255, 255, 0.8),
-    fontSize: 14.0,
+    fontSize: Dimens.forteen,
     fontFamily: "Roboto",
     fontWeight: FontWeight.bold);
 
@@ -39,7 +39,7 @@ Color color_red = const Color(0xFFF44336);
 TextStyle sliderTitleTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 20,
+    fontSize: Dimens.twenty,
     color: Color(0xFF28272C),
     height: 1.4);
 //faq
@@ -47,27 +47,27 @@ TextStyle titleTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w500,
     color: Colors.black,
-    fontSize: 13,
+    fontSize: Dimens.thrteen,
     height: 1.2);
 
 TextStyle faqRsStyle = TextStyle(
     fontFamily: fontFamily,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     color: Color(0xFF54DF6C),
-    fontSize: 14,
+    fontSize: Dimens.eighteen,
     height: 1.2);
 
 //login, addd prmo code
 TextStyle hintTextStyle = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: Dimens.twelve,
     fontWeight: FontWeight.w500,
     color: Color(0xFF9E9E9E),
     height: 1.2);
 
 TextStyle redTextStyle = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: Dimens.twelve,
     fontWeight: FontWeight.w500,
     color: color_red,
     height: 1.2);
@@ -83,14 +83,14 @@ TextStyle sliderDescriptionTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: Color(0xFF686868),
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.4);
 
 TextStyle sliderButtonTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: Colors.white,
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.4);
 
 //login page
@@ -99,7 +99,7 @@ TextStyle termsText = TextStyle(
     fontWeight: FontWeight.w400,
     color: colorCode(686868),
     decoration: TextDecoration.none,
-    fontSize: 12,
+    fontSize: Dimens.twelve,
     height: 1.2);
 
 //login page
@@ -108,7 +108,7 @@ TextStyle termsBoldText = TextStyle(
     fontWeight: FontWeight.w400,
     color: Color(0xFF54DF83),
     decoration: TextDecoration.none,
-    fontSize: 12,
+    fontSize: Dimens.twelve,
     height: 1.4);
 
 //login page//optp page//add card// add card subtitle// settings
@@ -116,34 +116,34 @@ TextStyle loginDetailText = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: colorCode(686868),
-    fontSize: 11,
+    fontSize: Dimens.eleven,
     height: 1.4);
 //redeem success
 TextStyle redeemSuccesss = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: colorCode(686868),
-    fontSize: 14,
-    height: 1.4);//redeem success
+    fontSize: Dimens.forteen,
+    height: 1.4); //redeem success
 TextStyle redeemSuccesssValue = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: colorCode(686868),
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.4);
 
 TextStyle skipTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: colorCode(848490),
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.2);
 
 TextStyle appBarTitleStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: Color(0xFF28272C),
-    fontSize: 15,
+    fontSize: Dimens.fifteen,
     height: 1.9);
 
 //release location, add payment text
@@ -151,7 +151,7 @@ TextStyle locationTitleStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w400,
     color: colorCode(686868),
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.2);
 
 //drawer login
@@ -159,7 +159,7 @@ TextStyle drawerTitleStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: Color(0xFF2F2F2F),
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.2);
 
 //drawer login doller
@@ -167,7 +167,7 @@ TextStyle drawerRsStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w700,
     color: Color(0xFF54DF6C),
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     height: 1.2);
 
 //add card
@@ -175,7 +175,7 @@ TextStyle addCardStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w500,
     color: Color(0xFF28272C),
-    fontSize: 13,
+    fontSize: Dimens.thrteen,
     height: 1.2);
 
 //add promo card
@@ -183,14 +183,14 @@ TextStyle addPromoCodeStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
     color: Colors.white,
-    fontSize: 11,
+    fontSize: Dimens.eleven,
     height: 2);
 
 //add promo code
 TextStyle addPromoCodeTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 20,
+    fontSize: Dimens.twenty,
     color: Colors.white,
     height: 1.4);
 
@@ -198,7 +198,7 @@ TextStyle addPromoCodeTextStyle = TextStyle(
 TextStyle addBtnTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 13,
+    fontSize: Dimens.thrteen,
     color: Color(0xFF848490),
     height: 2.2);
 
@@ -206,7 +206,7 @@ TextStyle addBtnTextStyle = TextStyle(
 TextStyle emptyTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w500,
-    fontSize: 20,
+    fontSize: Dimens.twenty,
     color: Color(0xFF28272C),
     height: 1.4);
 
@@ -214,7 +214,7 @@ TextStyle emptyTextStyle = TextStyle(
 TextStyle cardSubTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w400,
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     color: Colors.white,
     height: 1.4);
 
@@ -222,7 +222,7 @@ TextStyle cardSubTextStyle = TextStyle(
 TextStyle subTitleTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w400,
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     color: colorCode(686868),
     height: 1.8);
 
@@ -230,17 +230,16 @@ TextStyle subTitleTextStyle = TextStyle(
 TextStyle addCardTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     decoration: TextDecoration.underline,
     color: Color(0xFF2D2D2D),
     height: 1.4);
-
 
 //add card shwoing list
 TextStyle cardTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 11,
+    fontSize: Dimens.eleven,
     decoration: TextDecoration.underline,
     color: Colors.white.withOpacity(0.5),
     height: 2);
@@ -249,16 +248,15 @@ TextStyle cardTextStyle = TextStyle(
 TextStyle cardNumberTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 14,
+    fontSize: Dimens.forteen,
     color: Colors.white,
     height: 1.4);
-
 
 //add card shwoing list
 TextStyle historyTitleTextStyle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w600,
-    fontSize: 18,
+    fontSize: Dimens.eighteen,
     color: Color(0xFF54DF6C),
     height: 2.2);
 
@@ -267,6 +265,3 @@ Color colorCode(var number) {
   String string = "0xFF${number.toString()}";
   return Color(int.parse(string));
 }
-
-
-

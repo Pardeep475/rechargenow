@@ -12,6 +12,7 @@ import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:recharge_now/app/home_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyConstants.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,15 +56,17 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
             child: Column(
               children: <Widget>[
                 appBarViewEndBtn(
-                    name: "Release Location",
+                    name: AppLocalizations.of(context)
+                        .translate('Release Location'),
                     context: context,
                     callback: () {
                       navigateToDashBoardScreen();
                     }),
                 Expanded(
-                  child: Container(
-                    child: Image.asset('assets/images/slider1.png'),
-                  ),
+                  child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Image.asset('assets/images/slider1.png',
+                          fit: BoxFit.cover)),
                 ),
                 SizedBox(
                   height: 10,
@@ -74,7 +77,7 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
                   margin: EdgeInsets.only(
                       left: screenPadding, right: screenPadding),
                   child: Text(
-                    "ACTIVATE LOCATION",
+                    AppLocalizations.of(context).translate('ACTIVATE LOCATION'),
                     style: sliderTitleTextStyle,
                   ),
                 ),
@@ -82,7 +85,7 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
                   margin: EdgeInsets.only(
                       top: 13, left: screenPadding, right: screenPadding),
                   child: Text(
-                    "Allow us to access your location to show you all the show rental stations in the vicinity.",
+                    AppLocalizations.of(context).translate('Allow Access'),
                     textAlign: TextAlign.center,
                     style: locationTitleStyle,
                   ),
@@ -92,7 +95,8 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
                 ),
                 Container(
                   child: buttonView(
-                      text: "Release Now",
+                      text:
+                          AppLocalizations.of(context).translate('Release Now'),
                       callback: () async {
                         checkLocationServiceEnableOrDisable();
                       }),
@@ -111,24 +115,17 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
 
   bool _serviceEnabled = false;
   var location = new Location();
-  checkLocationServiceEnableOrDisable() async {
 
+  checkLocationServiceEnableOrDisable() async {
     _serviceEnabled = await location.serviceEnabled();
     print("serviceEnabled" + _serviceEnabled.toString());
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
-
     } else if (_serviceEnabled) {
       navigateToDashBoardScreen();
     }
     print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
-
-
   }
-
-
-
-
 
   void navigateToDashBoardScreen() {
     Navigator.of(context).pushAndRemoveUntil(

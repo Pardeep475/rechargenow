@@ -7,9 +7,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:recharge_now/app/home_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class HowToWorkScreen extends StatefulWidget {
   bool isFromHome;
@@ -44,6 +44,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
     pageLength = 4;
     loadShredPref();
     super.initState();
+
     var textstyle = TextStyle(
         height: 1.5,
         letterSpacing: 1.0,
@@ -66,7 +67,6 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 fit: BoxFit.cover,
               )),
         ),
-
         Positioned(
           left: 0,
           right: 0,
@@ -76,37 +76,44 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-        widget.isFromHome ? Positioned(
-          right: 20,
-          top: 125,
-          child: InkWell(
-            onTap: () {
-              if(widget.isFromHome){
-                onDonePress();
-              }else{
-                Navigator.of(context).pushReplacementNamed('/LoginScreen');
-              }
-            },
-            child: Container(
-                height: 36,
-                width: 81,
-                decoration: BoxDecoration(
-                    color: Color(0xffF2F3F7),
-                    borderRadius: BorderRadius.all(Radius.circular(50.0))),
-                child: Center(
-                  child: Text(
-                    'Skip'.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Color(0xff848490),
-                        fontSize: 14.0,
-                        height: 1.3,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Montserrat'),
-                  ),
-                )),
-          ),
-        ) :Positioned(top:120,child: SizedBox()),
+        widget.isFromHome
+            ? Positioned(
+                right: Dimens.twenty,
+                top: Dimens.oneTwentyFive,
+                child: InkWell(
+                  onTap: () {
+                    if (widget.isFromHome) {
+                      onDonePress();
+                    } else {
+                      Navigator.of(context)
+                          .pushReplacementNamed('/LoginScreen');
+                    }
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                          color: Color(0xffF2F3F7),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(50.0))),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: Dimens.twenty,vertical: Dimens.ten),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('Skip')
+                                .toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff848490),
+                                fontSize: 12.0,
+                                height: 1.3,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                      )),
+                ),
+              )
+            : Positioned(top: 120, child: SizedBox()),
         Positioned(
           bottom: 0,
           left: 40,
@@ -118,13 +125,17 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 textAlign: TextAlign.center,
                 style: sliderTitleTextStyle,
               ),
-              SizedBox(height: 13,),
+              SizedBox(
+                height: 13,
+              ),
               Text(
                 subTitle,
                 textAlign: TextAlign.center,
                 style: sliderDescriptionTextStyle,
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
             ],
           ),
         )
@@ -142,10 +153,8 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
           bottom: 150,
           child: Image.asset(
             assetImage,
-
           ),
         ),
-
         Positioned(
           left: 0,
           right: 0,
@@ -155,39 +164,44 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-
-        widget.isFromHome ? Positioned(
-          right: 20,
-          top: 125,
-          child: InkWell(
-            onTap: () {
-              if(widget.isFromHome){
-                onDonePress();
-              }else{
-                Navigator.of(context).pushReplacementNamed('/LoginScreen');
-              }
-            },
-            child: Container(
-                height: 36,
-                width: 81,
-                decoration: BoxDecoration(
-                    color: Color(0xffF2F3F7),
-                    borderRadius: BorderRadius.all(Radius.circular(50.0))),
-                child: Center(
-                  child: Text(
-                    'Skip'.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Color(0xff848490),
-                        fontSize: 14.0,
-                        height: 1.3,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Montserrat'),
-                  ),
-                )),
-          ),
-        ) :Positioned(top:120,child: SizedBox()),
-
+        widget.isFromHome
+            ? Positioned(
+                right: Dimens.twenty,
+                top: Dimens.oneTwentyFive,
+                child: InkWell(
+                  onTap: () {
+                    if (widget.isFromHome) {
+                      onDonePress();
+                    } else {
+                      Navigator.of(context)
+                          .pushReplacementNamed('/LoginScreen');
+                    }
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                          color: Color(0xffF2F3F7),
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(50.0))),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: Dimens.twenty,vertical: Dimens.ten),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('Skip')
+                                .toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff848490),
+                                fontSize: 12.0,
+                                height: 1.3,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                      )),
+                ),
+              )
+            : Positioned(top: 120, child: SizedBox()),
         Positioned(
           bottom: 0,
           left: 0,
@@ -199,13 +213,17 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 textAlign: TextAlign.center,
                 style: sliderTitleTextStyle,
               ),
-              SizedBox(height: 13,),
+              SizedBox(
+                height: 13,
+              ),
               Text(
                 subTitle,
                 textAlign: TextAlign.center,
                 style: sliderDescriptionTextStyle,
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
             ],
           ),
         )
@@ -223,10 +241,8 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
           bottom: 150,
           child: Image.asset(
             assetImage,
-
           ),
         ),
-
         Positioned(
           left: 0,
           right: 0,
@@ -236,39 +252,44 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-
-        widget.isFromHome ? Positioned(
-          right: 20,
-          top: 125,
-          child: InkWell(
-            onTap: () {
-              if(widget.isFromHome){
-                onDonePress();
-              }else{
-                Navigator.of(context).pushReplacementNamed('/LoginScreen');
-              }
-            },
-            child: Container(
-                height: 36,
-                width: 81,
-                decoration: BoxDecoration(
-                    color: Color(0xffF2F3F7),
-                    borderRadius: BorderRadius.all(Radius.circular(50.0))),
-                child: Center(
-                  child: Text(
-                    'Skip'.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Color(0xff848490),
-                        fontSize: 14.0,
-                        height: 1.3,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Montserrat'),
-                  ),
-                )),
-          ),
-        ) :Positioned(top:120,child: SizedBox()),
-
+        widget.isFromHome
+            ? Positioned(
+                right: Dimens.twenty,
+                top: Dimens.oneTwentyFive,
+                child: InkWell(
+                  onTap: () {
+                    if (widget.isFromHome) {
+                      onDonePress();
+                    } else {
+                      Navigator.of(context)
+                          .pushReplacementNamed('/LoginScreen');
+                    }
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                          color: Color(0xffF2F3F7),
+                          borderRadius:
+                          BorderRadius.all(Radius.circular(50.0))),
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: Dimens.twenty,vertical: Dimens.ten),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('Skip')
+                                .toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff848490),
+                                fontSize: 12.0,
+                                height: 1.3,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Montserrat'),
+                          ),
+                        ),
+                      )),
+                ),
+              )
+            : Positioned(top: 120, child: SizedBox()),
         Positioned(
           bottom: 0,
           left: 0,
@@ -280,13 +301,17 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 textAlign: TextAlign.center,
                 style: sliderTitleTextStyle,
               ),
-              SizedBox(height: 13,),
+              SizedBox(
+                height: 13,
+              ),
               Text(
                 subTitle,
                 textAlign: TextAlign.center,
                 style: sliderDescriptionTextStyle,
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 20,
+              ),
             ],
           ),
         )
@@ -300,11 +325,12 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
         Positioned(
           left: 0,
           right: 0,
-          top: 90,
-          bottom: 120,
-          child: Image.asset(assetImage),
-        ),
+          top: 70,
 
+          child: Image.asset(
+            assetImage,
+          ),
+        ),
         Positioned(
           left: 0,
           right: 0,
@@ -314,39 +340,44 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-
-        widget.isFromHome ? Positioned(
-          right: 20,
-          top: 125,
+        widget.isFromHome
+            ? Positioned(
+          right: Dimens.twenty,
+          top: Dimens.oneTwentyFive,
           child: InkWell(
             onTap: () {
-              if(widget.isFromHome){
+              if (widget.isFromHome) {
                 onDonePress();
-              }else{
-                Navigator.of(context).pushReplacementNamed('/LoginScreen');
+              } else {
+                Navigator.of(context)
+                    .pushReplacementNamed('/LoginScreen');
               }
             },
             child: Container(
-                height: 36,
-                width: 81,
                 decoration: BoxDecoration(
                     color: Color(0xffF2F3F7),
-                    borderRadius: BorderRadius.all(Radius.circular(50.0))),
+                    borderRadius:
+                    BorderRadius.all(Radius.circular(50.0))),
                 child: Center(
-                  child: Text(
-                    'Skip'.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Color(0xff848490),
-                        fontSize: 14.0,
-                        height: 1.3,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Montserrat'),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: Dimens.twenty,vertical: Dimens.ten),
+                    child: Text(
+                      AppLocalizations.of(context)
+                          .translate('Skip')
+                          .toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Color(0xff848490),
+                          fontSize: 12.0,
+                          height: 1.3,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Montserrat'),
+                    ),
                   ),
                 )),
           ),
-        ) :Positioned(top:120,child: SizedBox()),
-
+        )
+            : Positioned(top: 120, child: SizedBox()),
         Positioned(
           bottom: 0,
           left: 0,
@@ -356,41 +387,51 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               Container(
                 padding: EdgeInsets.all(0),
                 alignment: Alignment.center,
-                height: 100,
+                height: 90,
                 decoration: new BoxDecoration(
                     gradient: new LinearGradient(
                         colors: [
                           Colors.white60,
                           Colors.white,
                         ],
-                        stops: [0.0, 0.9],
+                        stops: [
+                          0.0,
+                          0.9
+                        ],
                         begin: FractionalOffset.topCenter,
                         end: FractionalOffset.bottomCenter,
-                        tileMode: TileMode.repeated
-                    )
-                ),
+                        tileMode: TileMode.repeated)),
                 width: double.infinity,
               ),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: sliderTitleTextStyle,
+              Container(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: sliderTitleTextStyle,
+                    ),
+                    SizedBox(
+                      height: 13,
+                    ),
+                    Text(
+                      subTitle,
+                      textAlign: TextAlign.center,
+                      style: sliderDescriptionTextStyle,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 13,),
-              Text(
-                subTitle,
-                textAlign: TextAlign.center,
-                style: sliderDescriptionTextStyle,
-              ),
-              SizedBox(height: 20,),
             ],
           ),
         )
       ],
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -419,8 +460,8 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               decorator: DotsDecorator(
                 color: Color(0xffF2F3F7),
                 activeColor: Color(0xff686868),
-                size: Size(10,10),
-                activeSize: Size(10,10),
+                size: Size(10, 10),
+                activeSize: Size(10, 10),
               ),
             ),
           ),
@@ -432,18 +473,20 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               height: 50,
               alignment: Alignment.bottomCenter,
               margin:
-              EdgeInsets.only(left: screenPadding, right: screenPadding),
+                  EdgeInsets.only(left: screenPadding, right: screenPadding),
               child: buttonView(
                   text: currentTab == 3
                       ? AppLocalizations.of(context).translate('LETS GO')
                       : AppLocalizations.of(context).translate('Next'),
                   callback: () {
                     if (currentTab == 3 && !widget.isFromHome) {
-                      prefs.setBool('isSkip',true);
-                      if (prefs.getBool('is_login')!=null&&prefs.getBool('is_login') == true) {
+                      prefs.setBool('isSkip', true);
+                      if (prefs.getBool('is_login') != null &&
+                          prefs.getBool('is_login') == true) {
                         Navigator.of(context).pushReplacementNamed('/HomePage');
                       } else {
-                        Navigator.of(context).pushReplacementNamed('/LoginScreen');
+                        Navigator.of(context)
+                            .pushReplacementNamed('/LoginScreen');
                       }
                     }
                     if (currentTab == 3 && widget.isFromHome) {

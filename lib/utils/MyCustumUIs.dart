@@ -4,6 +4,8 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:recharge_now/common/AllStrings.dart';
 import 'package:recharge_now/common/myStyle.dart';
 
+import 'Dimens.dart';
+
 dropDown() {
   return DropdownButton<String>(
     items: <String>['+91', '+1', '+87', '+76'].map((String value) {
@@ -267,39 +269,39 @@ Widget appBarView(
     bool isEnableBack = false,
     BuildContext context}) {
   return Container(
-    height: 110,
+    height: Dimens.oneThirty,
     width: MediaQuery.of(context).size.width,
     alignment: Alignment.center,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.only(
-        bottomLeft: Radius.circular(15.0),
-        bottomRight: Radius.circular(15.0),
+        bottomLeft: Radius.circular(Dimens.eighteen),
+        bottomRight: Radius.circular(Dimens.eighteen),
       ),
       color: Colors.white,
       boxShadow: [
         BoxShadow(
             color: Colors.black.withOpacity(0.1),
             offset: Offset(0, 4),
-            blurRadius: 8.0)
+            blurRadius: Dimens.ten)
       ],
     ),
     child: Stack(
       children: <Widget>[
         Positioned(
-          left: 12,
-          top: 53,
+          left: Dimens.fifteen,
+          top: Dimens.fiftySeven,
           child: SizedBox(
-            height: 50,
-            width: 50,
+            height: Dimens.fiftyFive,
+            width: Dimens.fiftyFive,
             child: FlatButton(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16))),
-              padding: const EdgeInsets.only(
-                  top: 12, bottom: 12, left: 12, right: 12),
+                  borderRadius: BorderRadius.all(Radius.circular(Dimens.eighteen))),
+              padding:  EdgeInsets.only(
+                  top: Dimens.forteen, bottom: Dimens.forteen, left: Dimens.forteen, right: Dimens.forteen),
               child: Image.asset(
                 'assets/images/back.png',
-                height: 15,
-                width: 16,
+                height: Dimens.eighteen,
+                width: Dimens.nineteen,
               ),
               onPressed: callback,
             ),
@@ -313,13 +315,87 @@ Widget appBarView(
             alignment: Alignment.center,
             child: Padding(
               padding: EdgeInsets.only(
-                top: 59,
-                bottom: 23,
+                top: Dimens.sixtyFive,
+                bottom: Dimens.twentyFive,
               ),
               child: Text(
                 name,
                 textAlign: TextAlign.center,
-                style: appBarTitleStyle,
+                style: TextStyle(
+                    fontFamily: fontFamily,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF28272C),
+                    fontSize: Dimens.seventeen,
+                    height: 1.9),
+              ),
+            ),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+Widget appBarViewCross(
+    {String name,
+      VoidCallback callback,
+      bool isEnableBack = false,
+      BuildContext context}) {
+  return Container(
+    height: Dimens.oneThirty,
+    width: MediaQuery.of(context).size.width,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(Dimens.eighteen),
+        bottomRight: Radius.circular(Dimens.eighteen),
+      ),
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: Offset(0, 4),
+            blurRadius: Dimens.ten)
+      ],
+    ),
+    child: Stack(
+      children: <Widget>[
+        Positioned(
+          left: Dimens.fifteen,
+          top: Dimens.fiftySeven,
+          child: SizedBox(
+            height: Dimens.fiftyFive,
+            width: Dimens.fiftyFive,
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(Dimens.eighteen))),
+              padding:  EdgeInsets.only(
+                  top: Dimens.forteen, bottom: Dimens.forteen, left: Dimens.forteen, right: Dimens.forteen),
+              child: Icon(Icons.clear),
+              onPressed: callback,
+            ),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          child: Container(
+            width: MediaQuery.of(context).size.width - 125,
+            alignment: Alignment.center,
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: Dimens.sixtyFive,
+                bottom: Dimens.twentyFive,
+              ),
+              child: Text(
+                name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: fontFamily,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF28272C),
+                    fontSize: Dimens.seventeen,
+                    height: 1.9),
               ),
             ),
           ),
@@ -429,7 +505,8 @@ Widget appBarViewEndBtn(
             width: 50,
             child: Center(
               child: FlatButton(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(50))),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
                 onPressed: callback,
                 padding: EdgeInsets.all(12),
                 child: Center(
@@ -484,9 +561,8 @@ Widget appBar({String name, VoidCallback callback, bool isEnableBack = false}) {
 Widget buttonView({String text = "NEXT", GestureTapCallback callback}) {
   return GestureDetector(
       child: Container(
-        padding: EdgeInsets.all(0),
+        padding: EdgeInsets.only(top: Dimens.fifteen, bottom: Dimens.fifteen),
         alignment: Alignment.center,
-        height: 48,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: <Color>[
@@ -495,12 +571,17 @@ Widget buttonView({String text = "NEXT", GestureTapCallback callback}) {
             ],
           ),
           borderRadius: BorderRadius.all(
-            Radius.circular(50.0),
+            Radius.circular(Dimens.sixty),
           ),
         ),
         child: Text(
           text.toUpperCase(),
-          style: sliderButtonTextStyle,
+          style: TextStyle(
+              fontFamily: fontFamily,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              fontSize: Dimens.sixteen,
+              height: 1.4),
         ),
         width: double.infinity,
       ),
@@ -567,4 +648,23 @@ Widget buttonGreyView(
         ),
       ),
       onTap: callback);
+}
+
+openDialogWithSlideInAnimation({BuildContext context, Widget itemWidget}) {
+  showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionBuilder: (context, a1, a2, widget) {
+        return Transform.scale(
+          scale: a1.value,
+          child: Opacity(
+            opacity: a1.value,
+            child: itemWidget,
+          ),
+        );
+      },
+      transitionDuration: Duration(milliseconds: 200),
+      barrierDismissible: true,
+      barrierLabel: '',
+      pageBuilder: (context, animation1, animation2) {});
 }

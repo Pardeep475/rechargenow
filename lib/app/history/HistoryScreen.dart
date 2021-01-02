@@ -5,12 +5,14 @@ import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/models/history_list_model.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/MyUtils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,16 +24,13 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-
-
   Completer<GoogleMapController> _controller = Completer();
   SharedPreferences prefs;
-  List<History> historyList ;
+  List<History> historyList;
 
   @override
   void initState() {
     super.initState();
-
 
     loadShredPref();
   }
@@ -46,12 +45,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: Column(
             children: <Widget>[
               appBarView(
-                  name: "HISTORY",
+                  name: AppLocalizations.of(context).translate('HISTORY'),
                   context: context,
                   callback: () {
                     Navigator.pop(context);
                   }),
-             historyList==null?Expanded(child: Center(child: CircularProgressIndicator())) :historyList.length==0?listEmptyUI():stickyListView()
+              historyList == null
+                  ? Expanded(child: Center(child: CircularProgressIndicator()))
+                  : historyList.length == 0
+                      ? listEmptyUI()
+                      : stickyListView()
             ],
           )),
     );
@@ -61,28 +64,31 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Expanded(
       child: Column(
         children: [
-          Image.asset('assets/images/emptyhistory.png',fit: BoxFit.cover,),
+          Image.asset(
+            'assets/images/emptyhistory.png',
+            fit: BoxFit.cover,
+          ),
           // SvgPicture.asset(
           //   'assets/images/emptyhistory.svg',
           //   allowDrawingOutsideViewBox: true,
           // ),
           Text(
-            "There is no history yet",
+            AppLocalizations.of(context).translate('There is no history yet'),
             textAlign: TextAlign.center,
             style: sliderTitleTextStyle,
           ),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           Text(
-            "As soon as you rent your first Powerbank, you\n will see here all information about renting",
+            AppLocalizations.of(context).translate('as soon as you rent'),
             textAlign: TextAlign.center,
             style: subTitleTextStyle,
           ),
         ],
       ),
     );
-
   }
-
 
   Widget bodyUI_WithApi_listView(BuildContext context) {
     return Expanded(
@@ -92,58 +98,61 @@ class _HistoryScreenState extends State<HistoryScreen> {
           itemBuilder: (context, index) {
             //Datum datum = eventList.data[index];
             return Container(
-
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: () {
-
-                  },
-                  child:
-                  index == 0 || index == 6
-                      ? Container( padding: EdgeInsets.only(left: screenPadding,top:10, right: screenPadding),
-                    child: Text(
-                        index == 0 ? "MARCH 2020" : "FEBRUARY 2020",
-                        style: historyTitleTextStyle),
-                  )
-                  :Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Padding(
-                        padding: EdgeInsets.only(left: screenPadding, right: screenPadding),
-                        child: Divider(
-                          color: Colors.grey.withOpacity(0.3),
-                          thickness: 1,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: screenPadding, right: screenPadding),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  onTap: () {},
+                  child: index == 0 || index == 6
+                      ? Container(
+                          padding: EdgeInsets.only(
+                              left: screenPadding,
+                              top: 10,
+                              right: screenPadding),
+                          child: Text(
+                              index == 0 ? "MARCH 2020" : "FEBRUARY 2020",
+                              style: historyTitleTextStyle),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "19 March",
-                              style: appBarTitleStyle,
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: screenPadding, right: screenPadding),
+                              child: Divider(
+                                color: Colors.grey.withOpacity(0.3),
+                                thickness: 1,
+                              ),
                             ),
-                            Text(
-                              "0,00 Rs",
-                              style: appBarTitleStyle,
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: screenPadding, right: screenPadding),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "19 March",
+                                    style: appBarTitleStyle,
+                                  ),
+                                  Text(
+                                    "0,00 Rs",
+                                    style: appBarTitleStyle,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: screenPadding, right: screenPadding),
+                              child: Text(
+                                "18-15 18-15",
+                                style: addBtnTextStyle,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: screenPadding, right: screenPadding),
-                        child: Text(
-                          "18-15 18-15",
-                          style: addBtnTextStyle,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             );
@@ -151,14 +160,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-
-  stickyListView(){
+  stickyListView() {
     return Expanded(
       child: StickyGroupedListView<History, String>(
         elements: newHostry,
         order: StickyGroupedListOrder.ASC,
-        groupBy: (History element) =>
-        element.monthYear,
+        groupBy: (History element) => element.monthYear,
         groupComparator: (String value1, String value2) =>
             value2.compareTo(value1),
         itemComparator: (History element1, History element2) =>
@@ -180,29 +187,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         itemBuilder: (_, History element) {
           return InkWell(
-            onTap: (){
-              showBottomSheet(context,element);
+            onTap: () {
+              showBottomSheet(context, element);
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Padding(
-                  padding: EdgeInsets.only(left: screenPadding, right: screenPadding),
+                  padding: EdgeInsets.only(
+                      left: screenPadding, right: screenPadding),
                   child: Divider(
                     color: Colors.grey.withOpacity(0.3),
                     thickness: 1,
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: screenPadding, right: screenPadding),
+                  padding: EdgeInsets.only(
+                      left: screenPadding, right: screenPadding),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        element.transactionDate,
+                        '${dateConvertMainTitle(element.rentalDate)}',
                         style: appBarTitleStyle,
                       ),
                       Text(
@@ -213,9 +221,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: screenPadding, right: screenPadding),
+                  padding: EdgeInsets.only(
+                      left: screenPadding, right: screenPadding),
                   child: Text(
-                    "${element.locationName}",
+                    "${startTimeAndEndTime(element.rentalDate, element.transactionDate)}",
                     style: addBtnTextStyle,
                   ),
                 ),
@@ -227,119 +236,207 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  String startTimeAndEndTime(String startDate, String endDate) {
+    DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat targetFormat = new DateFormat("h:mm");
+    DateTime dateStart = originalFormat.parse(startDate);
+    DateTime dateEnd = originalFormat.parse(endDate);
+    String formattedStartDate = targetFormat.format(dateStart.toLocal());
+    String formattedEndDate = targetFormat.format(dateEnd.toLocal());
+
+    return "$formattedStartDate - $formattedEndDate";
+  }
+
+  String dateConvertMainTitle(String value) {
+    DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat targetFormat = new DateFormat("dd MMMM");
+    DateTime date = originalFormat.parse(value);
+    String formattedDate = targetFormat.format(date.toLocal());
+    return formattedDate;
+  }
+
+  String dateConvert(String value) {
+    DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat targetFormat = new DateFormat("dd.MM.yyyy");
+    DateTime date = originalFormat.parse(value);
+    String formattedDate = targetFormat.format(date.toLocal());
+    return formattedDate;
+  }
+
+  String dateConvertStartEnd(String value) {
+    DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat targetFormat = new DateFormat("h:mm a / MMM yyyy dd");
+    DateTime date = originalFormat.parse(value);
+    String formattedDate = targetFormat.format(date.toLocal());
+    return formattedDate;
+  }
+
   void showBottomSheet(BuildContext context, History history) {
     showModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.transparent,
         builder: (BuildContext context) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15.0),
-                topRight: Radius.circular(15.0),
-              ),
-            ),
-            padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-            child: Center(
-              child: Wrap(
-                children: <Widget>[
-                  Text(
-                    "Rental-ID ",
-                    style: appBarTitleStyle,
+          return Wrap(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(Dimens.fifteen),
+                    topRight: Radius.circular(Dimens.fifteen),
                   ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Divider(
-                    color: Colors.grey.withOpacity(0.3),
-                    thickness: 1,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Station-ID",
-                        style: drawerTitleStyle,
-                      ),
-                      Text(
-                        history.stationNumber,
-                        style: addBtnTextStyle,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Powerbank-ID",
-                        style: drawerTitleStyle,
-                      ),
-                      Text(
-                        history.powerbankNumber,
-                        style: addBtnTextStyle,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Start",
-                        style: drawerTitleStyle,
-                      ),
-                      Text(
-
-                        history.rentalDate,//16:25 Uhr / 01.09.2020
-                        style: addBtnTextStyle,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "End",
-                        style: drawerTitleStyle,
-                      ),
-                      Text(
-                        history.transactionDate,//16:25 Uhr / 01.09.2020
-                        style: addBtnTextStyle,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  GestureDetector(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.only(
-                            left: 10, right: 10, top: 20, bottom: 20),
-                        padding: EdgeInsets.only(
-                            left: screenPadding, right: screenPadding),
-                        alignment: Alignment.center,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: <Color>[
-                              Color(0xFF54DF6C),
-                              Color(0xFF54DF83),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(50.0),
+                ),
+                padding: EdgeInsets.only(
+                    left: Dimens.twenty,
+                    right: Dimens.twenty,
+                    bottom: Dimens.twenty),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      height: Dimens.fifteen,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Center(
+                        child: Container(
+                          height: Dimens.five,
+                          width: Dimens.seventySeven,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFEBEBEB),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(Dimens.fifteen),
+                            ),
                           ),
                         ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: Dimens.sixteen,
+                    ),
+                    Text(
+                      "RENTAL-ID ${history.id}",
+                      style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2F2F2F),
+                          fontSize: Dimens.forteen,
+                          height: 1.2),
+                    ),
+                    SizedBox(
+                      height: Dimens.forteen,
+                    ),
+                    Divider(
+                      color: Colors.grey.withOpacity(0.3),
+                      thickness: 1,
+                    ),
+                    SizedBox(
+                      height: Dimens.eleven,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Station-ID",
+                          style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2F2F2F),
+                              fontSize: Dimens.forteen,
+                              height: 1.2),
+                        ),
+                        Text(
+                          "#${history.stationNumber}",
+                          style: addBtnTextStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimens.four,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Powerbank-ID",
+                          style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2F2F2F),
+                              fontSize: Dimens.forteen,
+                              height: 1.2),
+                        ),
+                        Text(
+                          "#${history.powerbankNumber}",
+                          style: addBtnTextStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimens.four,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Start",
+                          style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2F2F2F),
+                              fontSize: Dimens.forteen,
+                              height: 1.2),
+                        ),
+                        Text(
+                          dateConvertStartEnd(history.rentalDate),
+                          //16:25 Uhr / 01.09.2020history.rentalDate,//16:25 Uhr / 01.09.2020
+                          style: addBtnTextStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimens.four,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "End",
+                          style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2F2F2F),
+                              fontSize: Dimens.forteen,
+                              height: 1.2),
+                        ),
+                        Text(
+                          dateConvertStartEnd(history.transactionDate),
+                          //16:25 Uhr / 01.09.2020
+                          style: addBtnTextStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimens.twenty,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.only(
+                          left: screenPadding, right: screenPadding),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: <Color>[
+                            Color(0xFF54DF6C),
+                            Color(0xFF54DF83),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(Dimens.fifty),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: Dimens.twelve),
                         child: Row(
                           children: [
                             Text(
@@ -348,65 +445,84 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             ),
                             Spacer(),
                             Text(
-                              history.rentalTime,//2d : 23h : 28m
+                              history.rentalTime, //2d : 23h : 28m
                               style: sliderButtonTextStyle,
                             ),
                           ],
                         ),
                       ),
-                      onTap: () {}),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    "LOCATION",
-                    style: appBarTitleStyle,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Divider(
-                    color: Colors.grey.withOpacity(0.3),
-                    thickness: 1,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        history.locationName,
-                        style: drawerTitleStyle,
-                      ),
-                      Text(
-                        "#${history.locationName}",
-                        style: addBtnTextStyle,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Abegegeben",
-                        style: drawerTitleStyle,
-                      ),
-                      Text(
-                        "${history.returnLocationName}",
-                        style: addBtnTextStyle,
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    SizedBox(
+                      height: Dimens.twelve,
+                    ),
+                    Text(
+                      "LOCATION",
+                      style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2F2F2F),
+                          fontSize: Dimens.forteen,
+                          height: 1.2),
+                    ),
+                    SizedBox(
+                      height: Dimens.forteen,
+                    ),
+                    Divider(
+                      color: Colors.grey.withOpacity(0.3),
+                      thickness: 1,
+                    ),
+                    SizedBox(
+                      height: Dimens.eleven,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          history.locationName,
+                          style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2F2F2F),
+                              fontSize: Dimens.forteen,
+                              height: 1.2),
+                        ),
+                        Text(
+                          "#${history.locationName}",
+                          style: addBtnTextStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimens.four,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Abegegeben",
+                          style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF2F2F2F),
+                              fontSize: Dimens.forteen,
+                              height: 1.2),
+                        ),
+                        Text(
+                          "${history.returnLocationName}",
+                          style: addBtnTextStyle,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: Dimens.thirtyThree,
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           );
         });
   }
-
-
-
 
   getHistoryApi() {
     var apicall = getUserHistoryApi(
@@ -419,63 +535,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         HistoryListPojo stationsListPojo =
             HistoryListPojo.fromJson(jsonResponse);
         historyList = stationsListPojo.history;
-
-        /*if(historyList.length==0){
-          var json= {
-            "status": 1,
-            "message": "Success",
-            "history": [
-              {
-                "id": 1,
-                "locationName": "Street B",
-                "transactionDate": "15 Feb 2020",
-                "rentalTime": "1:25 Hours",
-                "longitude": "76.7626477",
-                "latitude": "30.7320825",
-                "type": "Rental",
-                "paymentStatus": "Success",
-                "totalAmount": "1.50 €"
-              },
-              {
-                "id": 2,
-                "locationName": "Street B",
-                "transactionDate": "16 Jan 2020",
-                "rentalTime": "1:25 Hours",
-                "longitude": "76.7626477",
-                "latitude": "30.7320825",
-                "type": "NewRental",
-                "paymentStatus": "Success",
-                "totalAmount": "2.50 €"
-              },
-              {
-                "id": 3,
-                "locationName": "Street B",
-                "transactionDate": "16 Jun 2020",
-                "rentalTime": "1:25 Hours",
-                "longitude": "76.7626477",
-                "latitude": "30.7320825",
-                "type": "NewRental",
-                "paymentStatus": "Success",
-                "totalAmount": "2.50 €"
-              },
-              {
-                "id": 3,
-                "locationName": "Street B",
-                "transactionDate": "16 Feb 2020",
-                "rentalTime": "1:25 Hours",
-                "longitude": "76.7626477",
-                "latitude": "30.7320825",
-                "type": "NewRental",
-                "paymentStatus": "Success",
-                "totalAmount": "2.50 €"
-              }
-            ]
-          };
-           stationsListPojo =
-          HistoryListPojo.fromJson(json);
-          historyList = stationsListPojo.history;
-
-        }*/
         groupByDate();
         setState(() {});
       } else {
@@ -487,28 +546,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-  HashMap<String, History> historyMapList=HashMap();
+  HashMap<String, History> historyMapList = HashMap();
+
   void loadShredPref() async {
     prefs = await SharedPreferences.getInstance();
     print("prefsuserId ${prefs.get('userId')}");
     await getHistoryApi();
-
-
-
   }
-  List<History> newHostry=[];
-  void groupByDate() {
 
+  String dateConverGroupByDate(String value) {
+    DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat targetFormat = new DateFormat("dd MMMM yyyy");
+    DateTime date = originalFormat.parse(value);
+    String formattedDate = targetFormat.format(date.toLocal());
+    return formattedDate;
+  }
+
+  List<History> newHostry = [];
+
+  void groupByDate() {
     historyList.forEach((element) {
-      var arr=element.transactionDate.split(" ");
-      var monthYear=arr[1]+" "+arr[2];
+      var transacion = dateConverGroupByDate(element.transactionDate);
+      var arr = transacion.split(" ");
+      var monthYear = arr[1] + " " + arr[2];
       print("monthYear$monthYear");
-      element.monthYear=monthYear;
+      element.monthYear = monthYear;
       newHostry.add(element);
     });
-    setState(() {
-
-    });
+    setState(() {});
     /*var groupByDate = groupBy(historyList, (obj) => obj['transactionDate'].substring(3, 10));
     groupByDate.forEach((date, list) {
       // Header

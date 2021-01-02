@@ -258,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  "CHANGE LANGUAGE",
+                  AppLocalizations.of(context).translate('change language').toUpperCase(),
                   style: loginDetailText,
                 ),
                 Expanded(

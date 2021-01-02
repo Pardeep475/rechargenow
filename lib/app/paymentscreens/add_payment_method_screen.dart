@@ -11,16 +11,18 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:recharge_now/app/paymentscreens/payment_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class AddPaymentMethodInitialScreen extends StatefulWidget {
   @override
-  _AddPaymentMethodInitialScreenState createState() => _AddPaymentMethodInitialScreenState();
+  _AddPaymentMethodInitialScreenState createState() =>
+      _AddPaymentMethodInitialScreenState();
 }
 
-class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialScreen> {
+class _AddPaymentMethodInitialScreenState
+    extends State<AddPaymentMethodInitialScreen> {
   SharedPreferences prefs;
   var digitComplete = false;
   bool _saving = false;
@@ -29,6 +31,7 @@ class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialS
     prefs = await SharedPreferences.getInstance();
   }
 
+//PaymentSmall
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +43,8 @@ class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialS
               child: Column(
                 children: <Widget>[
                   appBarView(
-                      name: "Zahlung",
+                      name: AppLocalizations.of(context)
+                          .translate('PaymentSmall'),
                       context: context,
                       callback: () {
                         Navigator.pop(context);
@@ -54,21 +58,36 @@ class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialS
                     margin: EdgeInsets.only(
                         left: screenPadding, right: screenPadding),
                     child: Text(
-                      AppLocalizations.of(context).translate('ADD PAYMENT METHOD'),
-                      style: sliderTitleTextStyle,
+                      AppLocalizations.of(context)
+                          .translate('ADD PAYMENT METHOD'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontWeight: FontWeight.w600,
+                          fontSize: Dimens.twentyThree,
+                          color: Color(0xFF28272C),
+                          height: 1.4),
                     ),
                   ),
                   Container(
                     margin: EdgeInsets.only(
-                        top: 13, left: screenPadding, right: screenPadding),
+                        top: Dimens.twenty,
+                        left: screenPadding,
+                        right: screenPadding),
                     child: Text(
-                      AppLocalizations.of(context).translate('paymentMETHODDESC'),
+                      AppLocalizations.of(context)
+                          .translate('paymentMETHODDESC'),
                       textAlign: TextAlign.center,
-                      style: locationTitleStyle,
+                      style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontWeight: FontWeight.w400,
+                          fontSize: Dimens.fifteen,
+                          color: Color(0xFF686868),
+                          height: 1.4),
                     ),
                   ),
                   SizedBox(
-                    height: 30,
+                    height: Dimens.thirtyFive,
                   ),
                   Container(
                     height: MediaQuery.of(context).size.width * .50,
@@ -76,48 +95,60 @@ class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialS
                     child: Image.asset("assets/images/add_card.png"),
                   ),
                   SizedBox(
-                    height: 30,
+                    height: Dimens.thirtyFive,
                   ),
                   Container(
-                    padding: EdgeInsets.all(5),
+                    padding: EdgeInsets.all(Dimens.eight),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Image.asset(
                           "assets/images/tick.png",
-                          height: 20,
-                          width: 20,
+                          height: Dimens.eighteen,
+                          width: Dimens.eighteen,
                         ),
                         Expanded(
                             child: Container(
-                              padding: EdgeInsets.only(left: 8),
-                              child: Text(
-                                "Different payment methods",
-                                textAlign: TextAlign.start,
-                                style: locationTitleStyle,
-                              ),
-                            ))
+                          padding: EdgeInsets.only(left: Dimens.ten),
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate('Different payment methods'),
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontFamily: fontFamily,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF686868),
+                                fontSize: Dimens.fifteen,
+                                height: 1.2),
+                          ),
+                        ))
                       ],
                     ),
                     margin: EdgeInsets.only(
                         left: screenPadding, right: screenPadding),
                   ),
                   Container(
-                    padding: EdgeInsets.all(5),
+                    padding: EdgeInsets.all(Dimens.eight),
                     child: Row(
                       children: [
                         Image.asset(
                           "assets/images/tick.png",
-                          height: 20,
-                          width: 20,
+                          height: Dimens.eighteen,
+                          width: Dimens.eighteen,
                         ),
                         Expanded(
                           child: Container(
-                            padding: EdgeInsets.only(left: 8),
+                            padding: EdgeInsets.only(left: Dimens.ten),
                             child: Text(
-                              "No deposit required",
+                              AppLocalizations.of(context)
+                                  .translate('No saftey deposit required'),
                               textAlign: TextAlign.start,
-                              style: locationTitleStyle,
+                              style: TextStyle(
+                                  fontFamily: fontFamily,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF686868),
+                                  fontSize: Dimens.fifteen,
+                                  height: 1.2),
                             ),
                           ),
                         )
@@ -127,21 +158,27 @@ class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialS
                         left: screenPadding, right: screenPadding),
                   ),
                   Container(
-                    padding: EdgeInsets.all(5),
+                    padding: EdgeInsets.all(Dimens.eight),
                     child: Row(
                       children: [
                         Image.asset(
                           "assets/images/tick.png",
-                          height: 20,
-                          width: 20,
+                          height: Dimens.eighteen,
+                          width: Dimens.eighteen,
                         ),
                         Expanded(
                           child: Container(
-                            padding: EdgeInsets.only(left: 8),
+                            padding: EdgeInsets.only(left: Dimens.ten),
                             child: Text(
-                              "Different payment methods",
+                              AppLocalizations.of(context)
+                                  .translate('Secure payment transactions'),
                               textAlign: TextAlign.start,
-                              style: locationTitleStyle,
+                              style: TextStyle(
+                                  fontFamily: fontFamily,
+                                  fontWeight: FontWeight.w400,
+                                  color: Color(0xFF686868),
+                                  fontSize: Dimens.fifteen,
+                                  height: 1.2),
                             ),
                           ),
                         )
@@ -151,18 +188,22 @@ class _AddPaymentMethodInitialScreenState extends State<AddPaymentMethodInitialS
                         left: screenPadding, right: screenPadding),
                   ),
                   SizedBox(
-                    height: 50,
+                    height: Dimens.sixty,
                   ),
                   Container(
-                    child: buttonView(callback: () {
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => Payments()));
-                    }),
+                    child: buttonView(
+                        text: AppLocalizations.of(context).translate('Next'),
+                        callback: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Payments()));
+                        }),
                     margin: EdgeInsets.only(
                         left: screenPadding, right: screenPadding),
                   ),
                   SizedBox(
-                    height: 50,
+                    height: Dimens.sixty,
                   ),
                 ],
               ),

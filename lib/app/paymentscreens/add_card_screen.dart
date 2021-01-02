@@ -26,9 +26,9 @@ class AddCardState extends State<AddCard> {
   String creditCardNumber = "", expriryDate = "", cvv;
   int month, year;
   SharedPreferences prefs;
-  TextEditingController cardHolderName=TextEditingController();
-  TextEditingController carNumberControler=TextEditingController();
-  TextEditingController cardDueDateController=TextEditingController();
+  TextEditingController cardHolderName = TextEditingController();
+  TextEditingController carNumberControler = TextEditingController();
+  TextEditingController cardDueDateController = TextEditingController();
 
   @override
   void initState() {
@@ -46,7 +46,8 @@ class AddCardState extends State<AddCard> {
           child: Column(
             children: <Widget>[
               appBarView(
-                  name: "ADD CREDIT CARD",
+                  name:
+                      AppLocalizations.of(context).translate("Add Credit Card"),
                   context: context,
                   callback: () {
                     Navigator.pop(context);
@@ -60,7 +61,7 @@ class AddCardState extends State<AddCard> {
                     boxShadow: [
                       BoxShadow(
                         blurRadius: 10,
-                        offset: Offset(0,4),
+                        offset: Offset(0, 4),
                         color: Color(0xff7174DF).withOpacity(0.44),
                       )
                     ],
@@ -76,7 +77,7 @@ class AddCardState extends State<AddCard> {
                       child: Image.asset("asssts/images/card_view,png"),
                     ),
                     Text(
-                      "Card number",
+                      AppLocalizations.of(context).translate("Card number"),
                       style: cardTextStyle,
                     ),
                     Text(
@@ -98,7 +99,8 @@ class AddCardState extends State<AddCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Holder Name",
+                                  AppLocalizations.of(context)
+                                      .translate("Card holder"),
                                   style: cardTextStyle,
                                 ),
                                 Text(
@@ -115,7 +117,8 @@ class AddCardState extends State<AddCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Valid until",
+                                  AppLocalizations.of(context)
+                                      .translate("Valid until"),
                                   style: cardTextStyle,
                                 ),
                                 Text(
@@ -141,7 +144,10 @@ class AddCardState extends State<AddCard> {
                         child: Container(
                             margin: EdgeInsets.fromLTRB(
                                 screenPadding, 24, screenPadding, 7),
-                            child: Text("Card Number", style: loginDetailText)),
+                            child: Text(
+                                AppLocalizations.of(context)
+                                    .translate("CARD NUMBER"),
+                                style: loginDetailText)),
                       ),
                       Container(
                         decoration: MyUtils.showRoundCornerDecoration(),
@@ -187,12 +193,12 @@ class AddCardState extends State<AddCard> {
               ),
               Container(
                 child: buttonView(
-                    text: "Add  Card",
+                    text: AppLocalizations.of(context).translate('Add Card'),
                     callback: () {
                       _ValidateForm();
                     }),
                 margin:
-                EdgeInsets.only(left: screenPadding, right: screenPadding),
+                    EdgeInsets.only(left: screenPadding, right: screenPadding),
               ),
               SizedBox(
                 height: 50,
@@ -207,111 +213,115 @@ class AddCardState extends State<AddCard> {
   secondUI() {
     return Container(
         child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                        margin:
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                    margin:
                         EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 7),
-                        child: Text("Expiration Date", style: loginDetailText)),
-                  ),
-                  Container(
-                    decoration: MyUtils.showRoundCornerDecoration(),
-                    margin: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 5),
-                    padding: EdgeInsets.only(left: 10),
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-
-                      style: addCardStyle,
-                      // cursorColor: Colors.greenAccent,
-                      // cursorRadius: Radius.circular(16.0),
-                      // cursorWidth: 16.0,
-                      validator: CardUtils.validateDate,
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter.digitsOnly,
-                        new LengthLimitingTextInputFormatter(4),
-                        new CardMonthInputFormatter()
-                      ],
-
-                      decoration: InputDecoration(
-                          hintText: "MM/YY",
-                          border: InputBorder.none,
-                          hintStyle: addCardStyle,
-                          // labelText: "Credit Card",
-                          fillColor: Colors.deepOrange,
-                          focusColor: Colors.deepOrange,
-                          hoverColor: Colors.deepOrange),
-
-                      onSaved: (text) {
-                        expriryDate = text;
-                        List<int> expiryDate = CardUtils.getExpiryDate(text);
-                        month = expiryDate[0];
-                        year = expiryDate[1];
-                        print(month);
-                        print(year);
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                ],
+                    child: Text(
+                        AppLocalizations.of(context).translate("ValidTill"),
+                        style: loginDetailText)),
               ),
-            ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                        margin:
+              Container(
+                decoration: MyUtils.showRoundCornerDecoration(),
+                margin: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 5),
+                padding: EdgeInsets.only(left: 10),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+
+                  style: addCardStyle,
+                  // cursorColor: Colors.greenAccent,
+                  // cursorRadius: Radius.circular(16.0),
+                  // cursorWidth: 16.0,
+                  validator: CardUtils.validateDate,
+                  inputFormatters: [
+                    WhitelistingTextInputFormatter.digitsOnly,
+                    new LengthLimitingTextInputFormatter(4),
+                    new CardMonthInputFormatter()
+                  ],
+
+                  decoration: InputDecoration(
+                      hintText: "MM/YY",
+                      border: InputBorder.none,
+                      hintStyle: addCardStyle,
+                      // labelText: "Credit Card",
+                      fillColor: Colors.deepOrange,
+                      focusColor: Colors.deepOrange,
+                      hoverColor: Colors.deepOrange),
+
+                  onSaved: (text) {
+                    expriryDate = text;
+                    List<int> expiryDate = CardUtils.getExpiryDate(text);
+                    month = expiryDate[0];
+                    year = expiryDate[1];
+                    print(month);
+                    print(year);
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                    margin:
                         EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 7),
-                        child: Text("CVV", style: loginDetailText)),
-                  ),
-                  Container(
-                    decoration: MyUtils.showRoundCornerDecoration(),
-                    margin: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 7),
-                    padding: EdgeInsets.only(left: 10),
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      //maxLength: 3,
-                      style: TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.normal),
-                      // cursorColor: Colors.greenAccent,
-                      // cursorRadius: Radius.circular(16.0),
-                      // cursorWidth: 16.0,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return AppLocalizations.of(context).translate("This field is required");
-                        }
-                        if (value.length < 3 || value.length > 3) {
-                          return "CVV ist ungültig";
-                        }
-                        return null;
-                      },
-
-                      decoration: InputDecoration(
-                          hintText: "123",
-                          border: InputBorder.none,
-                          hintStyle: addCardStyle,
-                          // labelText: "Credit Card",
-                          fillColor: Colors.deepOrange,
-                          focusColor: Colors.deepOrange,
-                          hoverColor: Colors.deepOrange),
-
-                      onSaved: (text) {
-                        cvv = text;
-                      },
-                    ),
-                  ),
-                ],
+                    child: Text(AppLocalizations.of(context).translate("CVV"),
+                        style: loginDetailText)),
               ),
-            ),
-          ],
-        ));
+              Container(
+                decoration: MyUtils.showRoundCornerDecoration(),
+                margin: EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 7),
+                padding: EdgeInsets.only(left: 10),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
+                  //maxLength: 3,
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.normal),
+                  // cursorColor: Colors.greenAccent,
+                  // cursorRadius: Radius.circular(16.0),
+                  // cursorWidth: 16.0,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      // return AppLocalizations.of(context).translate("This field is required");
+                      return "Bitte Pflichtfeld ausfüllen";
+                    }
+                    if (value.length < 3 || value.length > 3) {
+                      return "CVV ist ungültig";
+                    }
+                    return null;
+                  },
+
+                  decoration: InputDecoration(
+                      hintText: "123",
+                      border: InputBorder.none,
+                      hintStyle: addCardStyle,
+                      // labelText: "Credit Card",
+                      fillColor: Colors.deepOrange,
+                      focusColor: Colors.deepOrange,
+                      hoverColor: Colors.deepOrange),
+
+                  onSaved: (text) {
+                    cvv = text;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ));
   }
 
   void _ValidateForm() {

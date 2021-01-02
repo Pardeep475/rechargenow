@@ -8,11 +8,17 @@ class MyConstants {
 
  //start of change the app language
 
-
-
-
   //onLocaleChange(Locale(languagesMap["English"]));
   static double currentLat=52.520008,currentLong=13.404954;
+
+  static const String SOMETHING_WRONG = 'SOMETHING_WRONG';
+  static const String POWERBANK_RENTED_ALREADY = 'POWERBANK_RENTED_ALREADY';
+  static const String POWERBANK_RETURNED = 'POWERBANK_RETURNED';
+  static const String POWERBANK_RETURNED_MSG = 'POWERBANK_RETURNED_MSG';
+  static const String RENTAL_PERIOD_EXCEEDED = 'RENTAL_PERIOD_EXCEEDED';
+  static const String POWERBANK_SOLD_MSG = 'POWERBANK_SOLD_MSG';
+  static const String STATION_OFFLINE = 'STATION_OFFLINE';
+
 
 }
 

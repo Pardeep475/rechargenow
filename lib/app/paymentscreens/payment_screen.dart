@@ -9,14 +9,15 @@ import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/app/paymentscreens/add_card_screen.dart';
 import 'package:recharge_now/app/paymentscreens/payment_webview_screen.dart';
 import 'package:recharge_now/common/AllStrings.dart';
+import 'package:recharge_now/common/custom_widgets/common_error_dialog.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/models/CreditCardListPojo.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/MyUtils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 
 class Payments extends StatefulWidget {
   @override
@@ -40,35 +41,34 @@ class PaymentState extends State<Payments> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-
         body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              appBarView(
-                  name: AppLocalizations.of(context).translate("PAYMENTS")
-                      .toUpperCase()
-                      .toUpperCase(),
-                  context: context,
-                  callback: (){
-                    Navigator.pop(context);
-                  },
-                  isEnableBack: true
-              ),
-              SizedBox(height: 12,),
-              cardList(),
-              paypalButtonUI(),
-              //appleButtonUI(),
-              creditCardButtonUI(),
-              paymentText()
-              // callApi()
-            ],
+      child: Column(
+        children: <Widget>[
+          appBarViewCross(
+              name: AppLocalizations.of(context).translate("Payment methods"),
+              context: context,
+              callback: () {
+                Navigator.pop(context);
+              },
+              isEnableBack: true),
+          SizedBox(
+            height: Dimens.fifteen,
           ),
-        ));
+          cardList(),
+          paypalButtonUI(),
+          //appleButtonUI(),
+          creditCardButtonUI(),
+          paymentText()
+          // callApi()
+        ],
+      ),
+    ));
   }
 
   paymentText() {
     return Container(
-      margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
+      margin: EdgeInsets.fromLTRB(
+          Dimens.twentyThree, 0, Dimens.twentyThree, Dimens.twentyThree),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -76,12 +76,14 @@ class PaymentState extends State<Payments> {
             AppLocalizations.of(context).translate("Why add payment method?"),
             textAlign: TextAlign.start,
             style: TextStyle(
-                color: Color(0xff2F2F2F), fontSize: 16,
+                color: Color(0xff2F2F2F),
+                fontSize: Dimens.eighteen,
                 fontFamily: 'Montserrat',
-                height: 1.2,fontWeight: FontWeight.w600),
+                height: 1.2,
+                fontWeight: FontWeight.w600),
           ),
           SizedBox(
-            height: 10,
+            height: Dimens.twelve,
           ),
           Text(
             AppLocalizations.of(context).translate("payment_text"),
@@ -90,7 +92,8 @@ class PaymentState extends State<Payments> {
               color: Color(0xff686868),
               height: 1.4,
               fontFamily: 'Montserrat',
-              fontSize: 14, /*fontWeight: FontWeight.bold*/
+              fontWeight: FontWeight.w400,
+              fontSize: Dimens.fifteen, /*fontWeight: FontWeight.bold*/
             ),
           ),
         ],
@@ -100,19 +103,22 @@ class PaymentState extends State<Payments> {
 
   title() {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 5),
+      padding: EdgeInsets.fromLTRB(Dimens.twentyThree, Dimens.twentyThree,
+          Dimens.twentyThree, Dimens.six),
       child: Text(AppLocalizations.of(context).translate("Payment methods"),
           textAlign: TextAlign.center,
           style: TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: Dimens.twentyThree,
+              fontWeight: FontWeight.bold),
           textDirection: TextDirection.ltr),
     );
   }
 
-  createBillingAgreementApi() {
-    var apicall = getCreateBillingAgreementApi(
-        prefs.get('userId').toString(), prefs.get('accessToken').toString());
-    apicall.then((response) async {
+  createBillingAgreementApi() async {
+    var apicall = await getCreateBillingAgreementApi(
+            prefs.get('userId').toString(), prefs.get('accessToken').toString())
+        .then((response) {
       print(response.body);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -123,41 +129,53 @@ class PaymentState extends State<Payments> {
           Navigator.of(context).pushReplacement(new MaterialPageRoute(
               builder: (BuildContext context) =>
                   PaymentWebviewScreen(finalUrl: agreementURL)));
-        } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(),context);
-        } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          _showAnimatedDialog(jsonResponse['message'].toString());
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showAnimatedDialog(
+            AppLocalizations.of(context).translate("something_went_wrong"));
       }
-    }).catchError((error) {
-      print('error : $error');
+    }).catchError((onError) {
+      _showAnimatedDialog(
+          AppLocalizations.of(context).translate("something_went_wrong"));
     });
+  }
+
+  // AppLocalizations.of(context)
+  //             .translate("something_went_wrong")
+  _showAnimatedDialog(String message) {
+    openDialogWithSlideInAnimation(
+      context: context,
+      itemWidget: CommonErrorDialog(
+        title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+        descriptions:
+            AppLocalizations.of(context).translate("something_went_wrong"),
+        text: AppLocalizations.of(context).translate("Ok"),
+        img: "assets/images/something_went_wrong.svg",
+        double: 37.0,
+        isCrossIconShow: true,
+        callback: () {},
+      ),
+    );
   }
 
   paypalButtonUI() {
     return GestureDetector(
         onTap: () {
-          //callAddCardApi();
           createBillingAgreementApi();
-          // Navigator.of(context).push(new MaterialPageRoute(
-          //     builder: (BuildContext context) => AgreePaypalTermsConditionScreen()));
-          // createBillingAgreementApi();
         },
         child: new Container(
-            height: 45,
+            height: Dimens.fiftyFive,
             width: double.infinity,
-            margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
-            // padding: const EdgeInsets.all(3.0),
-            padding: EdgeInsets.only(left: 10, right: 10),
+            margin: EdgeInsets.fromLTRB(
+                Dimens.twentyThree, Dimens.twelve, Dimens.twentyThree, 0),
+            padding: EdgeInsets.only(left: Dimens.twelve, right: Dimens.twelve),
             decoration: new BoxDecoration(
               //color: Colors.green,
               border: Border.all(color: Colors.black12),
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(10.0),
+              borderRadius: BorderRadius.all(
+                Radius.circular(Dimens.twelve),
               ),
             ),
             child: Row(
@@ -166,21 +184,22 @@ class PaymentState extends State<Payments> {
                 Row(
                   children: <Widget>[
                     Container(
-                      height: 24,
-                      width: 24,
+                      height: Dimens.twentyEight,
+                      width: Dimens.twentyEight,
                       child: SvgPicture.asset(
                         'assets/images/paypal.svg',
                       ),
                     ),
                     SizedBox(
-                      width: 10,
+                      width: Dimens.twelve,
                     ),
                     Container(
-                      child: Text(AppLocalizations.of(context).translate("PayPal"),
+                      child: Text(
+                          AppLocalizations.of(context).translate("PayPal"),
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color(0xff2F2F2F),
-                              fontSize: 14,
+                              fontSize: Dimens.seventeen,
                               fontFamily: 'Montserrat',
                               fontWeight: FontWeight.normal),
                           textDirection: TextDirection.ltr),
@@ -189,70 +208,8 @@ class PaymentState extends State<Payments> {
                 ),
                 Flexible(
                   child: Container(
-                    height: 24,
-                    width: 30,
-                    /* child: SvgPicture.asset(
-                      'assets/images/heart.svg',
-                    ),*/
-                    child: Icon(
-                      Icons.chevron_right,
-                      // size: screenAwareSize(20.0, context),
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
-            )));
-  }
-  appleButtonUI() {
-    return GestureDetector(
-        onTap: () {
-
-        },
-        child: new Container(
-            height: 45,
-            width: double.infinity,
-            margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
-            // padding: const EdgeInsets.all(3.0),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            decoration: new BoxDecoration(
-              //color: Colors.green,
-              border: Border.all(color: Colors.black12),
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(10.0),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      height: 24,
-                      width: 24,
-                      child: SvgPicture.asset(
-                        'assets/images/apple.svg',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      child: Text('Apple Pay',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xff2F2F2F),
-                              fontSize: 14,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.normal),
-                          textDirection: TextDirection.ltr),
-                    ),
-                  ],
-                ),
-                Flexible(
-                  child: Container(
-                    height: 24,
-                    width: 30,
+                    height: Dimens.twentySeven,
+                    width: Dimens.thirtyThree,
                     /* child: SvgPicture.asset(
                       'assets/images/heart.svg',
                     ),*/
@@ -280,21 +237,19 @@ class PaymentState extends State<Payments> {
   creditCardButtonUI() {
     return GestureDetector(
         onTap: () {
-          //callAddCardApi();
           _NavigatetoAddCard();
-          //Navigator.of(context).pushNamed('/Signup');
         },
         child: new Container(
-            height: 45,
+            height: Dimens.fiftyFive,
             width: double.infinity,
-            margin: EdgeInsets.fromLTRB(20, 10, 20, 20),
-            // padding: const EdgeInsets.all(3.0),
-            padding: EdgeInsets.only(left: 10, right: 10),
+            margin: EdgeInsets.fromLTRB(Dimens.twentyThree, Dimens.twelve,
+                Dimens.twentyThree, Dimens.twentyThree),
+            padding: EdgeInsets.only(left: Dimens.twelve, right: Dimens.twelve),
             decoration: new BoxDecoration(
               //color: Colors.green,
               border: Border.all(color: Colors.black12),
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(10.0),
+              borderRadius: BorderRadius.all(
+                Radius.circular(Dimens.twelve),
               ),
             ),
             child: Row(
@@ -303,14 +258,14 @@ class PaymentState extends State<Payments> {
                 Row(
                   children: <Widget>[
                     Container(
-                      height: 24,
-                      width: 24,
+                      height: Dimens.twentyEight,
+                      width: Dimens.twentyEight,
                       child: SvgPicture.asset(
                         'assets/images/menu-payment.svg',
                       ),
                     ),
                     SizedBox(
-                      width: 10,
+                      width: Dimens.twelve,
                     ),
                     Container(
                       child: Text(
@@ -318,9 +273,8 @@ class PaymentState extends State<Payments> {
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               color: Color(0xff2F2F2F),
-                              fontSize: 14,
+                              fontSize: Dimens.seventeen,
                               fontFamily: 'Montserrat',
-
                               fontWeight: FontWeight.normal),
                           textDirection: TextDirection.ltr),
                     ),
@@ -328,14 +282,10 @@ class PaymentState extends State<Payments> {
                 ),
                 Flexible(
                   child: Container(
-                    height: 24,
-                    width: 30,
-                    /* child: SvgPicture.asset(
-                      'assets/images/heart.svg',
-                    ),*/
+                    height: Dimens.twentySeven,
+                    width: Dimens.thirtyThree,
                     child: Icon(
                       Icons.chevron_right,
-                      // size: screenAwareSize(20.0, context),
                       color: Colors.black,
                     ),
                   ),
@@ -346,16 +296,17 @@ class PaymentState extends State<Payments> {
 
   creditCardItemUI(index) {
     return new Container(
-        height: 45,
+        height: Dimens.fiftyFive,
         width: double.infinity,
-        margin: EdgeInsets.fromLTRB(20, 5, 20, 5),
+        margin: EdgeInsets.fromLTRB(
+            Dimens.twentyThree, Dimens.eight, Dimens.twentyThree, Dimens.three),
         // padding: const EdgeInsets.all(3.0),
-        padding: EdgeInsets.only(left: 10, right: 10),
+        padding: EdgeInsets.only(left: Dimens.twelve, right: Dimens.twelve),
         decoration: new BoxDecoration(
-          color: Colors.black12,
+          color: Color(0xFFF2F3F7),
           // border: Border.all(color: Colors.black12),
-          borderRadius: const BorderRadius.all(
-            const Radius.circular(10.0),
+          borderRadius: BorderRadius.all(
+            Radius.circular(Dimens.twelve),
           ),
         ),
         child: Row(
@@ -364,13 +315,13 @@ class PaymentState extends State<Payments> {
             Row(
               children: <Widget>[
                 Container(
-                  height: 24,
-                  width: 24,
+                  height: Dimens.twentyEight,
+                  width: Dimens.twentyEight,
                   child: conditionalCardTypesAndPaypal(creditCardList[
-                  index]), //for different card type icons and paypal
+                      index]), //for different card type icons and paypal
                 ),
                 SizedBox(
-                  width: 10,
+                  width: Dimens.twelve,
                 ),
                 Container(
                   child: Text(
@@ -380,7 +331,7 @@ class PaymentState extends State<Payments> {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           color: Color(0xff2F2F2F),
-                          fontSize: 14,
+                          fontSize: Dimens.seventeen,
                           fontFamily: 'Montserrat',
                           fontWeight: FontWeight.w600),
                       textDirection: TextDirection.ltr),
@@ -391,10 +342,11 @@ class PaymentState extends State<Payments> {
               child: GestureDetector(
                 onTap: () {
                   showAlertDialog1(context, creditCardList[index].id);
+                  // showAlertDialog(context, creditCardList[index].id);
                 },
                 child: Container(
-                  height: 24,
-                  width: 30,
+                  height: Dimens.twentySeven,
+                  width: Dimens.thirtyThree,
                   /* child: SvgPicture.asset(
                     'assets/images/heart.svg',
                   ),*/
@@ -457,83 +409,74 @@ class PaymentState extends State<Payments> {
   }
 
   cardList() {
-    return
-      (creditCardList!=null&&creditCardList.length==0)?Container():
-      creditCardList == null
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
-          : ListView.builder(
-          scrollDirection: Axis.vertical,
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          itemCount: creditCardList.length,
-          itemBuilder: (BuildContext ctxt, int index) {
-            return creditCardItemUI(index);
-          });
+    return (creditCardList != null && creditCardList.length == 0)
+        ? Container()
+        : creditCardList == null
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                scrollDirection: Axis.vertical,
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: creditCardList.length,
+                itemBuilder: (BuildContext ctxt, int index) {
+                  return creditCardItemUI(index);
+                });
   }
 
-  getCreditCardList() {
-    var apicall = getCreditCardListApi(
-        prefs.get('userId').toString(), prefs.get('accessToken').toString());
-    apicall.then((response) {
+  getCreditCardList() async {
+    var apicall = await getCreditCardListApi(
+            prefs.get('userId').toString(), prefs.get('accessToken').toString())
+        .then((response) {
       print(response.body);
       if (response.statusCode == 200) {
-        creditCardList=[];
+        creditCardList = [];
         final jsonResponse = json.decode(response.body);
         if (jsonResponse['status'].toString() == "1") {
           CreditCardListPojo stationsListPojo =
-          CreditCardListPojo.fromJson(jsonResponse);
+              CreditCardListPojo.fromJson(jsonResponse);
           creditCardList = stationsListPojo.creditCards;
           setState(() {});
-        } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(),context);
-        } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(),context);
+          _showAnimatedDialog(jsonResponse['message'].toString());
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showAnimatedDialog(
+            AppLocalizations.of(context).translate("something_went_wrong"));
       }
-    }).catchError((error) {
-      print('error : $error');
+    }).catchError((onError) {
+      _showAnimatedDialog(
+          AppLocalizations.of(context).translate("something_went_wrong"));
     });
   }
 
-  deleteCreditCard(cardId) {
-    var apicall =
-    deleteCreditCardApi(cardId, prefs.get('accessToken').toString());
-    apicall.then((response) {
+  deleteCreditCard(cardId) async {
+    await deleteCreditCardApi(cardId, prefs.get('accessToken').toString())
+        .then((response) {
       print(response.body);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        //MyUtils.showAlertDialog(jsonResponse['message'].toString());
         if (jsonResponse['status'].toString() == "1") {
           getCreditCardList();
           setState(() {});
-        } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(),context);
-        } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(),context);
+          _showAnimatedDialog(jsonResponse['message'].toString());
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showAnimatedDialog(
+            AppLocalizations.of(context).translate("something_went_wrong"));
       }
-    }).catchError((error) {
-      print('error : $error');
+    }).catchError((onError) {
+      _showAnimatedDialog(
+          AppLocalizations.of(context).translate("something_went_wrong"));
     });
   }
 
   void loadShredPref() async {
     prefs = await SharedPreferences.getInstance();
     getCreditCardList();
-    // creditCardList=[];
-
   }
-
 
   showAlertDialog1(BuildContext context, cardId) {
     Dialog myDialog = Dialog(
@@ -551,7 +494,6 @@ class PaymentState extends State<Payments> {
               child: Align(
                   alignment: Alignment.topRight, child: Icon(Icons.clear)),
             ),
-
             Container(
               margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
               height: 300.0,
@@ -561,7 +503,9 @@ class PaymentState extends State<Payments> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Align(
                     alignment: Alignment.center,
                     child: Container(
@@ -572,39 +516,50 @@ class PaymentState extends State<Payments> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 30,),
-                  Text(AppLocalizations.of(context).translate("Remove payment method?"),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Text(
+                    AppLocalizations.of(context)
+                        .translate("Remove payment method?"),
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black,
+                    style: TextStyle(
+                        color: Colors.black,
                         fontSize: 18,
-                        fontWeight: FontWeight.bold),),
-                  SizedBox(height: 15,),
-
-                  Text(AppLocalizations.of(context).translate("Are you sure you want to delete your payment method?"),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    AppLocalizations.of(context).translate(
+                        "Are you sure you want to delete your payment method?"),
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),),
-
-                  SizedBox(height: 20,),
-
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   GestureDetector(
                     onTap: () {
                       deleteCreditCard(cardId.toString());
-                      Navigator.of(context).pop();              },
+                      Navigator.of(context).pop();
+                    },
                     child: Container(
                       // margin: new EdgeInsets.fromLTRB(0,0,0,0),
                       height: 45,
                       width: 250,
                       child: new Center(
-                        child: new Text(AppLocalizations.of(context).translate("Ok"),
+                        child: new Text(
+                            AppLocalizations.of(context).translate("Ok"),
                             style: new TextStyle(
-                                color:
-                                Colors.white,
+                                color: Colors.white,
                                 //fontWeight: FontWeight.bold,
-                                fontSize: 14.0, fontWeight: FontWeight.bold)),
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.bold)),
                       ),
 
                       decoration: new BoxDecoration(
-
                         color: primaryGreenColor,
                         /* border: new Border.all(
                   width: .5,
@@ -628,8 +583,6 @@ class PaymentState extends State<Payments> {
         builder: (BuildContext context) => myDialog);
   }
 
-
-
   showAlertDialog(BuildContext context, cardId) {
     // set up the buttons
     Widget cancelButton = FlatButton(
@@ -641,14 +594,13 @@ class PaymentState extends State<Payments> {
         child: new Center(
           child: new Text(AppLocalizations.of(context).translate("Cancel"),
               style: new TextStyle(
-                  color:
-                  Colors.white,
+                  color: Colors.white,
                   //fontWeight: FontWeight.bold,
-                  fontSize: 14.0, fontWeight: FontWeight.bold)),
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold)),
         ),
 
         decoration: new BoxDecoration(
-
           color: primaryGreenColor,
           /* border: new Border.all(
               width: .5,
@@ -671,14 +623,13 @@ class PaymentState extends State<Payments> {
         child: new Center(
           child: new Text(AppLocalizations.of(context).translate("Ok"),
               style: new TextStyle(
-                  color:
-                  Colors.white,
+                  color: Colors.white,
                   //fontWeight: FontWeight.bold,
-                  fontSize: 14.0, fontWeight: FontWeight.bold)),
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold)),
         ),
 
         decoration: new BoxDecoration(
-
           color: primaryGreenColor,
           /* border: new Border.all(
               width: .5,
@@ -698,7 +649,8 @@ class PaymentState extends State<Payments> {
     AlertDialog alert = AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       title: Text(AppLocalizations.of(context).translate("Alert")),
-      content: Text(AppLocalizations.of(context).translate("Are you sure you want to delete?")),
+      content: Text(AppLocalizations.of(context)
+          .translate("Are you sure you want to delete?")),
       actions: [
         cancelButton,
         continueButton,
@@ -712,14 +664,5 @@ class PaymentState extends State<Payments> {
         return alert;
       },
     );
-  }
-
-  _launchURL(finalUrl) async {
-    var url = finalUrl;
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 }

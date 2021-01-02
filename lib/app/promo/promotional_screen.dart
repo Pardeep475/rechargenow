@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/common/AllStrings.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/models/promo_list_model.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/MyUtils.dart';
@@ -63,7 +64,7 @@ class _PromotionState extends State<PromotionScreen> {
             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               appBarView(
-                  name: "PROMO-CODE",
+                  name: AppLocalizations.of(context).translate('promo code'),
                   context: context,
                   callback: () {
                     Navigator.pop(context);
@@ -94,7 +95,8 @@ class _PromotionState extends State<PromotionScreen> {
                                 'assets/images/add_card_empty.png',
                               )),
                           Text(
-                            "No promo-codes available yet",
+                            //No promo-codes available yet
+                            AppLocalizations.of(context).translate('No promo-codes available yet'),
                             style: emptyTextStyle,
                             textAlign: TextAlign.center,
                           ),
@@ -108,7 +110,7 @@ class _PromotionState extends State<PromotionScreen> {
               ),
               Container(
                 child: buttonView(
-                    text: "Add Promo-Code".toUpperCase(),
+                    text: AppLocalizations.of(context).translate('ADD PROMO-CODE').toUpperCase(),
                     callback: () {
                       _NavigatetoAddPromos();
                     }),
@@ -156,7 +158,7 @@ class _PromotionState extends State<PromotionScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                "Promo-Code",
+                AppLocalizations.of(context).translate('promo code'),
                 style: addPromoCodeStyle,
               ),
               Padding(

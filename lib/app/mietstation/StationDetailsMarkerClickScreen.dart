@@ -136,10 +136,10 @@ class _StationDetailsMarkerClickScreenState extends State<StationDetailsMarkerCl
     return Scaffold(
      // appBar: toolbarLayoutTransparentBackground(context),
       body: Container(
-          height: double.infinity,
-          width: double.infinity,
-          color: color_white,
-          child: SingleChildScrollView(child: buildBodyUI())),
+        height: double.infinity,
+        width: double.infinity,
+        color: color_white,
+        child: SingleChildScrollView(child: buildBodyUI(),),),
     );
   }
 

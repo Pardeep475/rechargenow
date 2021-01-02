@@ -1,44 +1,44 @@
 import 'dart:async';
-
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:android_intent/android_intent.dart';
 import 'package:battery/battery.dart';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fluster/fluster.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
-
 import 'package:intercom_flutter/intercom_flutter.dart';
-///import 'package:intercom_flutter/intercom_flutter.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:provider/provider.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/app/faq/FAQScreen.dart';
 import 'package:recharge_now/app/history/HistoryScreen.dart';
 import 'package:recharge_now/app/notification/notification_list_screen.dart';
 import 'package:recharge_now/app/paymentscreens/add_payment_method_screen.dart';
-import 'package:recharge_now/app/paymentscreens/payment_screen.dart';
 import 'package:recharge_now/app/promo/promo_screen.dart';
 import 'package:recharge_now/app/scan_bar_qr_code_screen.dart';
 import 'package:recharge_now/app/settings/SettingsScreen.dart';
 import 'package:recharge_now/auth/intro_screen.dart';
 import 'package:recharge_now/auth/login_screen.dart';
-import 'package:recharge_now/common/AllStrings.dart';
+import 'package:recharge_now/common/CustomDialogBox.dart';
+import 'package:recharge_now/common/custom_widgets/ItemSlotEightStation.dart';
+import 'package:recharge_now/common/custom_widgets/common_error_dialog.dart';
+import 'package:recharge_now/common/custom_widgets/item_pannel_station.dart';
+import 'package:recharge_now/common/custom_widgets/item_slot_six_station.dart';
+import 'package:recharge_now/common/custom_widgets/item_station_tower.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/models/station_list_model.dart';
 import 'package:recharge_now/models/user_deatil_model.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyConstants.dart';
+import 'package:recharge_now/utils/MyCustumUIs.dart';
+import 'package:recharge_now/utils/app_colors.dart';
 import 'package:recharge_now/utils/color_list.dart';
 import 'package:recharge_now/utils/map_helper.dart';
 import 'package:recharge_now/utils/map_marker.dart';
@@ -47,15 +47,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:platform/platform.dart';
-
-import 'bottomsheet/home_bottomsheet.dart';
 import 'bottomsheet/how_timer_bottomsheet.dart';
-import 'chat/ContactScreen.dart';
 import 'home_toolbar.dart';
 import 'mietstation/StationDetailsMarkerClickScreen.dart';
+import 'mietstation/mietstation_detail.dart';
 import 'mietstation/mietstation_list_scren.dart';
+import 'mietstation/near_by_stationlist_item.dart';
 
 class HomeScreen extends StatefulWidget {
+  final bool isLocationOn;
+
+  HomeScreen({this.isLocationOn});
+
   @override
   HomeScreenState createState() => HomeScreenState();
 }
@@ -122,36 +125,18 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _animateController =
         AnimationController(vsync: this, duration: Duration(seconds: 2));
-
-    //get location first time
-    /*   this._getLocation().then((value) {
-      MyConstants.currentLat = value.latitude;
-      MyConstants.currentLong = value.longitude;
-      _latlng1 = LatLng(value.latitude, value.longitude);
-      print("firstTimelatlong "+_latlng1.toString());
-
-
-      setState(() {
-
-      });
-
-      */ /* _kGooglePlex = CameraPosition(
-        target: LatLng(_latitude, _longitude),
-        zoom: 14.4746,
-      );*/ /*
-    });*/
-
-    /*  _saving=true;
-    //Timer.run(() =>  MyUtils.showLoaderDialog(context)());
-     Timer(Duration(seconds: 2), () {
-       setState(() {
-         showGoogleMap=true;
-         _saving=false;
-         //Navigator.pop(context);
-       });
-     });*/
     loadShredPref();
     firebaseCloudMessaging_Listeners();
+
+    // if(widget.isLocationOn == null){
+    //   checkLocationServiceEnableOrDisable();
+    // }else if (widget.isLocationOn){
+    //
+    // }
+    //
+    // if(widget.isLocationOn){
+    //
+    // }
     checkLocationServiceEnableOrDisable();
     // permissionCode();
     getLocationData();
@@ -164,8 +149,13 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             currentLocation.latitude.toString() +
             " : " +
             currentLocation.longitude.toString());
+        // MyConstants.currentLat = currentLocation.latitude;
+        // MyConstants.currentLong = currentLocation.longitude;
+
         MyConstants.currentLat = currentLocation.latitude;
         MyConstants.currentLong = currentLocation.longitude;
+        prefs.setDouble("lat", _locationData.latitude);
+        prefs.setDouble("long", _locationData.longitude);
 
         _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
         _lastMapPosition = _latlng1;
@@ -200,61 +190,22 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  /* permissionCode() async {
-    final PermissionHandler _permissionHandler = PermissionHandler();
-    var permission_result =
-    await _permissionHandler.requestPermissions([PermissionGroup.location]);
-    switch (permission_result[PermissionGroup.location]) {
-      case PermissionStatus.granted:
-        print("granted");
-        // do something
-        break;
-      case PermissionStatus.denied:
-        //permissionCode();
-        // do something
-        break;
-      case PermissionStatus.disabled:
-      // do something
-        break;
-      case PermissionStatus.restricted:
-      // do something
-        break;
-
-      default:
-    }
-  }*/
   checkLocationServiceEnableOrDisable() async {
-    //  PermissionStatus _permissionGranted;
-
     _serviceEnabled = await location.serviceEnabled();
-    print("serviceEnabled" + _serviceEnabled.toString());
+    print("serviceEnabledLocation" + _serviceEnabled.toString());
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
       _lastMapPosition = _latlng1;
-      //code to animate the camera into current location
       getStationsOnMapApi();
     } else if (_serviceEnabled) {
       locationChangeListener();
       _getCurrentLocation();
     }
-    print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
-
-    //_permissionGranted = await location.hasPermission();
-    // print('_permissionGranted.toString()>>> '+_permissionGranted.toString());
-
-    /*if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }*/
   }
 
   @override
   Widget build(BuildContext context) {
-    // var batteryInfromation = Provider.of<BatteryInformation>(context);
-    //print("batteryInfromation${batteryInfromation.batteryLevel}");
     return Scaffold(
       key: _drawerKey,
       drawer: drawerUI(),
@@ -334,7 +285,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           rentalTime = jsonResponse['rentalDetails']['rentalTime'];
           _modalBottomSheetMenu(rentalPrice, rentalTime);
         } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          _showDifferentTypeOfDialogs(
+              jsonResponse['message'].toString(), context);
         } else if (jsonResponse['status'].toString() == "0") {
           prefs.setString(
               'walletAmount', jsonResponse['walletAmount'].toString());
@@ -346,10 +298,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             showBottomSheet = false;
           });
         }
-        /*   setState(() {
-        });*/
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((error) {
       print('error : $error');
@@ -422,11 +372,18 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return GestureDetector(
         onTap: () {
           scanQR();
-          //showBottomSheetTimer(context);
 
-          // showBottomSheet2(context);
-          // showBottomSheetUI(context);
-          //custumAlertDialogBatteryUnlocked(1,context);
+          // var rentalPrice = "30";
+          // rentalTime = "01:07:40";
+          // walletAmount = "40";
+          // _modalBottomSheetMenu(rentalPrice, rentalTime);
+          // debugPrint(
+          //     "HomeTimerBottomSheeet     Rental Price  $rentalPrice    Rental Time  $rentalTime  Wallet Amount   $walletAmount");
+          // HomeTimerBottomSheeet(
+          //   rentalPrice: rentalPrice,
+          //   rentalTime: rentalTime,
+          //   walletAmount: walletAmount,
+          // );
         },
         child: Align(
           alignment: FractionalOffset.bottomCenter,
@@ -533,7 +490,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       // size: Size(300.0, 400.0),
       onPressed: () async {
-          await Intercom.displayMessenger();
+        await Intercom.displayMessenger();
+
         // _currentLocation();
         //_getCurrentLocation();
         //showBottomSheet2(context);
@@ -673,7 +631,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   content() {
     return Text(
-      'List ',
+      AppLocalizations.of(context).translate('List'),
       style: TextStyle(
           fontSize: 11.0,
           height: 1.8,
@@ -685,7 +643,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   mapText() {
     return Text(
-      'Map ',
+      AppLocalizations.of(context).translate('Map'),
       style: TextStyle(
           fontSize: 11.0,
           height: 1.8,
@@ -715,7 +673,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Align(
                 alignment: Alignment.topLeft,
                 child: Container(
-                  margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                  margin: EdgeInsets.fromLTRB(
+                      Dimens.twentyFive, Dimens.fifteen, Dimens.twentyFive, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -726,37 +685,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           },
                           child: Container(child: Icon(Icons.clear))),
                       SizedBox(
-                        height: 20,
+                        height: Dimens.twentyFive,
                       ),
-                      /*  RichText(
-                        text: TextSpan(
-                          */ /*style: defaultStyle,
-                      text: " The RichText widget allows you to . ",*/ /*
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: 'Hello, ',
-                                style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black)),
-                            TextSpan(
-                                text: 'Charger',
-                                style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: primaryGreenColor))
-                          ],
-                        ),
-                      ),*/
-                      /* Text(
-                        "Hello, Charger",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),
-                      ),
-
-*/
-
                       Center(
                         child: SizedBox(
-                          height: 40,
+                          height: Dimens.fifty,
                           child: Image.asset(
                             'assets/images/logo.png',
                             fit: BoxFit.fill,
@@ -767,9 +700,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                        height: 0.3,
-                        color: Colors.grey,
+                        margin: EdgeInsets.fromLTRB(
+                            0, Dimens.twentyFive, 0, Dimens.thirty),
+                        height: 1,
+                        color: AppColor.divider_color,
                       ),
                     ],
                   ),
@@ -777,18 +711,29 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
 
               ListTile(
-                contentPadding: EdgeInsets.only(left: 25, right: 10),
+                dense: true,
+                contentPadding: EdgeInsets.only(
+                    left: Dimens.twentyFive, right: Dimens.fifteen),
                 title: Transform(
                   transform: Matrix4.translationValues(-18, 0.0, 0.0),
                   child: Text(
-                    AppLocalizations.of(context).translate('PAYMENT'),
+                    AppLocalizations.of(context).translate('Payment'),
                     style: drawerTitleStyle,
                   ),
                 ),
-                leading: SvgPicture.asset('assets/images/menu-payment.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/menu-payment.svg',
+                  width: Dimens.twentyFive,
+                  height: Dimens.twenty,
+                ),
                 trailing: Text(
                   walletAmount,
-                  style: drawerRsStyle,
+                  style: TextStyle(
+                      fontFamily: "Montserrat",
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF54DF6C),
+                      fontSize: Dimens.fifteen,
+                      height: 1.2),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -798,7 +743,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                contentPadding: EdgeInsets.only(left: 25, right: 0),
+
+                dense: true,
+                contentPadding: EdgeInsets.only(
+                    left: Dimens.twentyFive, right: Dimens.fifteen),
                 title: Transform(
                   transform: Matrix4.translationValues(-18, 0.0, 0.0),
                   child: Text(
@@ -806,7 +754,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     style: drawerTitleStyle,
                   ),
                 ),
-                leading: SvgPicture.asset('assets/images/meu-history.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/meu-history.svg',
+                  width: Dimens.twentyFive,
+                  height: Dimens.twentyFive,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -814,7 +766,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                contentPadding: EdgeInsets.only(left: 25, right: 0),
+                dense: true,
+                contentPadding: EdgeInsets.only(
+                    left: Dimens.twentyFive, right: Dimens.fifteen),
                 title: Transform(
                   transform: Matrix4.translationValues(-18, 0.0, 0.0),
                   child: Text(
@@ -822,7 +776,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     style: drawerTitleStyle,
                   ),
                 ),
-                leading: SvgPicture.asset('assets/images/meu-how-it-work.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/meu-how-it-work.svg',
+                  width: Dimens.twentyFive,
+                  height: Dimens.twentyFive,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -832,15 +790,21 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                contentPadding: EdgeInsets.only(left: 25, right: 0),
+                dense: true,
+                contentPadding: EdgeInsets.only(
+                    left: Dimens.twentyFive, right: Dimens.fifteen),
                 title: Transform(
                   transform: Matrix4.translationValues(-18, 0.0, 0.0),
                   child: Text(
-                    "PROMO - CODE",
+                    AppLocalizations.of(context).translate('promo code'),
                     style: drawerTitleStyle,
                   ),
                 ),
-                leading: SvgPicture.asset('assets/images/meni-promo.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/meni-promo.svg',
+                  width: Dimens.twentyFive,
+                  height: Dimens.twenty,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -848,7 +812,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                contentPadding: EdgeInsets.only(left: 25, right: 0),
+                dense: true,
+                contentPadding: EdgeInsets.only(
+                    left: Dimens.twentyFive, right: Dimens.fifteen),
                 title: Transform(
                   transform: Matrix4.translationValues(-18, 0.0, 0.0),
                   child: Text(
@@ -856,7 +822,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     style: drawerTitleStyle,
                   ),
                 ),
-                leading: SvgPicture.asset('assets/images/menu-help.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/menu-help.svg',
+                  width: Dimens.twentyFive,
+                  height: Dimens.twentyFive,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -864,7 +834,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                contentPadding: EdgeInsets.only(left: 25, right: 0),
+                dense: true,
+                contentPadding: EdgeInsets.only(
+                    left: Dimens.twentyFive, right: Dimens.fifteen),
                 title: Transform(
                   transform: Matrix4.translationValues(-18, 0.0, 0.0),
                   child: Text(
@@ -872,7 +844,12 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     style: drawerTitleStyle,
                   ),
                 ),
-                leading: SvgPicture.asset('assets/images/menu-settings.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/menu-settings.svg',
+                  width: Dimens.twentyFive,
+                  height: Dimens.twentyFive,
+                  fit: BoxFit.cover,
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
@@ -1103,35 +1080,19 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> scanQR() async {
-    var qrResult = await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) => ScanQrBarCodeScreen()));
-    if (qrResult != null && qrResult != "" && qrResult != "-1") {
-      rentBattery_PowerbankAPI(
-          prefs.get('userId').toString(), qrResult.toString());
-    }
-
-    /*String qrResult;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-
-
-    try {
-      qrResult = await FlutterBarcodeScanner.scanBarcode(
-          "#ff6666", "Cancel", true, ScanMode.QR);
-      print("ff6666$qrResult");
-
-
-
-    } on PlatformException {
-      qrResult = 'Failed to get platform version.';
-    }*/
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ScanQrBarCodeScreen()),
+    ).then((qrResult) {
+      debugPrint("barcode_is_scanner_result   $qrResult");
+      if (qrResult != null && qrResult != "" && qrResult != "-1") {
+        rentBattery_PowerbankAPI(
+            prefs.get('userId').toString(), qrResult.toString());
+      }
+    });
   }
 
   _getCurrentLocation() {
-    // final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-
-    // if(_latlng1.latitude=="52.520008"){
     if (LocalPlatform().isIOS) {
       if (iosLocationFirstTime) {
         Geolocator().getCurrentPosition().then((Position position) {
@@ -1163,10 +1124,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   initIntercom() async {
-     await Intercom.initialize('nait0fkp',
+    await Intercom.initialize('nait0fkp',
         iosApiKey: 'ios_sdk-4a6b5dbb9308a9ce3a9f8879b85d20753d28bf1d',
         androidApiKey: 'android_sdk-105de09284d5c5ca5aa918e21f02cc744407fc32');
-    Intercom.registerUnidentifiedUser();  // <<< add this
+    Intercom.registerUnidentifiedUser(); // <<< add this
   }
 
   void _modalBottomSheetMenu(rentalPrice, rentalTime) {
@@ -1211,140 +1172,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   custumAlertDialogBatteryUnlocked(slotNumber, context) {}
-
-  custumAlertDialogAddPaymentMethod() {
-    Dialog myDialog = Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      //this right here
-      child: Container(
-        margin: EdgeInsets.fromLTRB(0, 10, 10, 0),
-        height: 350.0,
-        // width: 600.0,
-        child: Stack(
-          children: <Widget>[
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Align(
-                  alignment: Alignment.topRight, child: Icon(Icons.clear)),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: SvgPicture.asset(
-                      'assets/images/wallet-euro.svg',
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Text(
-                    AppLocalizations.of(context)
-                        .translate("Check your payment methods"),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Text(
-                    AppLocalizations.of(context).translate(
-                        "Please add a payment method to confirm your account"),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  creditCardButtonUI(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => myDialog);
-  }
-
-  creditCardButtonUI() {
-    return GestureDetector(
-        onTap: () {
-          Navigator.of(context).pop();
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Payments()));
-        },
-        child: new Container(
-            height: 45,
-            width: double.infinity,
-            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            // padding: const EdgeInsets.all(3.0),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            decoration: new BoxDecoration(
-              //color: Colors.green,
-              border: Border.all(color: Colors.black12),
-              borderRadius: const BorderRadius.all(
-                const Radius.circular(10.0),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Container(
-                      height: 20,
-                      width: 20,
-                      child: SvgPicture.asset(
-                        'assets/images/menu-payment.svg',
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      child: Text(
-                          AppLocalizations.of(context).translate("Add Payment"),
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal),
-                          textDirection: TextDirection.ltr),
-                    ),
-                  ],
-                ),
-                Flexible(
-                  child: Container(
-                    height: 24,
-                    width: 30,
-                    /* child: SvgPicture.asset(
-                      'assets/images/heart.svg',
-                    ),*/
-                    child: Icon(
-                      Icons.chevron_right,
-                      // size: screenAwareSize(20.0, context),
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
-            )));
-  }
 
   void custumBottomSheetMarkerClick(MapLocation data, context) {
     showModalBottomSheet(
@@ -1662,393 +1489,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
   }
 
-  custumAlertDialogMarkerClick1(MapLocation data, context) {
-    Dialog myDialog = Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-        //this right here
-        child: Container(
-            margin: EdgeInsets.fromLTRB(8, 5, 8, 0),
-            //padding: EdgeInsets.all(8),
-            height: 185.0,
-            child: Stack(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Align(
-                      alignment: Alignment.topRight, child: Icon(Icons.clear)),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                            //padding: EdgeInsets.all(10),
-                            child: SizedBox(
-                                width: 45,
-                                height: 45,
-                                child: Image.network(IMAGE_BASE_URL +
-                                    data.imageFullPath.toString()))
-                            /*Image.network(
-                                      MyConstants.SERVICE_IMAGE+datum.image,
-                                      width: 60,
-                                      height: 60,
-                                      fit:BoxFit.fill )*/
-                            ),
-                        Flexible(
-                          child: Container(
-                            margin: EdgeInsets.all(8),
-                            padding: EdgeInsets.all(8),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(data.name,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(data.category,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: primaryGreenColor,
-                                        fontWeight: FontWeight.bold)),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(data.address,
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                    style: TextStyle(fontSize: 14)),
-                                SizedBox(
-                                  height: 8,
-                                ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        SizedBox(
-                                          width: 15,
-                                          height: 15,
-                                          child: SvgPicture.asset(
-                                            'assets/images/placeholder.svg',
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 3,
-                                        ),
-                                        Text(data.distance.toString(),
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        SvgPicture.asset(
-                                          'assets/images/battery-powerbank.svg',
-                                        ),
-                                        SizedBox(
-                                          width: 3,
-                                        ),
-                                        Text(
-                                            data.availablePowerbanks
-                                                    .toString() +
-                                                " Available",
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    ),
-                                    Row(
-                                      children: <Widget>[
-                                        SvgPicture.asset(
-                                          'assets/images/Star.svg',
-                                        ),
-                                        SizedBox(
-                                          width: 3,
-                                        ),
-                                        Text(
-                                            data.freeSlots.toString() + " Free",
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      margin: new EdgeInsets.fromLTRB(0, 0, 0, 0),
-                      child: Row(
-                        // mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          /*navigateButton(data),
-
-                markerDetailsButton(data),*/
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                onStartNavigationClicked(data);
-                              },
-                              child: Container(
-                                height: 45,
-                                decoration: new BoxDecoration(
-                                  border: new Border.all(
-                                      width: .5, color: Colors.grey),
-                                  borderRadius: const BorderRadius.all(
-                                    const Radius.circular(30.0),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: new Text("Navigate",
-                                      style: new TextStyle(
-                                          color: Colors.black,
-                                          //fontWeight: FontWeight.bold,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).push(
-                                    new MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            StationDetailsMarkerClickScreen(
-                                                nearbyLocation: data)));
-                              },
-                              child: Container(
-                                decoration: new BoxDecoration(
-                                  color: primaryGreenColor,
-                                  /* border: new Border.all(
-                    width: .5,
-                    color:Colors.grey),*/
-                                  borderRadius: const BorderRadius.all(
-                                    const Radius.circular(30.0),
-                                  ),
-                                ),
-                                height: 45,
-                                child: Center(
-                                  child: new Text("Details",
-                                      style: new TextStyle(
-                                          color: Colors.white,
-                                          //fontWeight: FontWeight.bold,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    /*    SizedBox(height: 20,),
-
-                GestureDetector(
-                  onTap: (){
-                   Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    height: 45,
-                    decoration: new BoxDecoration(
-
-                      border: new Border.all(
-                          width: .5,
-                          color: Colors.grey),
-                      borderRadius: const BorderRadius.all(
-                        const Radius.circular(30.0),
-                      ),
-                    ),
-                    child: Center(
-                      child: new Text("Cancel",
-                          style: new TextStyle(
-                              color:
-                              Colors.black,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 14.0, fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                )
-*/
-                  ],
-                ),
-              ],
-            )));
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => myDialog);
-  }
-
-  closeButtonUnlockbattery() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pop();
-        getRentalDetailsList();
-      },
-      child: Container(
-        // margin: new EdgeInsets.fromLTRB(0,0,0,0),
-        height: 45,
-        width: 250,
-        child: new Center(
-          child: new Text('Ok',
-              style: new TextStyle(
-                  color: Colors.white,
-                  //fontWeight: FontWeight.bold,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold)),
-        ),
-
-        decoration: new BoxDecoration(
-          color: primaryGreenColor,
-          /* border: new Border.all(
-              width: .5,
-              color:Colors.grey),*/
-          borderRadius: const BorderRadius.all(
-            const Radius.circular(30.0),
-          ),
-        ),
-      ),
-    );
-  }
-
-  closeButton() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pop();
-      },
-      child: Container(
-        // margin: new EdgeInsets.fromLTRB(0,0,0,0),
-        height: 45,
-        width: 250,
-        child: new Center(
-          child: new Text('Ok',
-              style: new TextStyle(
-                  color: Colors.white,
-                  //fontWeight: FontWeight.bold,
-                  fontSize: 14.0,
-                  fontWeight: FontWeight.bold)),
-        ),
-
-        decoration: new BoxDecoration(
-          color: primaryGreenColor,
-          /* border: new Border.all(
-              width: .5,
-              color:Colors.grey),*/
-          borderRadius: const BorderRadius.all(
-            const Radius.circular(30.0),
-          ),
-        ),
-      ),
-    );
-  }
-
-  navigateButton(MapLocation data) {
-    return GestureDetector(
-      onTap: () {
-        onStartNavigationClicked(data);
-      },
-      child: Expanded(
-        child: Container(
-          //padding: new EdgeInsets.fromLTRB(35,15,35,15),
-          height: 45,
-          width: MediaQuery.of(context).size.width,
-
-          decoration: new BoxDecoration(
-            border: new Border.all(width: .5, color: Colors.grey),
-            borderRadius: const BorderRadius.all(
-              const Radius.circular(30.0),
-            ),
-          ),
-
-          child: new Center(
-            child: new Text("Navigate",
-                style: new TextStyle(
-                    color: Colors.black,
-                    //fontWeight: FontWeight.bold,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold)),
-          ),
-        ),
-      ),
-    );
-  }
-
-  markerDetailsButton(MapLocation data) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(new MaterialPageRoute(
-            builder: (BuildContext context) =>
-                StationDetailsMarkerClickScreen(nearbyLocation: data)));
-      },
-      child: Expanded(
-        child: Container(
-          //padding: new EdgeInsets.fromLTRB(35,15,35,15),
-          /* height: 45,
-          width: 100,*/
-          child: new Center(
-            child: new Text("Details",
-                style: new TextStyle(
-                    color: Colors.white,
-                    //fontWeight: FontWeight.bold,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold)),
-          ),
-
-          decoration: new BoxDecoration(
-            color: primaryGreenColor,
-            /* border: new Border.all(
-                width: .5,
-                color:Colors.grey),*/
-            borderRadius: const BorderRadius.all(
-              const Radius.circular(30.0),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   rentBattery_PowerbankAPI(userId, deviceId) {
-    /* setState(() {
-      _saving = true;
-    });*/
     MyUtils.showLoaderDialog(context);
     var req = {"userId": userId, "deviceId": deviceId};
 
@@ -2060,44 +1501,50 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     apicall.then((response) {
       print(response.body);
       if (response.statusCode == 200) {
-        /* setState(() {
-          _saving = false;
-        });*/
         Navigator.pop(context);
         final jsonResponse = json.decode(response.body);
-
-        //MyUtils.showAlertDialog(jsonResponse['message'].toString());
-
         if (jsonResponse['status'].toString() == "1") {
           setState(() {
             showBottomSheet = true;
           });
-          //  custumAlertDialogBatteryUnlocked(jsonResponse['slotNumber'], context);
+          _showDifferentTypeOfDialogs("SUCCESS", context);
         } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          _showDifferentTypeOfDialogs(
+              jsonResponse['message'].toString(), context);
         } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          _showDifferentTypeOfDialogs(
+              jsonResponse['message'].toString(), context);
         } else if (jsonResponse['status'].toString() == "3") {
-          custumAlertDialogAddPaymentMethod();
+          _showDifferentTypeOfDialogs(
+              jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBox(
+                  title: AppLocalizations.of(context)
+                      .translate("Check your payment methods"),
+                  descriptions: AppLocalizations.of(context).translate(
+                      "Deposit a payment method to release a Powerbank"),
+                  text:
+                      AppLocalizations.of(context).translate("PAYMENT METHODS"),
+                  img: "assets/images/wallet-euro.svg",
+                  double: 50.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else if (jsonResponse['status'].toString() == "4") {
-          MyUtils.showRentalRefusedDialog(
+          _showDifferentTypeOfDialogs(
               jsonResponse['message'].toString(), context);
         }
       } else {
-        /*setState(() {
-          _saving = false;
-        });*/
         Navigator.pop(context);
-        //MyUtils.showAlertDialog(AllString.something_went_wrong);
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((error) {
       print('error : $error');
-      /*setState(() {
-        _saving = false;
-      });*/
       Navigator.pop(context);
-      MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+      _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
 
@@ -2107,6 +1554,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     prefs = await SharedPreferences.getInstance();
     timer = Timer.periodic(
         Duration(seconds: 5), (Timer t) => getStationsOnMapApi());
+    // getStationsOnMapApi();
     walletAmount = await prefs.get('walletAmount').toString();
     isNotificationSent = await prefs.getBool('isNotificationSent');
     print(prefs.get('accessToken').toString());
@@ -2125,7 +1573,33 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         (Route<dynamic> route) => false);
   }
 
+  getLocation() async {
+    LocationData _locationData;
+
+    _locationData = await location.getLocation();
+
+    MyConstants.currentLat = _locationData.latitude;
+    MyConstants.currentLong = _locationData.longitude;
+    prefs.setDouble("lat", _locationData.latitude);
+    prefs.setDouble("long", _locationData.longitude);
+
+    print("onLocationChanged Splash : " +
+        MyConstants.currentLat.toString() +
+        " : " +
+        MyConstants.currentLong.toString());
+  }
+
+  getTestNotification() {
+    // testNotificaitonFired
+    print("accesstoken " + prefs.get('accessToken').toString());
+    var apicall = testNotificaitonFired(prefs.get('accessToken').toString());
+    apicall.then((value) {
+      debugPrint('status_12345 ---->     ${value.body}');
+    });
+  }
+
   getStationsOnMapApi() {
+    getLocation();
     var betteryAlarm = prefs.getBool('betteryAlarm');
     if (betteryAlarm != null && betteryAlarm) {
       initbatteryInfo();
@@ -2253,7 +1727,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {});
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((error) {
       print('error : $error');
@@ -2261,9 +1735,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   getDetailsApi() {
-    /* setState(() {
-      _saving = true;
-    });*/
     var apicall = getUserDetailsApi(
         prefs.get('userId').toString(), prefs.get('accessToken').toString());
     apicall.then((response) {
@@ -2306,17 +1777,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
         setState(() {});
       } else {
-        /*setState(() {
-          _saving = false;
-        });*/
-        //final jsonResponse = json.decode(response.body);
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((error) {
       print('error : $error');
-      /* setState(() {
-        _saving = false;
-      });*/
     });
   }
 
@@ -2378,7 +1842,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _firebaseMessaging.getToken().then((token) {
       print("fcmtoken:" + token);
-       Intercom.sendTokenToIntercom(token);
+      // Intercom.sendTokenToIntercom(token);
 
       var fcmtoken = token;
       prefs.setString('fcmtoken', token);
@@ -2394,7 +1858,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           _message = message['notification'];
         }
 
-        //showDialogForNotificiation_forground(_message);
         showFirebaseMesgDialog(_message, context);
       },
       onResume: (Map<String, dynamic> message) async {
@@ -2413,93 +1876,292 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void iOS_Permission() {
     _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
         sound: true, badge: true, alert: true, provisional: false));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print("Settings registered: $settings");
+    _firebaseMessaging.onIosSettingsRegistered.first.then((settings) {
+      debugPrint("firebase_token    ${settings.alert}");
+      // if (settings.alert) {
+      _firebaseMessaging.getToken().then((token) {
+        debugPrint("firebase_token    $token");
+        prefs.setString('fcmtoken', token);
+      });
+      // }
     });
   }
 
-  showDialogForNotificiation_forground(message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: ListTile(
-          title: Text(message['notification']['title']),
-          subtitle: Text(message['notification']['body']),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            color: primaryGreenColor,
-            child: Text(
-              'Ok',
-              style: TextStyle(color: Colors.white),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-  }
+  // showDialogForNotificiation_forground(message) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       content: ListTile(
+  //         title: Text(message['notification']['title']),
+  //         subtitle: Text(message['notification']['body']),
+  //       ),
+  //       actions: <Widget>[
+  //         FlatButton(
+  //           color: primaryGreenColor,
+  //           child: Text(
+  //             'Ok',
+  //             style: TextStyle(color: Colors.white),
+  //           ),
+  //           onPressed: () => Navigator.of(context).pop(),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // SOMETHING_WRONG
+  // POWERBANK_RENTED_ALREADY
+  // POWERBANK_RETURNED
+  // POWERBANK_RETURNED_MSG
+  // RENTAL_PERIOD_EXCEEDED
+  // POWERBANK_SOLD_MSG
+  // STATION_OFFLINE
 
   showFirebaseMesgDialog(message, context) {
-    Dialog myDialog = Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      //this right here
-      child: Container(
-        margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-        height: message['title'] == "POWERBANK ZURCKGEGEBEN" ? 480 : 350.0,
-        // width: 600.0,
+    debugPrint("firebasemessegeis     ->      ${message["title"]}");
+    _showDifferentTypeOfDialogs(message["title"], context);
+    // showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return CustomDialogBoxError(
+    //         title:
+    //         AppLocalizations.of(context).translate("ERROR OCCURRED"),
+    //         descriptions: jsonResponse['message'].toString(),
+    //         text: AppLocalizations.of(context).translate("Ok"),
+    //         img: "assets/images/something_went_wrong.svg",
+    //         double: 37.0,
+    //         isCrossIconShow: true,
+    //         callback: () {},
+    //       );
+    //     });
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              height: 10,
+    // Dialog myDialog = Dialog(
+    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+    //   //this right here
+    //   child: Container(
+    //     margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+    //     height: message['title'] == "POWERBANK ZURCKGEGEBEN" ? 480 : 350.0,
+    //     // width: 600.0,
+    //
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: <Widget>[
+    //         SizedBox(
+    //           height: 10,
+    //         ),
+    //         Align(
+    //           alignment: Alignment.center,
+    //           child: message['title'] == "POWERBANK ZURCKGEGEBEN"
+    //               ? SizedBox(
+    //                   width: 200,
+    //                   height: 250,
+    //                   child: Image.asset(
+    //                     'assets/images/return_powerbank.png',
+    //                   ),
+    //                 )
+    //               : SvgPicture.asset(
+    //                   'assets/images/battery-unlocked.svg',
+    //                 ),
+    //         ),
+    //         SizedBox(
+    //           height: 20,
+    //         ),
+    //         Text(
+    //           message['title'],
+    //           style: TextStyle(
+    //               color: Colors.black,
+    //               fontSize: 16,
+    //               fontWeight: FontWeight.bold),
+    //         ),
+    //         SizedBox(
+    //           height: 15,
+    //         ),
+    //         Text(
+    //           message['body'],
+    //           textAlign: TextAlign.center,
+    //           style: TextStyle(color: Colors.grey),
+    //         ),
+    //         SizedBox(
+    //           height: 20,
+    //         ),
+    //         closeButton()
+    //       ],
+    //     ),
+    //   ),
+    // );
+    // return showDialog(
+    //     barrierDismissible: false,
+    //     context: context,
+    //     builder: (BuildContext context) => myDialog);
+  }
+
+  _showDifferentTypeOfDialogs(message, context) {
+    switch (message) {
+      case "SOMETHING_WRONG":
+        {
+          debugPrint("firebasemessegeis     ->      SOMETHING_WRONG");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            Align(
-              alignment: Alignment.center,
-              child: message['title'] == "POWERBANK ZURCKGEGEBEN"
-                  ? SizedBox(
-                      width: 200,
-                      height: 250,
-                      child: Image.asset(
-                        'assets/images/return_powerbank.png',
-                      ),
-                    )
-                  : SvgPicture.asset(
-                      'assets/images/battery-unlocked.svg',
-                    ),
+          );
+        }
+        break;
+      case "POWERBANK_RENTED_ALREADY":
+        {
+          debugPrint("firebasemessegeis     ->      POWERBANK_RENTED_ALREADY");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("You can only borrow one Powerbank at a time"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            SizedBox(
-              height: 20,
+          );
+        }
+        break;
+      case "POWERBANK_RETURNED":
+        {
+          debugPrint("firebasemessegeis     ->      POWERBANK_RETURNED");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("THANK YOU"),
+              descriptions: AppLocalizations.of(context).translate(
+                  "You have successfully brought back the Powerbank"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/congratulation.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            Text(
-              message['title'],
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+          );
+        }
+        break;
+      case "POWERBANK_RETURNED_MSG":
+        {
+          debugPrint("firebasemessegeis     ->      POWERBANK_RETURNED_MSG");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("THANK YOU"),
+              descriptions: AppLocalizations.of(context).translate(
+                  "You have successfully brought back the Powerbank"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/congratulation.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            SizedBox(
-              height: 15,
+          );
+        }
+        break;
+      case "RENTAL_PERIOD_EXCEEDED":
+        {
+          debugPrint("firebasemessegeis     ->      RENTAL_PERIOD_EXCEEDED");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context)
+                  .translate("RENTAL PERIOD EXCEEDED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("RENTAL PERIOD EXCEEDED DES"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            Text(
-              message['body'],
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+          );
+        }
+        break;
+      case "POWERBANK_SOLD_MSG":
+        {
+          debugPrint("firebasemessegeis     ->      POWERBANK_SOLD_MSG");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context)
+                  .translate("RENTAL PERIOD EXCEEDED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("RENTAL PERIOD EXCEEDED DES"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            SizedBox(
-              height: 20,
+          );
+        }
+        break;
+      case "STATION_OFFLINE":
+        {
+          debugPrint("firebasemessegeis     ->      STATION_OFFLINE");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context)
+                  .translate("RENTAL STATION IS OFFLINE"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("RENTAL STATION IS OFFLINE DES"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
             ),
-            closeButton()
-          ],
-        ),
-      ),
-    );
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) => myDialog);
+          );
+        }
+        break;
+      case "SUCCESS":
+        {
+          debugPrint("firebasemessegeis     ->      STATION_OFFLINE");
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("THANK YOU"),
+              descriptions: AppLocalizations.of(context).translate(
+                  "Your Powerbank has been successfully released from slot"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/congratulation.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            ),
+          );
+        }
+        break;
+      default:
+        {
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            ),
+          );
+        }
+        break;
+    }
   }
 
   Future<LocationData> _getLocation() async {
@@ -2523,41 +2185,205 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void showBottomSheet2(BuildContext context, MapLocation data) {
-    showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (BuildContext context) {
-          var filePath = "assets/images/slot6station.png";
-          var isLongImage = false;
-          switch (data.freeSlots) {
-            case 6:
-              filePath = "assets/images/slot6station.png";
-              isLongImage = false;
-              break;
-            case 8:
-              filePath = "assets/images/slot8station.png";
-              isLongImage = false;
-              break;
-            case 12:
-              filePath = "assets/images/slot8station.png";
-              isLongImage = false;
-              break;
-            case 24:
-              filePath = "assets/images/stationtower.png";
-              isLongImage = true;
-              break;
-            case 48:
-              filePath = "assets/images/panelstation.png";
-              isLongImage = true;
-              break;
-          }
+    // openDialogWithSlideInAnimation(
+    //   context: context,
+    //   itemWidget: ItemPanelTower(
+    //     data: data,
+    //     onDetailPressed: (MapLocation value) {
+    //       debugPrint("on detail pressed    ${value.name}");
+    //       _onDetailMarkerClick(context, value);
+    //     },
+    //     onNavigationPressed: (MapLocation value) {
+    //       debugPrint("on navigation pressed  ${value.name}");
+    //       _onNavigatorMarkerClick(value);
+    //     },
+    //   ),
+    // );
 
-          return BottomSheetWidget(
-            data,
-            slotTypeFilePath: filePath,
-            isLongImage: isLongImage,
-          );
-        });
+    switch (data.freeSlots) {
+      case 6:
+        openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: ItemSlotSixStation(
+              data: data,
+              onDetailPressed: (MapLocation value) {
+                debugPrint("on detail pressed    ${value.name}");
+                _onDetailMarkerClick(context, value);
+              },
+              onNavigationPressed: (MapLocation value) {
+                debugPrint("on navigation pressed  ${value.name}");
+                _onNavigatorMarkerClick(value);
+              },
+            ));
+        break;
+      case 8:
+        openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: ItemSlotEightStation(
+              data: data,
+              onDetailPressed: (MapLocation value) {
+                debugPrint("on detail pressed    ${value.name}");
+                _onDetailMarkerClick(context, value);
+              },
+              onNavigationPressed: (MapLocation value) {
+                debugPrint("on navigation pressed  ${value.name}");
+                _onNavigatorMarkerClick(value);
+              },
+            ));
+        break;
+      case 12:
+        openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: ItemSlotEightStation(
+              data: data,
+              onDetailPressed: (MapLocation value) {
+                debugPrint("on detail pressed    ${value.name}");
+                _onDetailMarkerClick(context, value);
+              },
+              onNavigationPressed: (MapLocation value) {
+                debugPrint("on navigation pressed  ${value.name}");
+                _onNavigatorMarkerClick(value);
+              },
+            ));
+        break;
+      case 24:
+        openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: ItemStationTower(
+              data: data,
+              onDetailPressed: (MapLocation value) {
+                debugPrint("on detail pressed    ${value.name}");
+                _onDetailMarkerClick(context, value);
+              },
+              onNavigationPressed: (MapLocation value) {
+                debugPrint("on navigation pressed  ${value.name}");
+                _onNavigatorMarkerClick(value);
+              },
+            ));
+        break;
+      case 48:
+        openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: ItemPanelTower(
+              data: data,
+              onDetailPressed: (MapLocation value) {
+                debugPrint("on detail pressed    ${value.name}");
+                _onDetailMarkerClick(context, value);
+              },
+              onNavigationPressed: (MapLocation value) {
+                debugPrint("on navigation pressed  ${value.name}");
+                _onNavigatorMarkerClick(value);
+              },
+            ));
+        break;
+      default:
+        {
+          openDialogWithSlideInAnimation(
+              context: context,
+              itemWidget: ItemSlotSixStation(
+                data: data,
+                onDetailPressed: (MapLocation value) {
+                  debugPrint("on detail pressed    ${value.name}");
+                  _onDetailMarkerClick(context, value);
+                },
+                onNavigationPressed: (MapLocation value) {
+                  debugPrint("on navigation pressed  ${value.name}");
+                  _onNavigatorMarkerClick(value);
+                },
+              ));
+        }
+    }
+
+    // showModalBottomSheet<void>(
+    //     context: context,
+    //     backgroundColor: Colors.transparent,
+    //     builder: (BuildContext context) {
+    //       var filePath = "assets/images/slot6station.png";
+    //       var isLongImage = false;
+    //
+    //
+    //       return BottomSheetWidget(
+    //         data,
+    //         slotTypeFilePath: filePath,
+    //         isLongImage: isLongImage,
+    //       );
+    //     });
+  }
+
+  void _onNavigatorMarkerClick(MapLocation data) async {
+    String origin = "" +
+        MyConstants.currentLat.toString() +
+        "," +
+        MyConstants.currentLong.toString(); // lat,long like 123.34,68.56
+
+    print(origin);
+    String destination = data.latitude + "," + data.longitude;
+    if (new LocalPlatform().isAndroid) {
+      final AndroidIntent intent = new AndroidIntent(
+          action: 'action_view',
+          data:
+              Uri.encodeFull("https://www.google.com/maps/dir/?api=1&origin=" +
+                  /* origin +*/ "&destination=" +
+                  destination +
+                  "&travelmode=driving&dir_action=navigate"),
+          package: 'com.google.android.apps.maps');
+      intent.launch();
+    } else {
+      String url =
+          "https://www.google.com/maps/dir/?api=1&origin=" /*+ origin */ +
+              "&destination=" +
+              destination +
+              "&travelmode=driving&dir_action=navigate";
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    }
+  }
+
+  void _onDetailMarkerClick(BuildContext context, MapLocation data) {
+    NearbyLocation value = NearbyLocation(
+      id: data.id,
+      name: data.name,
+      address: data.address,
+      availablePowerbanks: data.availablePowerbanks,
+      status: data.status,
+      description: data.description,
+      category: data.category,
+      city: data.city,
+      country: data.country,
+      distance: data.distance,
+      freeSlots: data.freeSlots,
+      fridayClosed: data.fridayClosed,
+      fridayHours: data.fridayHours,
+      houseNumber: data.houseNumber,
+      imageAvatarPath: data.imageAvatarPath,
+      imageFullPath: data.imageFullPath,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      mondayClosed: data.mondayClosed,
+      mondayHours: data.mondayHours,
+      pincode: data.pincode,
+      saturdayClosed: data.saturdayClosed,
+      saturdayHours: data.saturdayHours,
+      sundayClosed: data.sundayClosed,
+      sundayHours: data.sundayHours,
+      thursdayClosed: data.thursdayClosed,
+      thursdayHours: data.thursdayHours,
+      tuesdayClosed: data.tuesdayClosed,
+      tuesdayHours: data.tuesdayHours,
+      wednesdayClosed: data.wednesdayClosed,
+      wednesdayHours: data.wednesdayHours,
+    );
+
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (BuildContext context) => MietStationDetailScreen(
+          nearbyLocation: value,
+        ),
+      ),
+    );
   }
 
   @override

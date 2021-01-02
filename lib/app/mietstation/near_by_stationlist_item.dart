@@ -59,6 +59,7 @@ class NearbyLocation {
   bool fridayClosed;
   bool saturdayClosed;
   bool sundayClosed;
+  bool open;
   int availablePowerbanks;
   int freeSlots;
   String imageFullPath;
@@ -91,6 +92,7 @@ class NearbyLocation {
     this.thursdayClosed,
     this.fridayClosed,
     this.saturdayClosed,
+    this.open,
     this.sundayClosed,
     this.availablePowerbanks,
     this.freeSlots,
@@ -131,6 +133,7 @@ class NearbyLocation {
     imageFullPath: json["imagePath"],
     imageAvatarPath: json["thumbnailPath"],
     status: json["status"],
+    open: json["open"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -165,5 +168,6 @@ class NearbyLocation {
     "imagePath": imageFullPath,
     "thumbnailPath": imageAvatarPath,
     "status": status,
+    "open": open,
   };
 }

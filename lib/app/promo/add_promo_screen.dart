@@ -5,6 +5,7 @@ import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/app/promo/redeem_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/MyUtils.dart';
 
@@ -88,16 +89,26 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                         top: screenPadding,
                         right: screenPadding),
                     child: Text(
-                      "Promo-Code",
-                      style: sliderTitleTextStyle,
+                      AppLocalizations.of(context).translate('promo code small'),
+                      style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF28272C),
+                          fontSize: Dimens.twentyThree,
+                          height: 1.4),
                     ),
                   ),
                   Container(
                     margin: EdgeInsets.only(
                         left: screenPadding, top: 8, right: screenPadding),
                     child: Text(
-                      "Enter your promo code here to receive a \nbonus for to receive the wallet",
-                      style: loginDetailText,
+                      AppLocalizations.of(context).translate('enter your promocode here'),
+                      style: TextStyle(
+                          fontFamily: fontFamily,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF28272C),
+                          fontSize: Dimens.fifteen,
+                          height: 1.4),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -106,7 +117,7 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                     margin: EdgeInsets.only(
                         left: screenPadding, top: 43, right: screenPadding),
                     child: Text(
-                      "Enter Code".toUpperCase(),
+                      AppLocalizations.of(context).translate('ENTER CODE'),
                       style: loginDetailText,
                     ),
                   ),
@@ -133,7 +144,7 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                       textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "Add Promo-Code here",
+                          hintText: AppLocalizations.of(context).translate('Add Promo-Code here'),
                           hintStyle: TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
@@ -171,7 +182,7 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                           left: screenPadding, top: 8, right: screenPadding),
                       child: Center(
                         child: Text(
-                          "YOU WOULD LIKE TO GET CREDIT?",
+                          AppLocalizations.of(context).translate('YOU WOULD LIKE TO GET CREDIT'),
                           textAlign: TextAlign.center,
                           style: addCardTextStyle,
                         ),
@@ -184,7 +195,7 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                             bottom: 65,
                             right: screenPadding),
                         child: buttonView(
-                            text: "REDEEM",
+                            text: AppLocalizations.of(context).translate('REDEEM'),
                             callback: () {
                               addPromosButtonClick();
                             })),
@@ -200,7 +211,7 @@ class _AddPromosScreen extends State<AddPromosScreen> {
 
   addPromosButtonClick() {
     if (promoCode.trim().length == 0) {
-      MyUtils.showAlertDialog("Please enter promo code", context);
+      MyUtils.showAlertDialog(AppLocalizations.of(context).translate('enter your promocode here'), context);
     } else {
       addPromos();
     }
@@ -226,8 +237,8 @@ class _AddPromosScreen extends State<AddPromosScreen> {
         if (jsonResponse['status'].toString() == "1") {
           prefs.setString(
               'walletAmount', jsonResponse['walletAmount'].toString());
-          // Navigator.of(context).pop({'response': true});
-          navigatoToSuccessScreen();
+          Navigator.of(context).pop({'response': true});
+          // navigatoToSuccessScreen();
         } else if (jsonResponse['status'].toString() == "0") {
           isError = true;
           errorMessage = jsonResponse['message'].toString();

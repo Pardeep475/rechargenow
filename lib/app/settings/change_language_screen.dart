@@ -31,7 +31,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       body: Column(
         children: [
           appBarViewEndBtn(
-              name: 'CHANGE LANGUAGE',
+              name: AppLocalizations.of(context).translate('change language').toUpperCase(),
               context: context,
               callback: () {
                 Navigator.pop(context);

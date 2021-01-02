@@ -8,24 +8,24 @@ import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/auth/release_location.dart';
 import 'package:recharge_now/common/AllStrings.dart';
+import 'package:recharge_now/common/custom_dialog_box_error.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/my_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class CodeVerificationScreen extends StatefulWidget {
   var authyId, mobileNumber, countryCode, otp, email, fcmtoken, purpose;
 
   CodeVerificationScreen(
       {this.otp,
-        this.email,
-        this.authyId,
-        this.mobileNumber,
-        this.countryCode,
-        this.fcmtoken,
-        this.purpose});
+      this.email,
+      this.authyId,
+      this.mobileNumber,
+      this.countryCode,
+      this.fcmtoken,
+      this.purpose});
 
   @override
   _CodeVerificationScreenState createState() => _CodeVerificationScreenState();
@@ -37,7 +37,8 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
   SharedPreferences prefs;
   var digitComplete = false;
   bool _saving = false;
-  var verificationId="";
+  var verificationId = "";
+
   @override
   void initState() {
     // _getCurrentLocation();
@@ -48,7 +49,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
 
   initSession() async {
     prefs = await SharedPreferences.getInstance();
-    verificationId=widget.authyId;
+    verificationId = widget.authyId;
   }
 
   @override
@@ -69,7 +70,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
       child: Column(
         children: <Widget>[
           appBarView(
-              name: "Security code",
+              name: AppLocalizations.of(context).translate('Security code'),
               context: context,
               callback: () {
                 Navigator.pop(context);
@@ -81,7 +82,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(left: screenPadding, right: screenPadding),
             child: Text(
-              "Enter the 6-digit code",
+              AppLocalizations.of(context).translate('Enter the 6 digit code'),
               style: sliderTitleTextStyle,
             ),
           ),
@@ -93,7 +94,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
             margin: EdgeInsets.only(
                 left: screenPadding, top: 10, right: screenPadding),
             child: Text(
-              "SECURITY CODE",
+              AppLocalizations.of(context).translate('Security code'),
               textAlign: TextAlign.left,
               style: loginDetailText,
             ),
@@ -125,7 +126,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
           ),
           Container(
             child: buttonView(
-                text: "NEXT",
+                text: AppLocalizations.of(context).translate('Next'),
                 callback: () {
                   nextButtonClick();
                 }),
@@ -140,7 +141,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
                 left: screenPadding, top: 10, right: screenPadding),
             child: buttonGreyView(
                 height: 48,
-                text: "RESEND CODE",
+                text: AppLocalizations.of(context).translate('RESEND CODE'),
                 width: double.infinity,
                 callback: () {
                   //resendOtp();
@@ -154,10 +155,19 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
 
   void nextButtonClick() {
     if (otp.trim().length < 6) {
-      MyUtils.showAlertDialog(
-          AppLocalizations.of(context)
-              .translate("Please enter otp sent to your mobile"),
-          context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: "Please enter otp sent to your mobile",
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
     } else {
       if (widget.purpose == "updateMobile") {
         updatePhoneNumberApiAPI();
@@ -168,20 +178,20 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
     }
   }
 
-  permissionCode() async {
+  permissionCode() async {}
 
-  }
-
-  callLoginAPI() {
-    var mobileNumberWithCountryCode="";
-  showProgress();
+  callLoginAPI() async {
+    var mobileNumberWithCountryCode = "";
+    showProgress();
     //MyUtils.showLoaderDialog(context);
-    mobileNumberWithCountryCode = widget.countryCode +  widget.mobileNumber;
+    mobileNumberWithCountryCode = widget.countryCode + widget.mobileNumber;
 
+    String deviceToken = await prefs.getString('fcmtoken');
+    debugPrint("firebase_token    $deviceToken");
     var req = {
-      "countryCode":  widget.countryCode,
-      "phoneNumber":  widget.mobileNumber,
-      "contactMethod": "PhoneNumber"
+      "countryCode": widget.countryCode,
+      "phoneNumber": widget.mobileNumber,
+      "deviceToken": deviceToken
     };
 
     print(req);
@@ -197,7 +207,7 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
         });
         //Navigator.pop(context);
         final jsonResponse = json.decode(response.body);
-        // MyUtils.showAlertDialog(jsonResponse['message'].toString());
+
         if (jsonResponse['status'].toString() == "1") {
           debugPrint(
               "user_id_is   ---->   ${jsonResponse['userDetails']['id']}");
@@ -211,11 +221,50 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
           prefs.setBool('isRental', jsonResponse['isRental']);
           navigateToReleaseLocationScreen();
         } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         }
       } else {
         // progressDialog.hide();
@@ -223,7 +272,20 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
           _saving = false;
         });
         // Navigator.pop(context);
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomDialogBoxError(
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                descriptions: AppLocalizations.of(context)
+                    .translate("something_went_wrong"),
+                text: AppLocalizations.of(context).translate("Ok"),
+                img: "assets/images/something_went_wrong.svg",
+                double: 37.0,
+                isCrossIconShow: true,
+                callback: () {},
+              );
+            });
       }
     }).catchError((error) {
       print('error : $error');
@@ -252,29 +314,77 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
         dismissProgressDialog();
         callLoginAPI();
         //checkUserExistedOrNot(user.user.uid);
-
       }).catchError((signUpError) {
         print("Exceptiom ${signUpError}");
 
         if (signUpError is FirebaseAuthException) {
           print("CheckErrorCode${signUpError.code}");
           if (signUpError.code.trim() == 'invalid-verification-code'.trim()) {
-            MyUtils.showAlertDialog('The entered OTP is incorrect. Please try again.', context);
-
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CustomDialogBoxError(
+                    title: AppLocalizations.of(context)
+                        .translate("ERROR OCCURRED"),
+                    descriptions:
+                        'The entered OTP is incorrect. Please try again.',
+                    text: AppLocalizations.of(context).translate("Ok"),
+                    img: "assets/images/something_went_wrong.svg",
+                    double: 37.0,
+                    isCrossIconShow: true,
+                    callback: () {},
+                  );
+                });
           } else if (signUpError.code.trim() == 'session-expired'.trim()) {
-            MyUtils.showAlertDialog('The SMS code has expired. Please re-send the verification code to try again.', context);
-
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CustomDialogBoxError(
+                    title: AppLocalizations.of(context)
+                        .translate("ERROR OCCURRED"),
+                    descriptions:
+                        'The SMS code has expired. Please re-send the verification code to try again.',
+                    text: AppLocalizations.of(context).translate("Ok"),
+                    img: "assets/images/something_went_wrong.svg",
+                    double: 37.0,
+                    isCrossIconShow: true,
+                    callback: () {},
+                  );
+                });
           } else {
-            MyUtils.showAlertDialog(signUpError.toString(), context);
-
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return CustomDialogBoxError(
+                    title: AppLocalizations.of(context)
+                        .translate("ERROR OCCURRED"),
+                    descriptions: signUpError.toString(),
+                    text: AppLocalizations.of(context).translate("Ok"),
+                    img: "assets/images/something_went_wrong.svg",
+                    double: 37.0,
+                    isCrossIconShow: true,
+                    callback: () {},
+                  );
+                });
           }
           //Utils.showSnackBar(signUpError.toString(), context);
         }
         dismissProgressDialog();
       });
     } else {
-      MyUtils.showAlertDialog('Please enter otp.', context);
-
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: "Please enter otp.",
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
     }
   }
 
@@ -300,24 +410,51 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
     final PhoneVerificationFailed verifyFailed = (FirebaseAuthException e) {
       print('${e.message}');
       dismissProgressDialog();
-      MyUtils.showAlertDialog('Something went wrong.', context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
     };
 
     await FirebaseAuth.instance
         .verifyPhoneNumber(
-      phoneNumber: widget.countryCode+widget.mobileNumber,
-      timeout: const Duration(seconds: 60),
-      verificationCompleted: verifiedSuccess,
-      verificationFailed: verifyFailed,
-      codeSent: smsCodeSent,
-      codeAutoRetrievalTimeout: autoRetrieve,
-    )
+          phoneNumber: widget.countryCode + widget.mobileNumber,
+          timeout: const Duration(seconds: 60),
+          verificationCompleted: verifiedSuccess,
+          verificationFailed: verifyFailed,
+          codeSent: smsCodeSent,
+          codeAutoRetrievalTimeout: autoRetrieve,
+        )
         .then((value) {})
         .catchError((onError) {
       dismissProgressDialog();
-      MyUtils.showAlertDialog('Something went wrong.', context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
     });
   }
+
   verify_app_userApiAPI() {
     setState(() {
       _saving = true;
@@ -346,7 +483,6 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
         final jsonResponse = json.decode(response.body);
         // print(jsonResponse);
 
-        // MyUtils.showAlertDialog(jsonResponse['message'].toString());
         if (jsonResponse['status'].toString() == "1") {
           debugPrint(
               "user_id_is   ---->   ${jsonResponse['userDetails']['id']}");
@@ -361,23 +497,88 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
 
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => ReleaseLocationScreen()),
-                  (Route<dynamic> route) => false);
+              (Route<dynamic> route) => false);
         } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomDialogBoxError(
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                descriptions: AppLocalizations.of(context)
+                    .translate("something_went_wrong"),
+                text: AppLocalizations.of(context).translate("Ok"),
+                img: "assets/images/something_went_wrong.svg",
+                double: 37.0,
+                isCrossIconShow: true,
+                callback: () {},
+              );
+            });
       }
     }).catchError((error) {
       setState(() {
         _saving = false;
       });
       //Navigator.pop(context);
-      MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
       // print('error : $error');
     });
   }
@@ -410,7 +611,6 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
         final jsonResponse = json.decode(response.body);
         // print(jsonResponse);
 
-        // MyUtils.showAlertDialog(jsonResponse['message'].toString());
         if (jsonResponse['status'].toString() == "1") {
           prefs.setBool('is_login', true);
           /* prefs.setInt('userId', jsonResponse['userDetails']['id']);
@@ -431,21 +631,86 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
           //navigateToLoginScreen();
           Navigator.of(context).pop({'update': true});
         } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomDialogBoxError(
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                descriptions: AppLocalizations.of(context)
+                    .translate("something_went_wrong"),
+                text: AppLocalizations.of(context).translate("Ok"),
+                img: "assets/images/something_went_wrong.svg",
+                double: 37.0,
+                isCrossIconShow: true,
+                callback: () {},
+              );
+            });
       }
     }).catchError((error) {
       setState(() {
         _saving = false;
       });
       //Navigator.pop(context);
-      MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
     });
   }
 
@@ -472,20 +737,69 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
       // Navigator.pop(context);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        // print(jsonResponse);
-
-        //MyUtils.showAlertDialog(jsonResponse['message'].toString());
         if (jsonResponse['status'].toString() == "1") {
           widget.authyId = jsonResponse['authyId'].toString();
         } else if (jsonResponse['status'].toString() == "0") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else if (jsonResponse['status'].toString() == "2") {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomDialogBoxError(
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                  descriptions: jsonResponse['message'].toString(),
+                  text: AppLocalizations.of(context).translate("Ok"),
+                  img: "assets/images/something_went_wrong.svg",
+                  double: 37.0,
+                  isCrossIconShow: true,
+                  callback: () {},
+                );
+              });
         }
       } else {
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomDialogBoxError(
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                descriptions: AppLocalizations.of(context)
+                    .translate("something_went_wrong"),
+                text: AppLocalizations.of(context).translate("Ok"),
+                img: "assets/images/something_went_wrong.svg",
+                double: 37.0,
+                isCrossIconShow: true,
+                callback: () {},
+              );
+            });
       }
     }).catchError((error) {
       // print('error : $error');
@@ -493,26 +807,39 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
       setState(() {
         _saving = false;
       });
-      MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomDialogBoxError(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: AppLocalizations.of(context)
+                  .translate("something_went_wrong"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            );
+          });
     });
   }
 
   void dismissProgressDialog() {
-    _saving=false;
-    setState(() {
-
-    });
+    _saving = false;
+    setState(() {});
   }
 
   void navigateToReleaseLocationScreen() {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => ReleaseLocationScreen()),
-            (Route<dynamic> route) => false);
+        (Route<dynamic> route) => false);
   }
 
-  void showProgress() {  setState(() {
-    _saving = true;
-  });}
+  void showProgress() {
+    setState(() {
+      _saving = true;
+    });
+  }
 
 /*  _getCurrentLocation() {
     // final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
@@ -529,19 +856,19 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
     });
   }*/
 
- /* getLocation() async {
+/* getLocation() async {
     LocationData _locationData;
     // try {
     _locationData = await Location().getLocation();
 
-    *//*} on PlatformException catch (e) {
+    */ /*} on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
         var error = 'Permission denied';
       }else if(e.code == "PERMISSION_DENIED_NEVER_ASK"){
         var  error = 'Permission denied';
       }
       //_locationData = null;
-    }*//*
+    }*/ /*
 
     MyConstants.currentLat = _locationData.latitude;
     MyConstants.currentLong = _locationData.longitude;

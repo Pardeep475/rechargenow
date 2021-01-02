@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_qr_bar_scanner/qr_bar_scanner_camera.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyConstants.dart';
 
 class ScanQrBarCodeScreen extends StatefulWidget {
@@ -16,6 +17,9 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
   var _qrInfo = "";
   var _hasFlashlight = false;
   var isturnon = false;
+  String _qrCode = "";
+
+
 
   @override
   initState() {
@@ -61,7 +65,7 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Scan the QR-Code',
+              AppLocalizations.of(context).translate('Scan the QR-Code'),
               textAlign: TextAlign.center,
               style: TextStyle(
                   height: 1.4,
@@ -74,7 +78,7 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
           Padding(
             padding: const EdgeInsets.all(15.0),
             child: Text(
-              'Scan the QR Code at the station to release a Powerban',
+              AppLocalizations.of(context).translate('scan code to activate location'),
               textAlign: TextAlign.center,
               style: TextStyle(
                   height: 1.4,
@@ -97,29 +101,34 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
                   image: DecorationImage(
                       image: AssetImage('assets/images/Subtract.png'))),
               padding: const EdgeInsets.all(10.0),
-              child: Container(
-                width: 290,
-                height: 290,
-                child: Container(
-                  height: 290,
-                  width: 290,
-                  child: QRBarScannerCamera(
-                    onError: (context, error) => Text(
-                      error.toString(),
-                      style: TextStyle(color: Colors.red),
+              child: Builder(
+                builder: (context) {
+                  return Container(
+                    width: 290,
+                    height: 290,
+                    child: Container(
+                      height: 290,
+                      width: 290,
+                      child: QRBarScannerCamera(
+                        onError: (context, error) => Text(
+                          error.toString(),
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        qrCodeCallback: (code) async {
+                          await _qrCallback(context, code);
+                        },
+                      ),
                     ),
-                    qrCodeCallback: (code) async {
-                      await _qrCallback(code);
-                    },
-                  ),
-                ),
+                  );
+                },
               )),
           SizedBox(
             height: 23,
           ),
           InkWell(
             onTap: () {
-              if(isturnon){
+              if (isturnon) {
+                debugPrint("debugPrint      IsturnOn");
                 //if light is on, then turn off
                 Flashlight.lightOff();
                 setState(() {
@@ -127,12 +136,13 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
                   //flashicon = Icons.flash_off;
                   //flashbtncolor = Colors.deepOrangeAccent;
                 });
-              }else{
+              } else {
                 //if light is off, then turn on.
+                debugPrint("debugPrint      IsturnOff");
                 Flashlight.lightOn();
                 setState(() {
                   isturnon = true;
-                //  flashicon = Icons.flash_on;
+                  //  flashicon = Icons.flash_on;
                   //flashbtncolor = Colors.greenAccent;
                 });
               }
@@ -157,7 +167,11 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
     });
   }
 
-  _qrCallback(String code) {
-    Navigator.pop(context, code);
+  _qrCallback(BuildContext context, String code) {
+    if (_qrCode.isEmpty) {
+      _qrCode = code;
+      debugPrint("barcode_is_scanner   $code");
+      Navigator.pop(context, code);
+    }
   }
 }

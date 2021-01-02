@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/app/faq/help_list_model.dart';
-import 'package:recharge_now/common/AllStrings.dart';
+import 'package:recharge_now/common/custom_dialog_box_error.dart';
+import 'package:recharge_now/common/custom_widgets/common_error_dialog.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
-import 'package:recharge_now/utils/my_utils.dart';
+import 'package:recharge_now/utils/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FAQScreen extends StatefulWidget {
@@ -51,31 +54,139 @@ class _FAQScreenState extends State<FAQScreen> {
                   callback: () {
                     Navigator.pop(context);
                   }),
-              bodyUI_WithApi_listView(context)
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(padding: EdgeInsets.only(top: 10)),
+                    helpList == null
+                        ? SliverFillRemaining(
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        : helpList.isEmpty
+                            ? SliverFillRemaining(
+                                child: listEmptyUI(),
+                              )
+                            : SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                    (BuildContext context, int index) {
+                                  var item = helpList[index];
+                                  return _itemContent(item, index);
+                                }, childCount: helpList.length),
+                              ),
+                  ],
+                ),
+              ),
             ],
           )),
     );
   }
 
+  Widget _itemContent(RentalFaqs item, int index) {
+    return Container(
+      margin: EdgeInsets.only(
+          left: Dimens.twentyThree,
+          right: Dimens.twentyThree,
+          bottom: helpList.length - 1 == index ? Dimens.thirtyThree : 0),
+      child: item.id == -1
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: Dimens.twentyFive,
+                ),
+                Text(
+                  item.question.toUpperCase(),
+                  style: faqRsStyle,
+                ),
+                SizedBox(
+                  height: Dimens.ten,
+                ),
+                Divider(
+                  color: AppColor.divider_color,
+                  thickness: 1,
+                )
+              ],
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    if (isListPos == index) {
+                      isListPos = -1;
+                    } else {
+                      isListPos = index;
+                    }
+
+                    setState(() {});
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.question,
+                            style: TextStyle(
+                                fontFamily: fontFamily,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                fontSize: 13,
+                                height: 1.2),
+                          ),
+                        ),
+                        Container(
+                          child: SvgPicture.asset(
+                            isListPos == index
+                                ? "assets/images/arrow_up.svg"
+                                : "assets/images/arrow_down.svg",
+                            allowDrawingOutsideViewBox: true,
+                          ),
+                          padding: EdgeInsets.only(left: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                isListPos != index
+                    ? SizedBox()
+                    : Padding(
+                        padding: EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          item.answer,
+                          style: addBtnTextStyle,
+                        ),
+                      ),
+                Divider(
+                  color: AppColor.divider_color,
+                  thickness: 1,
+                )
+              ],
+            ),
+    );
+  }
+
   listEmptyUI() {
-    return Expanded(
-      child: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(
-              height: 20,
-            ),
-            Text(
-              "There is no data yet",
-              style: sliderTitleTextStyle,
-            ),
-            SizedBox(
-              height: 14,
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            "There is no data yet",
+            style: sliderTitleTextStyle,
+          ),
+          SizedBox(
+            height: 14,
+          ),
+        ],
       ),
     );
   }
@@ -83,10 +194,10 @@ class _FAQScreenState extends State<FAQScreen> {
   Widget bodyUI_WithApi_listView(BuildContext context) {
     return helpList == null
         ? Expanded(
-          child: Center(
+            child: Center(
               child: CircularProgressIndicator(),
             ),
-        )
+          )
         : helpList.length == 0
             ? listEmptyUI()
             : Expanded(
@@ -97,143 +208,141 @@ class _FAQScreenState extends State<FAQScreen> {
                       var item = helpList[index];
                       return Container(
                         margin: EdgeInsets.only(
-                          left: screenPadding,
-                          right: screenPadding,
-                          top: 15,
-                          bottom: helpList.length-1==index?30:0
-                        ),
-                        child:item.id==-1?Text(item.question.toUpperCase(),style: faqRsStyle,):Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            index != 0
-                                ? Divider(
-                                    color: Colors.grey.withOpacity(0.3),
-                                    thickness: 1,
-                                  )
-                                : SizedBox(),
-                            GestureDetector(
-                              onTap: () {
-                                if (isListPos == index) {
-                                  isListPos = -1;
-                                } else {
-                                  isListPos = index;
-                                }
+                            left: Dimens.twentyThree,
+                            right: Dimens.twentyThree,
+                            top: Dimens.thirtyThree,
+                            bottom: helpList.length - 1 == index
+                                ? Dimens.thirtyThree
+                                : 0),
+                        child: item.id == -1
+                            ? Text(
+                                item.question.toUpperCase(),
+                                style: faqRsStyle,
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  index != 0
+                                      ? Divider(
+                                          color: AppColor.divider_color,
+                                          thickness: 1,
+                                        )
+                                      : SizedBox(),
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (isListPos == index) {
+                                        isListPos = -1;
+                                      } else {
+                                        isListPos = index;
+                                      }
 
-                                setState(() {});
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        item.question,
-                                        style: titleTextStyle,
+                                      setState(() {});
+                                    },
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              item.question,
+                                              style: TextStyle(
+                                                  fontFamily: fontFamily,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black,
+                                                  fontSize: 13,
+                                                  height: 1.2),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: SvgPicture.asset(
+                                              isListPos == index
+                                                  ? "assets/images/arrow_up.svg"
+                                                  : "assets/images/arrow_down.svg",
+                                              allowDrawingOutsideViewBox: true,
+                                            ),
+                                            padding: EdgeInsets.only(left: 10),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Container(
-                                      child: SvgPicture.asset(
-                                        isListPos == index
-                                            ? "assets/images/arrow_up.svg"
-                                            : "assets/images/arrow_down.svg",
-                                        allowDrawingOutsideViewBox: true,
-                                      ),
-                                      padding: EdgeInsets.only(left: 10),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            isListPos != index
-                                ? Container()
-                                : Text(
-                                    item.answer,
-                                    style: addBtnTextStyle,
                                   ),
-                          ],
-                        ),
+                                  isListPos != index
+                                      ? Container()
+                                      : Text(
+                                          item.answer,
+                                          style: addBtnTextStyle,
+                                        ),
+                                ],
+                              ),
                       );
                     }),
               );
   }
 
   var language = "";
-
   List<RentalFaqs> rentalFaqs;
   List<RentalFaqs> rentalStationFaqs;
   List<RentalFaqs> powerbankFaqs;
-
   List<RentalFaqs> paymentsFaqs;
-  getHelpList() {
 
-
-    var apicall = getHelpListApi(prefs.get('accessToken').toString());
-    apicall.then((response) {
-      print(response.body);
+  getHelpList() async {
+    await getHelpListApi(prefs.get('accessToken').toString()).then((response) {
+      debugPrint(response.body);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        log("jsonResponse${response.body}");
         if (jsonResponse['status'].toString() == "1") {
-          helpList = [];
-          rentalFaqs=[];
-          rentalStationFaqs=[];
-          powerbankFaqs=[];
-          paymentsFaqs=[];
-          HelpListResponse stationsListPojo = HelpListResponse.fromJson(jsonResponse);
-
-          rentalFaqs = stationsListPojo.rentalFaqs;
-          helpList.add(RentalFaqs(
-            id: -1,question: "Rental"
-
-          ));
-          helpList.addAll(rentalFaqs);
-          rentalStationFaqs = stationsListPojo.rentalStationFaqs;
-          helpList.add(RentalFaqs(
-              id: -1,question: "rentalStation"
-
-          ));
-          helpList.addAll(rentalStationFaqs);
-          powerbankFaqs = stationsListPojo.powerbankFaqs;
-          helpList.add(RentalFaqs(
-              id: -1,question: "Powerbank"
-
-          ));
-          helpList.addAll(powerbankFaqs);
-          paymentsFaqs = stationsListPojo.paymentsFaqs;
-          helpList.add(RentalFaqs(
-              id: -1,question: "Payments"
-
-          ));
-          helpList.addAll(paymentsFaqs);
-          setState(() {});
-        } else if (jsonResponse['status'].toString() == "0") {
-          helpList = [];
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
-        } else if (jsonResponse['status'].toString() == "2") {
-          helpList = [];
-          helpList = [];
-          setState(() {
-
-          });
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          _successResponseOne(jsonResponse);
         } else {
-          MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
+          _errorResponse();
         }
       } else {
-        helpList = [];
-        setState(() {
-
-        });
-        MyUtils.showAlertDialog(AllString.something_went_wrong, context);
+        _errorResponse();
       }
-    }).catchError((error) {
-      helpList = [];
-      helpList = [];
-      setState(() {
-
-      });
-      print('error : $error');
+    }).catchError((onError) {
+      _errorResponse();
     });
+  }
+
+  void _successResponseOne(jsonResponse) {
+    helpList = [];
+    rentalFaqs = [];
+    rentalStationFaqs = [];
+    powerbankFaqs = [];
+    paymentsFaqs = [];
+    HelpListResponse stationsListPojo = HelpListResponse.fromJson(jsonResponse);
+
+    rentalFaqs = stationsListPojo.rentalFaqs;
+    helpList.add(RentalFaqs(id: -1, question: "Rental"));
+    helpList.addAll(rentalFaqs);
+    rentalStationFaqs = stationsListPojo.rentalStationFaqs;
+    helpList.add(RentalFaqs(id: -1, question: "rentalStation"));
+    helpList.addAll(rentalStationFaqs);
+    powerbankFaqs = stationsListPojo.powerbankFaqs;
+    helpList.add(RentalFaqs(id: -1, question: "Powerbank"));
+    helpList.addAll(powerbankFaqs);
+    paymentsFaqs = stationsListPojo.paymentsFaqs;
+    helpList.add(RentalFaqs(id: -1, question: "Payments"));
+    helpList.addAll(paymentsFaqs);
+    setState(() {});
+  }
+
+  void _errorResponse() {
+    helpList = [];
+    setState(() {});
+    openDialogWithSlideInAnimation(
+      context: context,
+      itemWidget: CommonErrorDialog(
+        title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+        descriptions:
+            AppLocalizations.of(context).translate("something_went_wrong"),
+        text: AppLocalizations.of(context).translate("Ok"),
+        img: "assets/images/something_went_wrong.svg",
+        double: 37.0,
+        isCrossIconShow: true,
+        callback: () {},
+      ),
+    );
   }
 }

@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "262930404202-gb0tf1nqgt2i1t1hk44jh4ohb0n4ptc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mobile.rechargenow.recharge_now",
+            "certificate_hash": "128f3c9d0e6b9f2c48fde6b8b9bacc176ea3c3ea"
+          }
+        },
+        {
+          "client_id": "262930404202-o2tu0jci8ef7vbjjq76f2cb172nkddk4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mobile.rechargenow.recharge_now",
+            "certificate_hash": "3c80d35e9cd2959fd8d518e306b198cfca51cdae"
+          }
+        },
+        {
           "client_id": "262930404202-dul9dusaa8ht3svd1209qd0924ccprjb.apps.googleusercontent.com",
           "client_type": 3
         }

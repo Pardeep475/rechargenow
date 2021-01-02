@@ -7,51 +7,59 @@ class HomeTimerBottomSheeet extends StatefulWidget {
   String rentalTime;
   String walletAmount;
   String rentalPrice;
-  HomeTimerBottomSheeet({this.rentalPrice,this.rentalTime,this.walletAmount});
+
+  HomeTimerBottomSheeet({this.rentalPrice, this.rentalTime, this.walletAmount});
 
   @override
   State<StatefulWidget> createState() {
-
     return _HomeTimerState();
-
   }
-
 }
 
-class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProviderStateMixin {
-  int hours=0;
-  int minutes=0;
-  int days=0;
+class _HomeTimerState extends State<HomeTimerBottomSheeet>
+    with SingleTickerProviderStateMixin {
+  int hours = 0;
+  int minutes = 0;
+  int days = 0;
   AnimationController _controller;
 
-  var arr=[];
+  var arr = [];
+
   @override
   void initState() {
-    arr= widget.rentalTime.split(':');
-    if(arr.length==2) {
+    debugPrint(
+        "HomeTimerBottomSheeet  widget   Rental Price  ${widget.rentalPrice}    Rental Time  ${widget.rentalTime}  Wallet Amount   ${widget.walletAmount}");
+
+    arr = widget.rentalTime.split(':');
+    if (arr.length == 2) {
       hours = int.parse(arr[0]);
       minutes = int.parse(arr[1]);
+      debugPrint(
+          "HomeTimerBottomSheeet     Hours  $hours    Minutes  $minutes");
       hours = hours * 60;
       minutes = minutes + hours;
-      _controller =
-          AnimationController(vsync: this, duration: Duration(minutes: minutes));
+      debugPrint("HomeTimerBottomSheeet     Minutes  $minutes");
+
+      _controller = AnimationController(
+          vsync: this, duration: Duration(minutes: minutes));
       _controller.forward();
-    }else{
+    } else {
       days = int.parse(arr[0]);
       hours = int.parse(arr[1]);
       minutes = int.parse(arr[2]);
-      days=days*24*60;
+      debugPrint(
+          "HomeTimerBottomSheeet     Days   $days   Hours  $hours    Minutes  $minutes");
+      days = days * 24 * 60;
       hours = hours * 60;
-      minutes = minutes + hours+days;
-      _controller =
-          AnimationController(vsync: this, duration: Duration(minutes: minutes));
+      minutes = minutes + hours + days;
+
+      debugPrint("HomeTimerBottomSheeet     Minutes  $minutes");
+
+      _controller = AnimationController(
+          vsync: this, duration: Duration(minutes: minutes));
       _controller.forward();
     }
-    setState(() {
-
-    });
-
-
+    setState(() {});
 
     super.initState();
   }
@@ -62,10 +70,6 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
     super.dispose();
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -73,7 +77,6 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
       margin: EdgeInsets.only(
         left: 18,
         right: 18,
-
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -106,7 +109,7 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
                 child: Countdown(
                   arr: arr,
                   animation: StepTween(
-                    begin:   minutes* 60,
+                    begin: minutes,
                     end: 0,
                   ).animate(_controller),
                 ),
@@ -115,24 +118,27 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                arr.length==2?Container(): Padding(
-                  padding: EdgeInsets.only(
-                    top: 2,
-                    right: 32,
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Days',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 11.0,
-                          height: 1.4,
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xff686868)),
-                    ),
-                  ),
-                ), Padding(
+                arr.length == 2
+                    ? Container()
+                    : Padding(
+                        padding: EdgeInsets.only(
+                          top: 2,
+                          right: 32,
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Days',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 11.0,
+                                height: 1.4,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xff686868)),
+                          ),
+                        ),
+                      ),
+                Padding(
                   padding: EdgeInsets.only(
                     top: 2,
                     right: 7,
@@ -149,7 +155,6 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
                           color: Color(0xff686868)),
                     ),
                   ),
-
                 ),
                 Padding(
                   padding: EdgeInsets.only(
@@ -172,12 +177,8 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(
-                  right: 40,
-                  left: 40,
-                  top: 12,
-                  bottom: 12
-              ),
+              padding:
+                  EdgeInsets.only(right: 40, left: 40, top: 12, bottom: 12),
               child: Divider(
                 color: Color(0xffEBEBEB),
                 height: 1,
@@ -189,7 +190,6 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-
                     right: 34,
                   ),
                   child: Center(
@@ -207,7 +207,7 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    left:34,
+                    left: 34,
                   ),
                   child: Center(
                     child: Text(
@@ -225,12 +225,8 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(
-                  right: 40,
-                  left: 40,
-                  top: 12,
-                  bottom: 12
-              ),
+              padding:
+                  EdgeInsets.only(right: 40, left: 40, top: 12, bottom: 12),
               child: Divider(
                 color: Color(0xffEBEBEB),
                 height: 1,
@@ -242,7 +238,6 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-
                     right: 34,
                   ),
                   child: Center(
@@ -260,7 +255,7 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    left:34,
+                    left: 34,
                   ),
                   child: Center(
                     child: Text(
@@ -284,28 +279,21 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet> with SingleTickerProv
   }
 }
 
-
 class Countdown extends AnimatedWidget {
-  Countdown({Key key, this.animation,this.arr}) : super(key: key, listenable: animation);
+  Countdown({Key key, this.animation, this.arr})
+      : super(key: key, listenable: animation);
   Animation<int> animation;
-var arr;
+  var arr;
+
   @override
   build(BuildContext context) {
-    Duration clockTimer = Duration(seconds: animation.value);
-    String timerText="";
-    if(arr.length==2) {
-       timerText =
-          '${clockTimer.inHours.remainder(60).toString().padLeft(
-          2, '0')} : ${(clockTimer.inMinutes.remainder(60) % 60)
-          .toString()
-          .padLeft(2, '0')}';
-    }else{
-      timerText =
-      '${clockTimer.inDays.remainder(24).toString().padLeft(
-          2, '0')} : ${clockTimer.inHours.remainder(60).toString().padLeft(
-          2, '0')} : ${(clockTimer.inMinutes.remainder(60) % 60)
-          .toString()
-          .padLeft(2, '0')}';
+    Duration clockTimer = Duration(minutes: animation.value);
+    String timerText = "";
+    if (arr.length == 2) {
+      timerText = '${clockTimer.inHours.remainder(60).toString().padLeft(2, '0')} : ${(clockTimer.inMinutes.remainder(60) % 60).toString().padLeft(2, '0')}';
+    } else {
+      int hours = (clockTimer.inHours - (clockTimer.inDays * 24));
+      timerText = '${clockTimer.inDays.remainder(24).toString().padLeft(2, '0')} : ${hours.remainder(60).toString().padLeft(2, '0')} : ${(clockTimer.inMinutes.remainder(60)).toString().padLeft(2, '0')}';
     }
     return Text(
       "$timerText",

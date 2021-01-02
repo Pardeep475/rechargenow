@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:recharge_now/app/promo/invite_screen.dart';
 import 'package:recharge_now/app/promo/promotional_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/my_utils.dart';
 
@@ -10,6 +11,7 @@ class PromoCodeScreen extends StatefulWidget {
   _PromoCodeScreenState createState() => _PromoCodeScreenState();
 }
 
+//
 class _PromoCodeScreenState extends State<PromoCodeScreen> {
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class _PromoCodeScreenState extends State<PromoCodeScreen> {
       body: Column(
         children: [
           appBarView(
-              name: "Promo - Code",
+              name: AppLocalizations.of(context).translate('promo code'),
               context: context,
               callback: () {
                 Navigator.pop(context);
@@ -34,7 +36,7 @@ class _PromoCodeScreenState extends State<PromoCodeScreen> {
                 Container(
                   margin: EdgeInsets.only(bottom: 6),
                   child: Text(
-                    "Promo-Code".toUpperCase(),
+                    AppLocalizations.of(context).translate('promo code'),
                     style: addPromoCodeStyle,
                   ),
                 ),
@@ -43,26 +45,32 @@ class _PromoCodeScreenState extends State<PromoCodeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      /**/
+                        /**/
                         flex: 4,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              child: Text("Add \nPromo-Code",
+                              child: Text(
+                                  "${AppLocalizations.of(context)
+                                      .translate('ADD PROMO CODE')}\n",
+                                  maxLines: 2,
+                                  softWrap: true,
                                   style: addPromoCodeTextStyle),
                             ),
                             GestureDetector(
                               child: Container(
-                                height: 36,
-                                margin: EdgeInsets.only(top: 15),
-                                padding: EdgeInsets.only(left: 54, right: 54),
+                                margin: EdgeInsets.only(top: 25),
+                                padding: EdgeInsets.only(left: 54, right: 54,top: 3,bottom: 10),
                                 decoration: BoxDecoration(
                                     color: Color(0xFFF2F3F7),
-                                    borderRadius:
-                                    BorderRadius.all(Radius.circular(50))),
-                                child: Text("Add", style: addBtnTextStyle),
+                                    borderRadius: BorderRadius.all(Radius.circular(50))),
+                                child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate('add'),
+                                    textAlign: TextAlign.center,
+                                    style: addBtnTextStyle),
                               ),
                               onTap: () {
                                 Navigator.of(context).push(
@@ -103,7 +111,7 @@ class _PromoCodeScreenState extends State<PromoCodeScreen> {
                 Container(
                   margin: EdgeInsets.only(bottom: 6),
                   child: Text(
-                    "INVITATION CODE",
+                    AppLocalizations.of(context).translate('INVITATION CODE'),
                     style: addPromoCodeStyle,
                   ),
                 ),
@@ -112,26 +120,30 @@ class _PromoCodeScreenState extends State<PromoCodeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      /**/
+                        /**/
                         flex: 4,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Container(
-                              child: Text("Invite friends & receive bonus",
+                              child: Text(
+                                  AppLocalizations.of(context).translate(
+                                      'Invite friends and receive bonus'),
                                   style: addPromoCodeTextStyle),
                             ),
                             GestureDetector(
                               child: Container(
-                                height: 36,
-                                margin: EdgeInsets.only(top: 15),
-                                padding: EdgeInsets.only(left: 54, right: 54),
+                                margin: EdgeInsets.only(top: 25),
+                                padding: EdgeInsets.only(left: 54, right: 54,top: 3,bottom: 10),
                                 decoration: BoxDecoration(
                                     color: Color(0xFFF2F3F7),
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(50))),
-                                child: Text("Invite", style: addBtnTextStyle),
+                                        BorderRadius.all(Radius.circular(50))),
+                                child: Text(
+                                    AppLocalizations.of(context)
+                                        .translate('Invite'),
+                                    style: addBtnTextStyle),
                               ),
                               onTap: () {
                                 Navigator.of(context).push(

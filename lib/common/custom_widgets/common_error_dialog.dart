@@ -1,46 +1,22 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:recharge_now/app/paymentscreens/payment_screen.dart';
-import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 
-class CustomDialogBox extends StatefulWidget {
+class CommonErrorDialog extends StatelessWidget{
+
   final String title, descriptions, text;
   final String img;
   final VoidCallback callback;
   final double;
   final isCrossIconShow;
 
-  const CustomDialogBox(
-      {Key key,
-      this.title,
-      this.descriptions,
-      this.text,
-      this.img,
-      this.callback,
-        this.isCrossIconShow,
-      this.double})
-      : super(key: key);
 
-  @override
-  _CustomDialogBoxState createState() => _CustomDialogBoxState();
-}
-
-class _CustomDialogBoxState extends State<CustomDialogBox> {
-
-  double height = 0.0;
-
-  @override
-  void initState() {
-    height = widget.double;
-    super.initState();
-  }
+  CommonErrorDialog({this.title, this.descriptions, this.text, this.img,
+    this.callback, this.double, this.isCrossIconShow});
 
   @override
   Widget build(BuildContext context) {
-
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -56,21 +32,21 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(
-              left: 20, top: (height + 25), right: 20, bottom: 20),
-          margin: EdgeInsets.only(top: height,),
+              left: 20, top: (double + 25), right: 20, bottom: 20),
+          margin: EdgeInsets.only(top: double,),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black, offset: Offset(0, 10), blurRadius: 10),
+                    color: Colors.black, offset: Offset(0, 1), blurRadius: 10),
               ]),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Text(
-                widget.title,
+                title,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.black,
@@ -82,7 +58,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 height: 11,
               ),
               Text(
-                widget.descriptions,
+                descriptions,
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: 14,
@@ -97,10 +73,10 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 alignment: Alignment.bottomCenter,
                 child: Container(
                   child: buttonView(
-                      text: widget.text,
+                      text: text,
                       callback: () {
                         Navigator.of(context).pop();
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Payments()));
+
                       }),
                   margin: EdgeInsets.only(
                       left: 20, right: 20),
@@ -115,20 +91,11 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
         Positioned(
           left: 20,
           right: 20,
-          child: SvgPicture.asset(widget.img),
-        ),
-        Positioned(
-          top: (height + 25),
-          right: 25,
-          child: widget.isCrossIconShow ?GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child:
-                Align(alignment: Alignment.topRight, child: Icon(Icons.clear)),
-          ):SizedBox(),
+          child: SvgPicture.asset(img),
         ),
       ],
     );
   }
+
+  
 }

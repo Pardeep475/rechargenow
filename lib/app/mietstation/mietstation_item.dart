@@ -1,20 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/color_list.dart';
 
 import 'near_by_stationlist_item.dart';
 
 class MietStationItem extends StatelessWidget {
   NearbyLocation nearbyLocation;
+
   MietStationItem({this.nearbyLocation});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: Padding(
         padding:
-        const EdgeInsets.only(top: 20, bottom: 15, left: 30, right: 30),
+            const EdgeInsets.only(top: 20, bottom: 15, left: 30, right: 30),
         child: Column(
           children: <Widget>[
             Row(
@@ -32,14 +35,25 @@ class MietStationItem extends StatelessWidget {
                                 width: 1,
                                 style: BorderStyle.solid),
                             borderRadius:
-                            BorderRadius.all(Radius.circular(12.0))),
+                                BorderRadius.all(Radius.circular(12.0))),
                         child: Image.asset(
                           'assets/images/mietstation.png',
                         )),
                     SizedBox(
                       height: 12,
                     ),
-                    Text('Open')
+                    Text(
+                      nearbyLocation.open
+                          ? AppLocalizations.of(context).translate("Open")
+                          : AppLocalizations.of(context).translate("Close"),
+                      style: TextStyle(
+                          fontSize: 11.0,
+                          height: 1.5,
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.w600,
+                          color:
+                              nearbyLocation.open ? Colors.green : Colors.red),
+                    )
                   ],
                 ),
                 SizedBox(
@@ -87,9 +101,7 @@ class MietStationItem extends StatelessWidget {
                             width: 7.0,
                           ),
                           Text(
-                            nearbyLocation
-                                .availablePowerbanks
-                                .toString() ,
+                            nearbyLocation.availablePowerbanks.toString(),
                             style: TextStyle(
                                 fontSize: 12.0,
                                 height: 1,
@@ -105,9 +117,7 @@ class MietStationItem extends StatelessWidget {
                             width: 7.0,
                           ),
                           Text(
-                            nearbyLocation
-                                .freeSlots
-                                .toString(),
+                            nearbyLocation.freeSlots.toString(),
                             style: TextStyle(
                                 fontSize: 12.0,
                                 height: 1,
@@ -126,9 +136,7 @@ class MietStationItem extends StatelessWidget {
                             width: 7.0,
                           ),
                           Text(
-                            nearbyLocation
-                                .distance
-                                .toString(),
+                            nearbyLocation.distance.toString(),
                             style: TextStyle(
                                 fontSize: 12.0,
                                 height: 1,
@@ -156,5 +164,3 @@ class MietStationItem extends StatelessWidget {
     );
   }
 }
-
-

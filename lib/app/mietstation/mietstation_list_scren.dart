@@ -153,6 +153,9 @@ class _StationListScreenState extends State<StationListScreen> {
 
 
   getStationsOnMapApi() {
+
+    debugPrint("my_current_lat_lng :-   latitude  ${MyConstants.currentLat.toString()}    longitude  ${MyConstants.currentLong.toString()}");
+
     var req = {
       "latitude": MyConstants.currentLat.toString(),
       "longitude": MyConstants.currentLong.toString()

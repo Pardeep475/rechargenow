@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:recharge_now/app/home_screen.dart';
 import 'package:recharge_now/auth/login_screen.dart';
@@ -14,7 +13,10 @@ import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLanguage.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyConstants.dart';
+import 'package:recharge_now/utils/SizeConfig.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'location/dummy_location.dart';
 
 void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
@@ -56,33 +58,33 @@ class MyApp extends StatelessWidget {
       create: (context) => appLanguage,
       child: Consumer<AppLanguage>(
         builder: (context, model, child) {
-          return MaterialApp(
-            title: AllString.app_name,
-            debugShowCheckedModeBanner: false,
-            home: SplashScreen(),
-            theme: appTheme,
-            routes: routes,
-            //debugShowCheckedModeBanner: false,
-            localizationsDelegates: [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-            ],
-            locale: model.appLocal,
-            supportedLocales: [
-              Locale('en', 'US'),
-              Locale('de', 'DE'),
-            ],
-          );
+          return LayoutBuilder(builder: (context, constraints) {
+            return OrientationBuilder(builder: (context, orientation) {
+              SizeConfig().init(constraints, orientation);
+              return MaterialApp(
+                title: AllString.app_name,
+                debugShowCheckedModeBanner: false,
+                home: SplashScreen(),
+                theme: appTheme,
+                routes: routes,
+                //debugShowCheckedModeBanner: false,
+                localizationsDelegates: [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                ],
+                locale: model.appLocal,
+                supportedLocales: [
+                  Locale('en', 'US'),
+                  Locale('de', 'DE'),
+                ],
+              );
+            });
+          });
         },
       ),
     );
     return matApp;
   }
-
-
 }
-
-
-

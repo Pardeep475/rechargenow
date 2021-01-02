@@ -113,6 +113,7 @@ class Dimens {
   static final ninetyNine = 11.05 * SizeConfig.heightMultiplier;
   static final hundred = 11.16 * SizeConfig.heightMultiplier;
 
+  static final oneTwentyFive = 13.95 * SizeConfig.heightMultiplier;
   static final oneThirty = 14.508 * SizeConfig.heightMultiplier;
   static final oneForty = 15.625 * SizeConfig.heightMultiplier;
   static final oneFifty = 16.741 * SizeConfig.heightMultiplier;
@@ -124,6 +125,7 @@ class Dimens {
   static final oneEightyFive = 20.66 * SizeConfig.heightMultiplier;
   static final twoForty = 26.7857 * SizeConfig.heightMultiplier;
   static final twoEighty = 31.25 * SizeConfig.heightMultiplier;
+  static final threeHundurd = 33.48 * SizeConfig.heightMultiplier;
 
   static final cameraZoom = 8;
 }

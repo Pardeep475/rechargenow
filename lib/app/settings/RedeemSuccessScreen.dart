@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recharge_now/common/myStyle.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -118,7 +119,7 @@ class _RedeemSuccess extends State<RedeemSuccess> {
                         bottom: 65,
                         right: screenPadding),
                     child: buttonView(
-                        text: "Weiter",
+                        text: AppLocalizations.of(context).translate('Next'),
                         callback: () {
                          navigateToHome();
                         })),

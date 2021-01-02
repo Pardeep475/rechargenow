@@ -6,6 +6,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:progress_dialog/progress_dialog.dart';
+// http://3.64.19.80/stations
+// sarfrazmalik111@gmail.com
+// MSMalik099
 
 String BASE_URL = 'http://3.64.19.80/api/users';
 String PAYMENT_BASE_URL = 'http://3.64.19.80/api/payment';
@@ -66,6 +69,17 @@ Future<http.Response> getMapLocationsApi(request, accessToken) async {
       body: request);
   return response;
 }
+
+Future<http.Response> testNotificaitonFired(accessToken) async {
+  final response = await http.post('http://3.64.19.80/api/test/test-notification',
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'accessToken': accessToken,
+      },
+  );
+  return response;
+}
+
 
 Future<http.Response> getNearbyLocationsApi(request, accessToken) async {
   final response = await http.post('$BASE_URL/get-nearby-locations',
