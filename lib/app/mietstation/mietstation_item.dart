@@ -11,6 +11,11 @@ class MietStationItem extends StatelessWidget {
 
   MietStationItem({this.nearbyLocation});
 
+  display(){
+    var display = "50";
+    var message = "You have received a bonus of $display for the friend request";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,8 +49,8 @@ class MietStationItem extends StatelessWidget {
                     ),
                     Text(
                       nearbyLocation.open
-                          ? AppLocalizations.of(context).translate("Open")
-                          : AppLocalizations.of(context).translate("Close"),
+                          ? AppLocalizations.of(context).translate("Open").toUpperCase()
+                          : AppLocalizations.of(context).translate("Close").toUpperCase(),
                       style: TextStyle(
                           fontSize: 11.0,
                           height: 1.5,
@@ -65,7 +70,7 @@ class MietStationItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        nearbyLocation.category,
+                        nearbyLocation.category.toUpperCase(),
                         style: TextStyle(
                             fontSize: 11.0,
                             height: 1.5,

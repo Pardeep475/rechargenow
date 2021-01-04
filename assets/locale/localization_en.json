@@ -208,6 +208,7 @@
   "You can only borrow one Powerbank at a time": "You can only borrow one Powerbank at a time",
   "You have successfully brought back the Powerbank": "You have successfully brought back the Powerbank",
   "Your Powerbank has been successfully released from slot": "Your Powerbank has been successfully released from slot",
+  "Your Powerbank has been successfully released from slot two": " ",
   "RENTAL PERIOD EXCEEDED": "Rental period exceeded",
   "RENTAL PERIOD EXCEEDED DES": "You have exceeded the rental period of 7 days The Powerbank is now yours and cannot be returned",
   "RENTAL STATION IS OFFLINE": "RENTAL STATION IS OFFLINE",
@@ -233,5 +234,7 @@
   "USER_VIP": "Congratulations",
   "USER_VIP_MSG": "You are now a VIP member of RechargeNow. Rent a Powerbank for free at every rental station",
   "INVALID_INPUT": "Incorrect data",
-  "INVALID_INPUT_MSG": "You made a mistake with your login data. Try it again"
+  "INVALID_INPUT_MSG": "You made a mistake with your login data. Try it again",
+  "FAILED_TXN_EXISTS": "Your payment method not correct, please contact our support"
+
 }

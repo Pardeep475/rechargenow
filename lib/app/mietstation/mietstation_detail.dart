@@ -119,22 +119,18 @@ class _MietStationState extends State<MietStationDetailScreen> {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(top: Dimens.fifteen),
-                      child: SizedBox(
-                        height: Dimens.thirty,
-                        width: Dimens.forty,
-                        child: SvgPicture.asset(
-                          'assets/images/back.svg',
-                          fit: BoxFit.none,
-                        ),
-                      ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    height: Dimens.thirty,
+                    width: Dimens.forty,
+                    margin: EdgeInsets.only(top: Dimens.fifteen),
+                    alignment: Alignment.centerLeft,
+                    child: SvgPicture.asset(
+                      'assets/images/back.svg',
+                      fit: BoxFit.none,
                     ),
                   ),
                 ),

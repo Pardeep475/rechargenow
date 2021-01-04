@@ -160,8 +160,8 @@ class ItemStationTower extends StatelessWidget {
                         width: Dimens.eighty,
                         child: Text(
                           data.open
-                              ? AppLocalizations.of(context).translate("Open")
-                              : AppLocalizations.of(context).translate("Close"),
+                              ? AppLocalizations.of(context).translate("Open").toUpperCase()
+                              : AppLocalizations.of(context).translate("Close").toUpperCase(),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

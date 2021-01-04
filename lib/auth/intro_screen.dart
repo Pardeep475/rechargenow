@@ -82,12 +82,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 top: Dimens.oneTwentyFive,
                 child: InkWell(
                   onTap: () {
-                    if (widget.isFromHome) {
-                      onDonePress();
-                    } else {
-                      Navigator.of(context)
-                          .pushReplacementNamed('/LoginScreen');
-                    }
+                   Navigator.pop(context);
                   },
                   child: Container(
                       decoration: BoxDecoration(
@@ -170,12 +165,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 top: Dimens.oneTwentyFive,
                 child: InkWell(
                   onTap: () {
-                    if (widget.isFromHome) {
-                      onDonePress();
-                    } else {
-                      Navigator.of(context)
-                          .pushReplacementNamed('/LoginScreen');
-                    }
+                    Navigator.pop(context);
                   },
                   child: Container(
                       decoration: BoxDecoration(
@@ -258,12 +248,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 top: Dimens.oneTwentyFive,
                 child: InkWell(
                   onTap: () {
-                    if (widget.isFromHome) {
-                      onDonePress();
-                    } else {
-                      Navigator.of(context)
-                          .pushReplacementNamed('/LoginScreen');
-                    }
+                    Navigator.pop(context);
                   },
                   child: Container(
                       decoration: BoxDecoration(
@@ -346,12 +331,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
           top: Dimens.oneTwentyFive,
           child: InkWell(
             onTap: () {
-              if (widget.isFromHome) {
-                onDonePress();
-              } else {
-                Navigator.of(context)
-                    .pushReplacementNamed('/LoginScreen');
-              }
+              Navigator.pop(context);
             },
             child: Container(
                 decoration: BoxDecoration(
@@ -391,7 +371,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 decoration: new BoxDecoration(
                     gradient: new LinearGradient(
                         colors: [
-                          Colors.white60,
+                          Colors.white10,
                           Colors.white,
                         ],
                         stops: [

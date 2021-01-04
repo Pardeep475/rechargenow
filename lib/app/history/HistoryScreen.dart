@@ -272,6 +272,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void showBottomSheet(BuildContext context, History history) {
+    debugPrint("History_Address :-   ${history.locationAddress}");
+    debugPrint("History_Address :-   ${history.returnLocationAddress}");
+
     showModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.transparent,
@@ -476,9 +479,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          history.locationName,
+                          "Taken",
                           style: TextStyle(
                               fontFamily: fontFamily,
                               fontWeight: FontWeight.w700,
@@ -486,16 +490,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               fontSize: Dimens.forteen,
                               height: 1.2),
                         ),
-                        Text(
-                          "#${history.locationName}",
-                          style: addBtnTextStyle,
+                        SizedBox(
+                          width: 0,
+                        ),
+                        Expanded(
+                          child: Text(
+                            "${history.locationName}\n${history.locationAddress}",
+                            maxLines: 3,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w600,
+                              fontSize: Dimens.thrteen,
+                              height: 1.4,
+                              color: Color(0xFF848490),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: Dimens.four,
+                      height: Dimens.eight,
                     ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
@@ -504,12 +522,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               fontFamily: fontFamily,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF2F2F2F),
+
                               fontSize: Dimens.forteen,
                               height: 1.2),
                         ),
-                        Text(
-                          "${history.returnLocationName}",
-                          style: addBtnTextStyle,
+                        SizedBox(
+                          width: 80,
+                        ),
+                        Expanded(
+                          child: Text(
+                            "${history.returnLocationName}\n${history.returnLocationAddress}",
+                            maxLines: 3,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontFamily: fontFamily,
+                              fontWeight: FontWeight.w600,
+                              fontSize: Dimens.thrteen,
+                              height: 1.4,
+                              color: Color(0xFF848490),
+                            ),
+                          ),
                         ),
                       ],
                     ),

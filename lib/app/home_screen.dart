@@ -1499,12 +1499,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             showBottomSheet = true;
           });
           _showDifferentTypeOfDialogs("SUCCESS", context);
-        } else if (jsonResponse['status'].toString() == "0") {
-          _showDifferentTypeOfDialogs(
-              jsonResponse['message'].toString(), context);
-        } else if (jsonResponse['status'].toString() == "2") {
-          _showDifferentTypeOfDialogs(
-              jsonResponse['message'].toString(), context);
         } else if (jsonResponse['status'].toString() == "3") {
           _showDifferentTypeOfDialogs(
               jsonResponse['message'].toString(), context);
@@ -1524,7 +1518,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   callback: () {},
                 );
               });
-        } else if (jsonResponse['status'].toString() == "4") {
+        } else {
           _showDifferentTypeOfDialogs(
               jsonResponse['message'].toString(), context);
         }
@@ -1609,8 +1603,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     print(jsonReqString);
 
-    await getMapLocationsApi(
-            jsonReqString, prefs.get('accessToken').toString())
+    await getMapLocationsApi(jsonReqString, prefs.get('accessToken').toString())
         .then((response) {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -1860,7 +1853,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     //     builder: (BuildContext context) => myDialog);
   }
 
-  _showDifferentTypeOfDialogs(message, context) {
+  _showDifferentTypeOfDialogs(message, context, {String currncy}) {
     switch (message) {
       case "SOMETHING_WRONG":
         {
@@ -1997,9 +1990,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           openDialogWithSlideInAnimation(
             context: context,
             itemWidget: CommonErrorDialog(
-              title: AppLocalizations.of(context).translate("THANK YOU"),
-              descriptions: AppLocalizations.of(context).translate(
-                  "Your Powerbank has been successfully released from slot"),
+              title: AppLocalizations.of(context).translate("Congratulations"),
+              descriptions:
+                  "${AppLocalizations.of(context).translate("Your Powerbank has been successfully released from slot")} $currncy ${AppLocalizations.of(context).translate("Your Powerbank has been successfully released from slot two")}",
               text: AppLocalizations.of(context).translate("Ok"),
               img: "assets/images/congratulation.svg",
               double: 37.0,
@@ -2009,6 +2002,24 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
         }
         break;
+      case "FAILED_TXN_EXISTS":
+        {
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions:
+                  AppLocalizations.of(context).translate("FAILED_TXN_EXISTS"),
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            ),
+          );
+        }
+        break;
+      //FAILED_TXN_EXISTS
       default:
         {
           openDialogWithSlideInAnimation(

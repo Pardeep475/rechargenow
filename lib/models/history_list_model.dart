@@ -45,6 +45,8 @@ class History {
   String type;
   String paymentStatus;
   String longitude;
+  String locationAddress;
+  String returnLocationAddress;
 
   History({
     this.totalAmount,
@@ -62,6 +64,8 @@ class History {
     this.type,
     this.paymentStatus,
     this.longitude,
+    this.locationAddress,
+    this.returnLocationAddress,
   });
 
   factory History.fromJson(Map<String, dynamic> json) => History(
@@ -80,6 +84,8 @@ class History {
     monthYear: json["monthYear"],
     paymentStatus: json["paymentStatus"],
     longitude: json["longitude"],
+    locationAddress: json["locationAddress"],
+    returnLocationAddress: json["returnLocationAddress"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -98,5 +104,7 @@ class History {
     "type": type,
     "paymentStatus": paymentStatus,
     "longitude": longitude,
+    "locationAddress": locationAddress,
+    "returnLocationAddress": returnLocationAddress,
   };
 }

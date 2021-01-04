@@ -16,7 +16,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'mietstation_detail.dart';
 import 'mietstation_item.dart';
 
-
 class StationListScreen extends StatefulWidget {
   @override
   _StationListScreenState createState() => _StationListScreenState();
@@ -53,7 +52,8 @@ class _StationListScreenState extends State<StationListScreen> {
       body: Column(
         children: <Widget>[
           appBarView(
-              name: AppLocalizations.of(context).translate("RENTAL STATION")
+              name: AppLocalizations.of(context)
+                  .translate("RENTAL STATION")
                   .toUpperCase(),
               context: context,
               callback: () {
@@ -61,13 +61,13 @@ class _StationListScreenState extends State<StationListScreen> {
               }),
           maplocationList == null
               ? Expanded(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
               : maplocationList.length == 0
-              ? emptyStation()
-              : listViewMietstation()
+                  ? emptyStation()
+                  : listViewMietstation()
         ],
       ),
     );
@@ -76,24 +76,25 @@ class _StationListScreenState extends State<StationListScreen> {
   listViewMietstation() {
     return Expanded(
       child: ListView.builder(
+          padding: EdgeInsets.symmetric(vertical:10,),
           itemCount: maplocationList.length,
           itemBuilder: (BuildContext context, int position) {
             return maplocationList == null ||
-                (maplocationList != null && maplocationList.length == 0)
+                    (maplocationList != null && maplocationList.length == 0)
                 ? emptyStation()
                 : InkWell(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              MietStationDetailScreen(
-                                nearbyLocation: maplocationList[position],
-                              )));
-                },
-                child: MietStationItem(
-                  nearbyLocation: maplocationList[position],
-                ));
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  MietStationDetailScreen(
+                                    nearbyLocation: maplocationList[position],
+                                  )));
+                    },
+                    child: MietStationItem(
+                      nearbyLocation: maplocationList[position],
+                    ));
           }),
     );
   }
@@ -101,18 +102,18 @@ class _StationListScreenState extends State<StationListScreen> {
   Widget bodyUI_WithApi_listView() {
     return maplocationList == null
         ? Center(
-      child: CircularProgressIndicator(),
-    )
+            child: CircularProgressIndicator(),
+          )
         : maplocationList.length == 0
-        ? emptyStation()
-        : ListView.builder(
-        physics: ClampingScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: maplocationList.length,
-        itemBuilder: (context, index) {
-          //Datum datum = eventList.data[index];
-          return MietStationItem();
-        });
+            ? emptyStation()
+            : ListView.builder(
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: maplocationList.length,
+                itemBuilder: (context, index) {
+                  //Datum datum = eventList.data[index];
+                  return MietStationItem();
+                });
   }
 
   emptyStation() {
@@ -151,10 +152,9 @@ class _StationListScreenState extends State<StationListScreen> {
     );
   }
 
-
   getStationsOnMapApi() {
-
-    debugPrint("my_current_lat_lng :-   latitude  ${MyConstants.currentLat.toString()}    longitude  ${MyConstants.currentLong.toString()}");
+    debugPrint(
+        "my_current_lat_lng :-   latitude  ${MyConstants.currentLat.toString()}    longitude  ${MyConstants.currentLong.toString()}");
 
     var req = {
       "latitude": MyConstants.currentLat.toString(),
@@ -172,7 +172,7 @@ class _StationListScreenState extends State<StationListScreen> {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         NearbyStationsListPojo stationsListPojo =
-        NearbyStationsListPojo.fromJson(jsonResponse);
+            NearbyStationsListPojo.fromJson(jsonResponse);
         maplocationList = [];
         maplocationList.addAll(stationsListPojo.nearbyLocations);
         print("CheckLength${maplocationList.length}");
@@ -298,7 +298,7 @@ class _StationListScreenState extends State<StationListScreen> {
               borderRadius: BorderRadius.all(Radius.circular(7)),
               side: BorderSide(width: 0.5, color: Colors.grey)),
           child: Container(
-            //margin: EdgeInsets.fromLTRB(20,0,0,0),
+              //margin: EdgeInsets.fromLTRB(20,0,0,0),
               width: 90.0,
               height: 90.0,
               // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
@@ -306,14 +306,14 @@ class _StationListScreenState extends State<StationListScreen> {
               decoration: new BoxDecoration(
                 shape: BoxShape.rectangle,
                 image: new DecorationImage(
-                  // fit: BoxFit.fill,
+                    // fit: BoxFit.fill,
                     image: new NetworkImage(url))
                 //,fit: BoxFit.cover,
                 ,
                 // size: Size(300.0, 400.0),
               ) // You can add a Icon instead of text also, like below.
-            //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
-          ),
+              //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
+              ),
         ),
       ),
     );

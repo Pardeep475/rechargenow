@@ -83,9 +83,6 @@ class _NotificationState extends State<NotificationScreen> {
         if (notifications.length == 0) {}
         setState(() {});
 
-        _showErrorDialog(AppLocalizations.of(context).translate("INVALID_INPUT"),
-            AppLocalizations.of(context).translate("INVALID_INPUT_MSG"));
-
       } else {
         _showErrorDialog(AppLocalizations.of(context).translate("ERROR OCCURRED"),
             AppLocalizations.of(context).translate("something_went_wrong"));
@@ -116,3 +113,5 @@ class _NotificationState extends State<NotificationScreen> {
 }
 // }
 // emptyNotification(),
+//_showErrorDialog(AppLocalizations.of(context).translate("INVALID_INPUT"),
+//             AppLocalizations.of(context).translate("INVALID_INPUT_MSG"));

@@ -29,7 +29,7 @@ String IMAGE_BASE_URL = 'http://3.64.19.80';
 /*http://3.125.79.59:8088/RechargeNow/api/users/
 login*/
 Future<http.Response> createLoginRequestApi(request) async {
-  final response = await http.post('$BASE_URL/login',
+  final response = await http.post('$BASE_URL/login2',
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
         //'XAPIKEY' : MyConstants.XAPIKEY,
