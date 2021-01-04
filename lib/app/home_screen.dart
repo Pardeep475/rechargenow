@@ -125,21 +125,20 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _animateController =
         AnimationController(vsync: this, duration: Duration(seconds: 2));
+
     loadShredPref();
     firebaseCloudMessaging_Listeners();
-
-    // if(widget.isLocationOn == null){
-    //   checkLocationServiceEnableOrDisable();
-    // }else if (widget.isLocationOn){
-    //
-    // }
-    //
-    // if(widget.isLocationOn){
-    //
-    // }
-    checkLocationServiceEnableOrDisable();
-    // permissionCode();
-    getLocationData();
+    if (widget.isLocationOn != null) {
+      if (widget.isLocationOn) {
+        getStationsOnMapApi();
+      } else {
+        checkLocationServiceEnableOrDisable();
+        getLocationData();
+      }
+    } else {
+      checkLocationServiceEnableOrDisable();
+      getLocationData();
+    }
   }
 
   locationChangeListener() {
@@ -149,9 +148,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             currentLocation.latitude.toString() +
             " : " +
             currentLocation.longitude.toString());
-        // MyConstants.currentLat = currentLocation.latitude;
-        // MyConstants.currentLong = currentLocation.longitude;
-
         MyConstants.currentLat = currentLocation.latitude;
         MyConstants.currentLong = currentLocation.longitude;
         prefs.setDouble("lat", _locationData.latitude);
@@ -164,14 +160,13 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           //animateFirstTime = false;
           getStationsOnMapApi();
         }
-
         setMarker_OnCurrentLocation();
       });
     });
   }
 
-  getLocationData() {
-    Geolocator().getCurrentPosition().then((Position position) {
+  getLocationData() async {
+    await Geolocator().getCurrentPosition().then((Position position) {
       setState(() {
         Position _currentPosition = position;
         MyConstants.currentLat = _currentPosition.latitude;
@@ -199,7 +194,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _lastMapPosition = _latlng1;
       getStationsOnMapApi();
     } else if (_serviceEnabled) {
-      locationChangeListener();
+      // locationChangeListener();
       _getCurrentLocation();
     }
   }
@@ -743,7 +738,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-
                 dense: true,
                 contentPadding: EdgeInsets.only(
                     left: Dimens.twentyFive, right: Dimens.fifteen),
@@ -1092,10 +1086,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  _getCurrentLocation() {
+  _getCurrentLocation() async {
     if (LocalPlatform().isIOS) {
       if (iosLocationFirstTime) {
-        Geolocator().getCurrentPosition().then((Position position) {
+        await Geolocator().getCurrentPosition().then((Position position) {
           setState(() {
             Position _currentPosition = position;
             MyConstants.currentLat = _currentPosition.latitude;
@@ -1171,334 +1165,331 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
   }
 
-  custumAlertDialogBatteryUnlocked(slotNumber, context) {}
+  // custumAlertDialogBatteryUnlocked(slotNumber, context) {}
 
-  void custumBottomSheetMarkerClick(MapLocation data, context) {
-    showModalBottomSheet(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        backgroundColor: Colors.transparent,
-        context: context,
-        builder: (builder) {
-          return Container(
-            height: 290.0,
-            child: Stack(
-              children: <Widget>[
-                Container(
-                    margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
-                    //padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: const Radius.circular(15.0),
-                          topRight: const Radius.circular(15.0)),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black12, blurRadius: 5)
-                      ],
-                    ),
-                    child: Container(
-                      margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                      child: Stack(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Align(
-                                alignment: Alignment.topRight,
-                                child: Icon(Icons.clear)),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Flexible(
-                                    child: Container(
-                                      margin: EdgeInsets.fromLTRB(8, 20, 8, 8),
-                                      padding: EdgeInsets.all(8),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(data.name.toString(),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold)),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(data.category.toString(),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: primaryGreenColor,
-                                                  fontWeight: FontWeight.bold)),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(data.address.toString(),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: TextStyle(fontSize: 14)),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.max,
-                                            //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              Row(
-                                                children: <Widget>[
-                                                  SizedBox(
-                                                    width: 15,
-                                                    height: 15,
-                                                    child: SvgPicture.asset(
-                                                      'assets/images/placeholder.svg',
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Text(data.distance.toString(),
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold))
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Row(
-                                                children: <Widget>[
-                                                  SvgPicture.asset(
-                                                    'assets/images/battery-powerbank.svg',
-                                                  ),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Text(
-                                                      data.availablePowerbanks
-                                                              .toString() +
-                                                          " " +
-                                                          AppLocalizations.of(
-                                                                  context)
-                                                              .translate(
-                                                                  "Available"),
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold))
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Row(
-                                                children: <Widget>[
-                                                  SvgPicture.asset(
-                                                    'assets/images/Star.svg',
-                                                  ),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Text(
-                                                      data.freeSlots
-                                                              .toString() +
-                                                          " " +
-                                                          AppLocalizations.of(
-                                                                  context)
-                                                              .translate(
-                                                                  "Free"),
-                                                      style: TextStyle(
-                                                          fontSize: 10,
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold))
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                child: Row(
-                                  // mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    /*navigateButton(data),
+  // void custumBottomSheetMarkerClick(MapLocation data, context) {
+  //   showModalBottomSheet(
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(5.0),
+  //       ),
+  //       backgroundColor: Colors.transparent,
+  //       context: context,
+  //       builder: (builder) {
+  //         return Container(
+  //           height: 290.0,
+  //           child: Stack(
+  //             children: <Widget>[
+  //               Container(
+  //                   margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
+  //                   //padding: EdgeInsets.all(8),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.white,
+  //                     borderRadius: BorderRadius.only(
+  //                         topLeft: const Radius.circular(15.0),
+  //                         topRight: const Radius.circular(15.0)),
+  //                     boxShadow: [
+  //                       BoxShadow(color: Colors.black12, blurRadius: 5)
+  //                     ],
+  //                   ),
+  //                   child: Container(
+  //                     margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
+  //                     child: Stack(
+  //                       children: <Widget>[
+  //                         GestureDetector(
+  //                           onTap: () {
+  //                             Navigator.of(context).pop();
+  //                           },
+  //                           child: Align(
+  //                               alignment: Alignment.topRight,
+  //                               child: Icon(Icons.clear)),
+  //                         ),
+  //                         Column(
+  //                           mainAxisAlignment: MainAxisAlignment.start,
+  //                           children: <Widget>[
+  //                             Row(
+  //                               mainAxisSize: MainAxisSize.max,
+  //                               mainAxisAlignment: MainAxisAlignment.start,
+  //                               children: <Widget>[
+  //                                 Flexible(
+  //                                   child: Container(
+  //                                     margin: EdgeInsets.fromLTRB(8, 20, 8, 8),
+  //                                     padding: EdgeInsets.all(8),
+  //                                     child: Column(
+  //                                       mainAxisSize: MainAxisSize.max,
+  //                                       mainAxisAlignment:
+  //                                           MainAxisAlignment.start,
+  //                                       crossAxisAlignment:
+  //                                           CrossAxisAlignment.start,
+  //                                       children: <Widget>[
+  //                                         Text(data.name.toString(),
+  //                                             overflow: TextOverflow.ellipsis,
+  //                                             maxLines: 1,
+  //                                             style: TextStyle(
+  //                                                 fontSize: 16,
+  //                                                 fontWeight: FontWeight.bold)),
+  //                                         SizedBox(
+  //                                           height: 5,
+  //                                         ),
+  //                                         Text(data.category.toString(),
+  //                                             overflow: TextOverflow.ellipsis,
+  //                                             maxLines: 1,
+  //                                             style: TextStyle(
+  //                                                 fontSize: 14,
+  //                                                 color: primaryGreenColor,
+  //                                                 fontWeight: FontWeight.bold)),
+  //                                         SizedBox(
+  //                                           height: 10,
+  //                                         ),
+  //                                         Text(data.address.toString(),
+  //                                             overflow: TextOverflow.ellipsis,
+  //                                             maxLines: 1,
+  //                                             style: TextStyle(fontSize: 14)),
+  //                                         SizedBox(
+  //                                           height: 10,
+  //                                         ),
+  //                                         Row(
+  //                                           mainAxisSize: MainAxisSize.max,
+  //                                           //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                                           children: <Widget>[
+  //                                             Row(
+  //                                               children: <Widget>[
+  //                                                 SizedBox(
+  //                                                   width: 15,
+  //                                                   height: 15,
+  //                                                   child: SvgPicture.asset(
+  //                                                     'assets/images/placeholder.svg',
+  //                                                   ),
+  //                                                 ),
+  //                                                 SizedBox(
+  //                                                   width: 5,
+  //                                                 ),
+  //                                                 Text(data.distance.toString(),
+  //                                                     style: TextStyle(
+  //                                                         fontSize: 10,
+  //                                                         color: Colors.black,
+  //                                                         fontWeight:
+  //                                                             FontWeight.bold))
+  //                                               ],
+  //                                             ),
+  //                                             SizedBox(
+  //                                               width: 20,
+  //                                             ),
+  //                                             Row(
+  //                                               children: <Widget>[
+  //                                                 SvgPicture.asset(
+  //                                                   'assets/images/battery-powerbank.svg',
+  //                                                 ),
+  //                                                 SizedBox(
+  //                                                   width: 5,
+  //                                                 ),
+  //                                                 Text(
+  //                                                     data.availablePowerbanks
+  //                                                             .toString() +
+  //                                                         " " +
+  //                                                         AppLocalizations.of(
+  //                                                                 context)
+  //                                                             .translate(
+  //                                                                 "Available"),
+  //                                                     style: TextStyle(
+  //                                                         fontSize: 10,
+  //                                                         color: Colors.black,
+  //                                                         fontWeight:
+  //                                                             FontWeight.bold))
+  //                                               ],
+  //                                             ),
+  //                                             SizedBox(
+  //                                               width: 20,
+  //                                             ),
+  //                                             Row(
+  //                                               children: <Widget>[
+  //                                                 SvgPicture.asset(
+  //                                                   'assets/images/Star.svg',
+  //                                                 ),
+  //                                                 SizedBox(
+  //                                                   width: 5,
+  //                                                 ),
+  //                                                 Text(
+  //                                                     data.freeSlots
+  //                                                             .toString() +
+  //                                                         " " +
+  //                                                         AppLocalizations.of(
+  //                                                                 context)
+  //                                                             .translate(
+  //                                                                 "Free"),
+  //                                                     style: TextStyle(
+  //                                                         fontSize: 10,
+  //                                                         color: Colors.black,
+  //                                                         fontWeight:
+  //                                                             FontWeight.bold))
+  //                                               ],
+  //                                             )
+  //                                           ],
+  //                                         ),
+  //                                       ],
+  //                                     ),
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                             SizedBox(
+  //                               height: 10,
+  //                             ),
+  //                             Container(
+  //                               margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+  //                               child: Row(
+  //                                 // mainAxisSize: MainAxisSize.max,
+  //                                 mainAxisAlignment:
+  //                                     MainAxisAlignment.spaceBetween,
+  //                                 children: <Widget>[
+  //                                   /*navigateButton(data),
+  //
+  //                     markerDetailsButton(data),*/
+  //                                   Expanded(
+  //                                     child: GestureDetector(
+  //                                       onTap: () {
+  //                                         Navigator.of(context).pop();
+  //                                         onStartNavigationClicked(data);
+  //                                       },
+  //                                       child: Container(
+  //                                         height: 45,
+  //                                         decoration: new BoxDecoration(
+  //                                           border: new Border.all(
+  //                                               width: .5, color: Colors.grey),
+  //                                           borderRadius:
+  //                                               const BorderRadius.all(
+  //                                             const Radius.circular(30.0),
+  //                                           ),
+  //                                         ),
+  //                                         child: Center(
+  //                                           child: new Text(
+  //                                               AppLocalizations.of(context)
+  //                                                   .translate("Navigate"),
+  //                                               style: new TextStyle(
+  //                                                   color: Colors.black,
+  //                                                   //fontWeight: FontWeight.bold,
+  //                                                   fontSize: 14.0,
+  //                                                   fontWeight:
+  //                                                       FontWeight.bold)),
+  //                                         ),
+  //                                       ),
+  //                                     ),
+  //                                   ),
+  //                                   SizedBox(
+  //                                     width: 10,
+  //                                   ),
+  //                                   Expanded(
+  //                                     child: GestureDetector(
+  //                                       onTap: () {
+  //                                         Navigator.of(context).pop();
+  //                                         Navigator.of(context).push(
+  //                                             new MaterialPageRoute(
+  //                                                 builder: (BuildContext
+  //                                                         context) =>
+  //                                                     StationDetailsMarkerClickScreen(
+  //                                                         nearbyLocation:
+  //                                                             data)));
+  //                                       },
+  //                                       child: Container(
+  //                                         decoration: new BoxDecoration(
+  //                                           color: primaryGreenColor,
+  //                                           /* border: new Border.all(
+  //                         width: .5,
+  //                         color:Colors.grey),*/
+  //                                           borderRadius:
+  //                                               const BorderRadius.all(
+  //                                             const Radius.circular(30.0),
+  //                                           ),
+  //                                         ),
+  //                                         height: 45,
+  //                                         child: Center(
+  //                                           child: new Text(
+  //                                               AppLocalizations.of(context)
+  //                                                   .translate("Details"),
+  //                                               style: new TextStyle(
+  //                                                   color: Colors.white,
+  //                                                   //fontWeight: FontWeight.bold,
+  //                                                   fontSize: 14.0,
+  //                                                   fontWeight:
+  //                                                       FontWeight.bold)),
+  //                                         ),
+  //                                       ),
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   )),
+  //
+  //               //center logo code
+  //               Align(
+  //                 alignment: Alignment.topCenter,
+  //                 child: Container(
+  //                   //margin: EdgeInsets.only(top: 200),
+  //                   padding: EdgeInsets.all(10),
+  //                   child: Card(
+  //                     elevation: 5,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.all(Radius.circular(45)),
+  //                       // side: BorderSide(width: 1, color: Colors.grey)
+  //                     ),
+  //                     child: Container(
+  //                       //color: primaryGreenColor,
+  //                       //margin: EdgeInsets.fromLTRB(20,0,0,0),
+  //                       width: 90.0,
+  //                       height: 90.0,
+  //                       // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
+  //
+  //                       decoration: new BoxDecoration(
+  //                           shape: BoxShape.circle,
+  //                           image: new DecorationImage(
+  //                               fit: BoxFit.fill,
+  //                               image: new NetworkImage(
+  //                                   data.imageFullPath.toString())))
+  //                       /*child: IconButton(
+  //                    icon:  Image.network(IMAGE_BASE_URL+data.imageAvatarPath.toString()
+  //                      //,fit: BoxFit.cover,
+  //                    ),
+  //                    // size: Size(300.0, 400.0),
+  //                    onPressed: () {
+  //
+  //                    },
+  //                  )*/
+  //                       , // You can add a Icon instead of text also, like below.
+  //                       //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
+  //                     ),
+  //                   ),
+  //                 ), /*Container(
+  //                color: primaryGreenColor,
+  //                //padding: EdgeInsets.all(10),
+  //                child: SizedBox(
+  //                    width: 80,
+  //                    height: 80,
+  //                    child:  Image.asset("assets/images/logo.png"))*/ /*Image.network(IMAGE_BASE_URL+data.imageAvatarPath))*/ /*
+  //
+  //              */ /*Image.network(
+  //                                           MyConstants.SERVICE_IMAGE+datum.image,
+  //                                           width: 60,
+  //                                           height: 60,
+  //                                           fit:BoxFit.fill )*/ /*
+  //            )*/
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       });
+  // }
 
-                      markerDetailsButton(data),*/
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.of(context).pop();
-                                          onStartNavigationClicked(data);
-                                        },
-                                        child: Container(
-                                          height: 45,
-                                          decoration: new BoxDecoration(
-                                            border: new Border.all(
-                                                width: .5, color: Colors.grey),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              const Radius.circular(30.0),
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: new Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("Navigate"),
-                                                style: new TextStyle(
-                                                    color: Colors.black,
-                                                    //fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context).push(
-                                              new MaterialPageRoute(
-                                                  builder: (BuildContext
-                                                          context) =>
-                                                      StationDetailsMarkerClickScreen(
-                                                          nearbyLocation:
-                                                              data)));
-                                        },
-                                        child: Container(
-                                          decoration: new BoxDecoration(
-                                            color: primaryGreenColor,
-                                            /* border: new Border.all(
-                          width: .5,
-                          color:Colors.grey),*/
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              const Radius.circular(30.0),
-                                            ),
-                                          ),
-                                          height: 45,
-                                          child: Center(
-                                            child: new Text(
-                                                AppLocalizations.of(context)
-                                                    .translate("Details"),
-                                                style: new TextStyle(
-                                                    color: Colors.white,
-                                                    //fontWeight: FontWeight.bold,
-                                                    fontSize: 14.0,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )),
-
-                //center logo code
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    //margin: EdgeInsets.only(top: 200),
-                    padding: EdgeInsets.all(10),
-                    child: Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(45)),
-                        // side: BorderSide(width: 1, color: Colors.grey)
-                      ),
-                      child: Container(
-                        //color: primaryGreenColor,
-                        //margin: EdgeInsets.fromLTRB(20,0,0,0),
-                        width: 90.0,
-                        height: 90.0,
-                        // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
-
-                        decoration: new BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: new DecorationImage(
-                                fit: BoxFit.fill,
-                                image: new NetworkImage(
-                                    data.imageFullPath.toString())))
-                        /*child: IconButton(
-                     icon:  Image.network(IMAGE_BASE_URL+data.imageAvatarPath.toString()
-                       //,fit: BoxFit.cover,
-                     ),
-                     // size: Size(300.0, 400.0),
-                     onPressed: () {
-
-                     },
-                   )*/
-                        , // You can add a Icon instead of text also, like below.
-                        //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
-                      ),
-                    ),
-                  ), /*Container(
-                 color: primaryGreenColor,
-                 //padding: EdgeInsets.all(10),
-                 child: SizedBox(
-                     width: 80,
-                     height: 80,
-                     child:  Image.asset("assets/images/logo.png"))*/ /*Image.network(IMAGE_BASE_URL+data.imageAvatarPath))*/ /*
-
-               */ /*Image.network(
-                                            MyConstants.SERVICE_IMAGE+datum.image,
-                                            width: 60,
-                                            height: 60,
-                                            fit:BoxFit.fill )*/ /*
-             )*/
-                ),
-              ],
-            ),
-          );
-        });
-  }
-
-  rentBattery_PowerbankAPI(userId, deviceId) {
+  rentBattery_PowerbankAPI(userId, deviceId) async {
     MyUtils.showLoaderDialog(context);
     var req = {"userId": userId, "deviceId": deviceId};
-
-    print(req);
     var jsonReqString = json.encode(req);
-    var apicall;
-    apicall = rentBattery_PowerbankApi(
-        jsonReqString, prefs.get('accessToken').toString());
-    apicall.then((response) {
+    await rentBattery_PowerbankApi(
+            jsonReqString, prefs.get('accessToken').toString())
+        .then((response) {
       print(response.body);
       if (response.statusCode == 200) {
         Navigator.pop(context);
@@ -1541,8 +1532,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         Navigator.pop(context);
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
-    }).catchError((error) {
-      print('error : $error');
+    }).catchError((onError) {
       Navigator.pop(context);
       _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
@@ -1553,7 +1543,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void loadShredPref() async {
     prefs = await SharedPreferences.getInstance();
     timer = Timer.periodic(
-        Duration(seconds: 5), (Timer t) => getStationsOnMapApi());
+        Duration(seconds: 60), (Timer t) => getStationsOnMapApi());
     // getStationsOnMapApi();
     walletAmount = await prefs.get('walletAmount').toString();
     isNotificationSent = await prefs.getBool('isNotificationSent');
@@ -1575,9 +1565,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   getLocation() async {
     LocationData _locationData;
-
     _locationData = await location.getLocation();
-
     MyConstants.currentLat = _locationData.latitude;
     MyConstants.currentLong = _locationData.longitude;
     prefs.setDouble("lat", _locationData.latitude);
@@ -1598,8 +1586,16 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  getStationsOnMapApi() {
-    getLocation();
+  getStationsOnMapApi() async {
+    if (widget.isLocationOn != null) {
+      if (widget.isLocationOn) {
+      } else {
+        getLocation();
+      }
+    } else {
+      getLocation();
+    }
+
     var betteryAlarm = prefs.getBool('betteryAlarm');
     if (betteryAlarm != null && betteryAlarm) {
       initbatteryInfo();
@@ -1607,18 +1603,15 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     var req = {
       "latitude": MyConstants.currentLat.toString(),
       "longitude": MyConstants.currentLong.toString()
-      /*"latitude": "30.7320822",
-      "longitude": "76.76264739999999"*/
     };
     var jsonReqString = json.encode(req);
     print("accesstoken " + prefs.get('accessToken').toString());
 
     print(jsonReqString);
 
-    var apicall =
-        getMapLocationsApi(jsonReqString, prefs.get('accessToken').toString());
-    apicall.then((response) {
-      debugPrint('status_12345 ---->     ${response.statusCode}');
+    await getMapLocationsApi(
+            jsonReqString, prefs.get('accessToken').toString())
+        .then((response) {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         print(jsonResponse.toString());
@@ -1632,91 +1625,14 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
         StationsListPojo stationsListPojo =
             StationsListPojo.fromJson(jsonResponse);
-        debugPrint('status_12345 ---->     ${stationsListPojo.status}');
-        debugPrint('status_12345 ---->     ${stationsListPojo.message}');
         if (stationsListPojo.status == 0 &&
             stationsListPojo.message.compareTo('ILLEGAL_ACCESS') == 0) {
-          debugPrint('status_12345 ---->     ${stationsListPojo.message}');
           prefs.setBool('is_login', false);
           navigateToLoginScreen();
         } else {
           maplocationList = [];
           maplocationList = stationsListPojo.mapLocations;
-          if (maplocationList.length == 0) {
-            /*   var json = {
-              "message": "Success",
-              "mapLocations": [
-                {
-                  "id": 1,
-                  "name": "LocationA",
-                  "address":
-                  "Capital O 10540 Hotel JD Residency, Shahi Majra, Industrial Area, Sector 58, Sahibzada Ajit Singh Nagar, Punjab, India",
-                  "category": "Restaurant",
-                  "onlineStations": 0,
-                  "distance": "1.54 KM",
-                  "latitude": "29.907420799",
-                  "longitude": "77.9096036",
-                  "description": "This is the setails for location",
-                  "mondayHours": "10:00 - 22:00",
-                  "tuesdayHours": "10:00 - 22:00",
-                  "wednesdayHours": "10:00 - 22:00",
-                  "thursdayHours": "10:00 - 22:00",
-                  "fridayHours": "10:00 - 22:00",
-                  "saturdayHours": "10:00 - 22:00",
-                  "sundayHours": "10:00 - 22:00",
-                  "mondayClosed": false,
-                  "tuesdayClosed": false,
-                  "wednesdayClosed": false,
-                  "thursdayClosed": false,
-                  "fridayClosed": false,
-                  "saturdayClosed": false,
-                  "sundayClosed": true,
-                  "availablePowerbanks": 21,
-                  "freeSlots": 3,
-                  "imagePath": "/uploadedFiles/locations/Home.jpg",
-                  "thumbnailPath": "/uploadedFiles/locations/HomeA.jpg",
-                  "open": false
-                },
-                {
-                  "id": 1,
-                  "name": "LocationA",
-                  "address":
-                  "Capital O 10540 Hotel JD Residency, Shahi Majra, Industrial Area, Sector 58, Sahibzada Ajit Singh Nagar, Punjab, India",
-                  "category": "Restaurant",
-                  "onlineStations": 0,
-                  "distance": "1.54 KM",
-                  "latitude": "29.907420799",
-                  "longitude": "77.9096036",
-                  "description": "This is the setails for location",
-                  "mondayHours": "10:00 - 22:00",
-                  "tuesdayHours": "10:00 - 22:00",
-                  "wednesdayHours": "10:00 - 22:00",
-                  "thursdayHours": "10:00 - 22:00",
-                  "fridayHours": "10:00 - 22:00",
-                  "saturdayHours": "10:00 - 22:00",
-                  "sundayHours": "10:00 - 22:00",
-                  "mondayClosed": false,
-                  "tuesdayClosed": false,
-                  "wednesdayClosed": false,
-                  "thursdayClosed": false,
-                  "fridayClosed": false,
-                  "saturdayClosed": false,
-                  "sundayClosed": true,
-                  "availablePowerbanks": 21,
-                  "freeSlots": 3,
-                  "imagePath": "/uploadedFiles/locations/Home.jpg",
-                  "thumbnailPath": "/uploadedFiles/locations/HomeA.jpg",
-                  "open": false
-                },
-              ],
-              "status": 1
-            };
-            StationsListPojo stationsListPojo2 =
-            StationsListPojo.fromJson(json);
-            maplocationList.addAll(stationsListPojo2.mapLocations);*/
-          }
           debugPrint('stationsListPojo2 ---->     ${maplocationList.length}');
-          // _onAddMarker(maplocationList);
           _initMarkers(maplocationList);
           if (animateFirstTime) {
             CameraUpdate cameraUpdate =
@@ -1729,58 +1645,29 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       } else {
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
-    }).catchError((error) {
-      print('error : $error');
+    }).catchError((onError) {
+      _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
 
-  getDetailsApi() {
-    var apicall = getUserDetailsApi(
-        prefs.get('userId').toString(), prefs.get('accessToken').toString());
-    apicall.then((response) {
+  getDetailsApi() async {
+    await getUserDetailsApi(
+            prefs.get('userId').toString(), prefs.get('accessToken').toString())
+        .then((response) {
       print(response.body);
       if (response.statusCode == 200) {
-        /* setState(() {
-          _saving = false;
-        });*/
-        // final jsonResponse = json.decode(response.body);
-        /*      final jsonResponse = {
-          "status":1,
-          "message":"Success",
-          "userDetails":{
-            "id":2,
-            "usercodeUsed":false,
-            "deleted":false,
-            "countryCode":"+91",
-            "phoneNumber":"9756264795",
-            "usercode": "FTQ0CL",
-            "accessToken": "h0KJ8ZLKaEkQabgzFl1B/Q==",
-            "createdOn":"Sun Jan 26 11:32:10 IST 2020",
-            "walletAmount":0,
-            "contactMethod":"PhoneNumber",
-            "authyId":"218899105"
-          }
-        };*/
-        //print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+jsonResponse.toString());
         final jsonResponse = json.decode(response.body);
         UserDetailsPojo userDetailsPojo =
             UserDetailsPojo.fromJson(jsonResponse);
         UserDetails userdetails = userDetailsPojo.userDetails;
-
-        //  prefs.setString('walletAmount', ""+userdetails.walletAmount);
-        // prefs.setBool('is_login', true);
-        // prefs.setInt('userId', userdetails.id);
-        // prefs.setString('accessToken', jsonResponse['userDetails']['accessToken']);
-        //prefs.setString('usercode', jsonResponse['userDetails']['usercode']);
         prefs.setString('walletAmount', userdetails.walletAmount.toString());
         prefs.setBool('isRental', userDetailsPojo.isRental);
-
         setState(() {});
       } else {
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
-    }).catchError((error) {
-      print('error : $error');
+    }).catchError((value) {
+      _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
 
@@ -1886,28 +1773,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       // }
     });
   }
-
-  // showDialogForNotificiation_forground(message) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       content: ListTile(
-  //         title: Text(message['notification']['title']),
-  //         subtitle: Text(message['notification']['body']),
-  //       ),
-  //       actions: <Widget>[
-  //         FlatButton(
-  //           color: primaryGreenColor,
-  //           child: Text(
-  //             'Ok',
-  //             style: TextStyle(color: Colors.white),
-  //           ),
-  //           onPressed: () => Navigator.of(context).pop(),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   // SOMETHING_WRONG
   // POWERBANK_RENTED_ALREADY
@@ -2164,17 +2029,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<LocationData> _getLocation() async {
-    try {
-      currentLocation = await location.getLocation();
-    } catch (e) {
-      if (e.code == 'PERMISSION_DENIED') {
-        print('Permission denied');
-      }
-    }
-    return currentLocation;
-  }
-
   void showBottomSheetTimer(BuildContext context) {
     showModalBottomSheet<void>(
         context: context,
@@ -2409,15 +2263,13 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  sendBatterAlarmToServer() {
-    var apicall = sendAlarm(
-        prefs.get('userId').toString(), prefs.get('accessToken').toString());
-    apicall.then((response) async {
+  sendBatterAlarmToServer() async {
+    await sendAlarm(
+            prefs.get('userId').toString(), prefs.get('accessToken').toString())
+        .then((response) {
       print(response.body);
       if (response.statusCode == 200) {}
-    }).catchError((error) {
-      print('error : $error');
-    });
+    }).catchError((onError) {});
   }
 
   @override

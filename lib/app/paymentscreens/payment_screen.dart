@@ -164,6 +164,8 @@ class PaymentState extends State<Payments> {
     return GestureDetector(
         onTap: () {
           createBillingAgreementApi();
+
+          // showAlertDialog(context, "123123");
         },
         child: new Container(
             height: Dimens.fiftyFive,
@@ -343,6 +345,7 @@ class PaymentState extends State<Payments> {
                 onTap: () {
                   showAlertDialog1(context, creditCardList[index].id);
                   // showAlertDialog(context, creditCardList[index].id);
+                  // showAlertDialog1(context, "123123");
                 },
                 child: Container(
                   height: Dimens.twentySeven,
@@ -542,8 +545,8 @@ class PaymentState extends State<Payments> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      deleteCreditCard(cardId.toString());
                       Navigator.of(context).pop();
+                      deleteCreditCard(cardId.toString());
                     },
                     child: Container(
                       // margin: new EdgeInsets.fromLTRB(0,0,0,0),

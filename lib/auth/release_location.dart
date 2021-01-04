@@ -1,23 +1,13 @@
-import 'package:android_intent/android_intent.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/services.dart';
-import 'package:location/location.dart';
+import 'package:flutter/material.dart';
+import 'package:location_permissions/location_permissions.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:pin_input_text_field/pin_input_text_field.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:recharge_now/app/home_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
-import 'package:recharge_now/utils/MyConstants.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../main.dart';
 
 class ReleaseLocationScreen extends StatefulWidget {
   @override
@@ -60,7 +50,7 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
                         .translate('Release Location'),
                     context: context,
                     callback: () {
-                      navigateToDashBoardScreen();
+                      navigateToDashBoardScreen(isLocation: true);
                     }),
                 Expanded(
                   child: SizedBox(
@@ -98,7 +88,11 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
                       text:
                           AppLocalizations.of(context).translate('Release Now'),
                       callback: () async {
-                        checkLocationServiceEnableOrDisable();
+                        if (Platform.isAndroid) {
+                          _permissionCheckForAndroid();
+                        } else if (Platform.isIOS) {
+                          _permissionCheckForIOS();
+                        }
                       }),
                   margin: EdgeInsets.only(
                       left: screenPadding, right: screenPadding),
@@ -113,23 +107,78 @@ class _ReleaseLocationScreenState extends State<ReleaseLocationScreen> {
     );
   }
 
-  bool _serviceEnabled = false;
-  var location = new Location();
+  // bool _serviceEnabled = false;
+  // var location = new Location();
+  //
+  // checkLocationServiceEnableOrDisable() async {
+  //   _serviceEnabled = await location.serviceEnabled();
+  //   print("serviceEnabled" + _serviceEnabled.toString());
+  //   if (!_serviceEnabled) {
+  //     _serviceEnabled = await location.requestService();
+  //   } else if (_serviceEnabled) {
+  //     navigateToDashBoardScreen();
+  //   }
+  //   print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
+  // }
 
-  checkLocationServiceEnableOrDisable() async {
-    _serviceEnabled = await location.serviceEnabled();
-    print("serviceEnabled" + _serviceEnabled.toString());
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-    } else if (_serviceEnabled) {
-      navigateToDashBoardScreen();
-    }
-    print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
-  }
-
-  void navigateToDashBoardScreen() {
+  void navigateToDashBoardScreen({bool isLocation = false}) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => HomeScreen()),
         (Route<dynamic> route) => false);
+  }
+
+  void _permissionCheckForAndroid() async {
+    PermissionStatus permission =
+        await LocationPermissions().requestPermissions();
+    bool isShown =
+        await LocationPermissions().shouldShowRequestPermissionRationale();
+    debugPrint("Permission  Rotational :---     $isShown");
+    if (PermissionStatus.denied == permission && isShown) {
+      debugPrint("Permission:---    Normal Permission   $permission");
+      // Normal Permission
+      navigateToDashBoardScreen(isLocation: true);
+    } else if (PermissionStatus.denied == permission && !isShown) {
+      debugPrint("Permission:---   open app settings  $permission");
+      // bool isOpened = await LocationPermissions().openAppSettings();
+      // debugPrint("Permission:---   isOpen  $isOpened");
+      // open app settings
+      navigateToDashBoardScreen(isLocation: true);
+    } else if (PermissionStatus.granted == permission) {
+      debugPrint("Permission:---     $permission");
+      navigateToDashBoardScreen(isLocation: false);
+    } else if (PermissionStatus.restricted == permission) {
+      debugPrint("Permission:---     $permission");
+      navigateToDashBoardScreen(isLocation: true);
+    } else if (PermissionStatus.unknown == permission) {
+      debugPrint("Permission:---     $permission");
+      navigateToDashBoardScreen(isLocation: true);
+    }
+  }
+
+  void _permissionCheckForIOS() async {
+    PermissionStatus permission =
+        await LocationPermissions().requestPermissions();
+
+    if (PermissionStatus.denied == permission) {
+      debugPrint("Permission:---    Normal Permission   $permission");
+      navigateToDashBoardScreen(isLocation: true);
+      // bool isOpened = await LocationPermissions().openAppSettings();
+      // Normal Permission
+      /*else if (PermissionStatus.denied == permission ) {
+      debugPrint("Permission:---   open app settings  $permission");
+      bool isOpened = await LocationPermissions().openAppSettings();
+      debugPrint("Permission:---   isOpen  $isOpened");
+      // open app settings
+    }*/
+    } else if (PermissionStatus.granted == permission) {
+      debugPrint("Permission:---     $permission");
+      navigateToDashBoardScreen(isLocation: false);
+    } else if (PermissionStatus.restricted == permission) {
+      debugPrint("Permission:---     $permission");
+      navigateToDashBoardScreen(isLocation: true);
+    } else if (PermissionStatus.unknown == permission) {
+      debugPrint("Permission:---     $permission");
+      navigateToDashBoardScreen(isLocation: true);
+    }
   }
 }

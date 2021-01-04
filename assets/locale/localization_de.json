@@ -221,5 +221,13 @@
   "VIP member of RechargeNow": "Du bist ab heute VIP Mitglied bei RechargeNow. Leihe an jeder Mietstation kostenlos eine Powerbank",
   "Incorrect data": "Falsche Daten",
   "You made a mistake with your login data": "Bei deinen Login-Daten ist dir ein Fehler unterlaufen.",
-  "Try it again": "Probiere es erneut"
+  "Try it again": "Probiere es erneut",
+  "Battery_Alarm": "Akkualarm",
+  "Battery_Alarm_MSG": "Dein Akku ist fast leer, suche eine RechargeNow Mietstation in deiner Nähe",
+  "FRIEND_INVITE": "Glückwunsch",
+  "FRIEND_INVITE_MSG": "Du hast für die Freundschaftsanfrage einen Bonus in Höhe von X,XX€ erhalten",
+  "USER_VIP": "Herzlichen Glückwunsch",
+  "USER_VIP_MSG": "Du bist ab heute VIP Mitglied bei RechargeNow. Leihe an jeder Mietstation kostenlos eine Powerbank",
+  "INVALID_INPUT": "Falsche Daten",
+  "INVALID_INPUT_MSG": "Bei deinen Login-Daten ist dir ein Fehler unterlaufen. Probiere es erneut"
 }
