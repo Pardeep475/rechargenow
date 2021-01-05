@@ -280,6 +280,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           rentalTime = jsonResponse['rentalDetails']['rentalTime'];
           _modalBottomSheetMenu(rentalPrice, rentalTime);
         } else if (jsonResponse['status'].toString() == "2") {
+          debugPrint("rentBattery_PowerbankAPI   getRentalDetailsList   2");
           _showDifferentTypeOfDialogs(
               jsonResponse['message'].toString(), context);
         } else if (jsonResponse['status'].toString() == "0") {
@@ -294,6 +295,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           });
         }
       } else {
+        debugPrint("rentBattery_PowerbankAPI   else");
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((error) {
@@ -1490,7 +1492,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     await rentBattery_PowerbankApi(
             jsonReqString, prefs.get('accessToken').toString())
         .then((response) {
-      print(response.body);
+      debugPrint("rentBattery_PowerbankAPI   ${response.body}");
       if (response.statusCode == 200) {
         Navigator.pop(context);
         final jsonResponse = json.decode(response.body);
@@ -1498,10 +1500,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {
             showBottomSheet = true;
           });
-          _showDifferentTypeOfDialogs("SUCCESS", context);
+          _showDifferentTypeOfDialogs("SUCCESS", context,
+              currncy: jsonResponse['slotNumber']);
         } else if (jsonResponse['status'].toString() == "3") {
-          _showDifferentTypeOfDialogs(
-              jsonResponse['message'].toString(), context);
+          debugPrint("rentBattery_PowerbankAPI   3");
           showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -1519,14 +1521,17 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 );
               });
         } else {
+          debugPrint("rentBattery_PowerbankAPI   else    200");
           _showDifferentTypeOfDialogs(
               jsonResponse['message'].toString(), context);
         }
       } else {
+        debugPrint("rentBattery_PowerbankAPI   else");
         Navigator.pop(context);
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((onError) {
+      debugPrint("rentBattery_PowerbankAPI   catch");
       Navigator.pop(context);
       _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
@@ -1636,9 +1641,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {});
         }
       } else {
+        debugPrint("rentBattery_PowerbankAPI   getStationsOnMapApi else");
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((onError) {
+      debugPrint("rentBattery_PowerbankAPI   getStationsOnMapApi catchError");
       _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
@@ -1657,9 +1664,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         prefs.setBool('isRental', userDetailsPojo.isRental);
         setState(() {});
       } else {
+        debugPrint("rentBattery_PowerbankAPI   getDetailsApi");
         _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
       }
     }).catchError((value) {
+      debugPrint("rentBattery_PowerbankAPI   getDetailsApi catchError");
       _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
@@ -1776,7 +1785,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // STATION_OFFLINE
 
   showFirebaseMesgDialog(message, context) {
-    debugPrint("firebasemessegeis     ->      ${message["title"]}");
+    debugPrint("rentBattery_PowerbankAPI   showFirebaseMesgDialog");
     _showDifferentTypeOfDialogs(message["title"], context);
     // showDialog(
     //     context: context,

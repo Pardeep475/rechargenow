@@ -491,7 +491,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               height: 1.2),
                         ),
                         SizedBox(
-                          width: 0,
+                          width: 80,
                         ),
                         Expanded(
                           child: Text(
