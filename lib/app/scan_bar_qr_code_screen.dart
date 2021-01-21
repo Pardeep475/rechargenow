@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_qr_bar_scanner/qr_bar_scanner_camera.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyConstants.dart';
 
 class ScanQrBarCodeScreen extends StatefulWidget {
@@ -35,97 +36,93 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
       body: Column(
         children: [
           SizedBox(
-            height: 20,
+            height: Dimens.twentyFive,
           ),
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
-              height: 50,
-              width: 50,
+              height: Dimens.fiftyFive,
+              width: Dimens.fiftyFive,
               child: Align(
                 alignment: Alignment.centerRight,
                 child: FlatButton(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(50))),
+                      borderRadius: BorderRadius.all(Radius.circular(Dimens.fiftyFive))),
                   onPressed: () {
                     Navigator.pop(context, null);
                   },
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.all(Dimens.fifteen),
                   child: Center(
                       child: Image.asset(
                     'assets/images/close_black.png',
                     color: Colors.white,
-                    height: 15,
-                    width: 15,
+                    height: Dimens.eighteen,
+                    width: Dimens.eighteen,
                   )),
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding:  EdgeInsets.all(Dimens.ten),
             child: Text(
               AppLocalizations.of(context).translate('Scan the QR-Code'),
               textAlign: TextAlign.center,
               style: TextStyle(
                   height: 1.4,
-                  fontSize: 20,
+                  fontSize: Dimens.twentyThree,
                   fontWeight: FontWeight.w600,
                   fontFamily: fontFamily,
                   color: Colors.white),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(15.0),
+            padding:  EdgeInsets.all(Dimens.eighteen),
             child: Text(
               AppLocalizations.of(context).translate('scan code to activate location'),
               textAlign: TextAlign.center,
               style: TextStyle(
                   height: 1.4,
-                  fontSize: 14,
+                  fontSize: Dimens.sixteen,
                   fontWeight: FontWeight.w400,
                   fontFamily: fontFamily,
                   color: Colors.white),
             ),
           ),
           SizedBox(
-            height: 4,
+            height: Dimens.six,
           ),
           Image.asset('assets/images/slot8station.png'),
           SizedBox(
-            height: 35,
+            height: Dimens.forty,
           ),
           Container(
               decoration: BoxDecoration(
                   color: Color(0xff666666),
                   image: DecorationImage(
                       image: AssetImage('assets/images/Subtract.png'))),
-              padding: const EdgeInsets.all(10.0),
+              padding:  EdgeInsets.all(Dimens.thrteen),
               child: Builder(
                 builder: (context) {
                   return Container(
-                    width: 290,
-                    height: 290,
-                    child: Container(
-                      height: 290,
-                      width: 290,
-                      child: QRBarScannerCamera(
-                        onError: (context, error) => Text(
-                          error.toString(),
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        qrCodeCallback: (code) async {
-                          await _qrCallback(context, code);
-                        },
+                      width: Dimens.twoEighty,
+                      height: Dimens.twoEighty,
+                    child: QRBarScannerCamera(
+                      onError: (context, error) => Text(
+                        error.toString(),
+                        style: TextStyle(color: Colors.red),
                       ),
+                      qrCodeCallback: (code) async {
+                        await _qrCallback(context, code);
+                      },
                     ),
                   );
                 },
               )),
           SizedBox(
-            height: 23,
+            height: Dimens.twentyThree,
           ),
-          InkWell(
+          GestureDetector(
             onTap: () {
               if (isturnon) {
                 debugPrint("debugPrint      IsturnOn");
@@ -148,7 +145,7 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
               }
             },
             child: Container(
-              padding: EdgeInsets.all(13),
+              padding: EdgeInsets.all(Dimens.fifteen),
               decoration:
                   BoxDecoration(color: Colors.white, shape: BoxShape.circle),
               child: SvgPicture.asset('assets/images/Frame.svg'),
@@ -174,4 +171,6 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
       Navigator.pop(context, code);
     }
   }
+
+
 }

@@ -20,12 +20,10 @@ class ItemPanelTower extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
       elevation: 0,
-
       backgroundColor: Colors.transparent,
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -50,10 +48,10 @@ class ItemPanelTower extends StatelessWidget {
                 top: Dimens.oneEightyFive,
               ),
               decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  ),
+                shape: BoxShape.rectangle,
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Column(
                 children: [
                   SizedBox(
@@ -81,35 +79,64 @@ class ItemPanelTower extends StatelessWidget {
                     height: Dimens.seventyOne,
                   ),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: Dimens.eighty,
-                        width: Dimens.eighty,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Color(0xffEBEBEB),
-                              width: 1,
-                              style: BorderStyle.solid),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(Dimens.twelve),
+                      Column(
+                        children: [
+                          Container(
+                            height: Dimens.eighty,
+                            width: Dimens.eighty,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Color(0xffEBEBEB),
+                                  width: 1,
+                                  style: BorderStyle.solid),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(Dimens.twelve),
+                              ),
+                            ),
+                            child: CachedNetworkImage(
+                              imageUrl: data.imageFullPath,
+                              height: Dimens.seventy,
+                              width: Dimens.seventy,
+                              // errorWidget: (a, d, c) {
+                              //   return Image.asset(
+                              //     'assets/images/mietstation.png',
+                              //   );
+                              // },
+                              // placeholder: (a, b) {
+                              //   return Image.asset(
+                              //     'assets/images/mietstation.png',
+                              //   );
+                              // },
+                            ),
                           ),
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: data.imageFullPath,
-                          height: Dimens.seventy,
-                          width: Dimens.seventy,
-                          errorWidget: (a, d, c) {
-                            return Image.asset(
-                              'assets/images/mietstation.png',
-                            );
-                          },
-                          placeholder: (a, b) {
-                            return Image.asset(
-                              'assets/images/mietstation.png',
-                            );
-                          },
-                        ),
+                          SizedBox(
+                            height: Dimens.sixteen,
+                          ),
+                          SizedBox(
+                            width: Dimens.eighty,
+                            child: Text(
+                              data.open
+                                  ? AppLocalizations.of(context)
+                                      .translate("Open")
+                                      .toUpperCase()
+                                  : AppLocalizations.of(context)
+                                      .translate("Close")
+                                      .toUpperCase(),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 11.0,
+                                  height: 1.5,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w600,
+                                  color: data.open
+                                      ? primaryGreenColor
+                                      : Color(0xffF44336)),
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         width: Dimens.sixteen,
@@ -138,7 +165,9 @@ class ItemPanelTower extends StatelessWidget {
                                   color: Color(0xff28272C)),
                             ),
                             Text(
-                              '${data.address}',
+                              '${data.address}\n',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: Dimens.forteen,
                                   height: 1.2,
@@ -146,88 +175,68 @@ class ItemPanelTower extends StatelessWidget {
                                   fontWeight: FontWeight.w400,
                                   color: lightGray_text),
                             ),
+                            SizedBox(
+                              height: Dimens.sixteen,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                SvgPicture.asset(
+                                    'assets/images/battery_small.svg'),
+                                SizedBox(
+                                  width: Dimens.seven,
+                                ),
+                                Text(
+                                  '${data.availablePowerbanks}',
+                                  style: TextStyle(
+                                      fontSize: Dimens.twelve,
+                                      height: 1,
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.w600,
+                                      color: lightGray_text),
+                                ),
+                                SizedBox(
+                                  width: Dimens.fifteen,
+                                ),
+                                SvgPicture.asset(
+                                    'assets/images/star_small.svg'),
+                                SizedBox(
+                                  width: Dimens.seven,
+                                ),
+                                Text(
+                                  '${data.freeSlots}',
+                                  style: TextStyle(
+                                      fontSize: Dimens.twelve,
+                                      height: 1,
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.w600,
+                                      color: lightGray_text),
+                                ),
+                                SizedBox(
+                                  width: Dimens.fifteen,
+                                ),
+                                SvgPicture.asset(
+                                  'assets/images/location_small.svg',
+                                  color: Color(0xff54DF6C),
+                                ),
+                                SizedBox(
+                                  width: Dimens.seven,
+                                ),
+                                Text(
+                                  '${data.distance}',
+                                  style: TextStyle(
+                                      fontSize: Dimens.twelve,
+                                      height: 1,
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.w600,
+                                      color: lightGray_text),
+                                )
+                              ],
+                            ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: Dimens.sixteen,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(
-                        width: Dimens.eighty,
-                        child: Text(
-                          data.open
-                              ? AppLocalizations.of(context).translate("Open").toUpperCase()
-                              : AppLocalizations.of(context).translate("Close").toUpperCase(),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: 11.0,
-                              height: 1.5,
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w600,
-                              color: data.open
-                                  ? primaryGreenColor
-                                  : Color(0xffF44336)),
-                        ),
-                      ),
-                      SizedBox(
-                        width: Dimens.sixteen,
-                      ),
-                      SvgPicture.asset('assets/images/battery_small.svg'),
-                      SizedBox(
-                        width: Dimens.seven,
-                      ),
-                      Text(
-                        '${data.availablePowerbanks}',
-                        style: TextStyle(
-                            fontSize: Dimens.twelve,
-                            height: 1,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w600,
-                            color: lightGray_text),
-                      ),
-                      SizedBox(
-                        width: Dimens.fifteen,
-                      ),
-                      SvgPicture.asset('assets/images/star_small.svg'),
-                      SizedBox(
-                        width: Dimens.seven,
-                      ),
-                      Text(
-                        '${data.freeSlots}',
-                        style: TextStyle(
-                            fontSize: Dimens.twelve,
-                            height: 1,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w600,
-                            color: lightGray_text),
-                      ),
-                      SizedBox(
-                        width: Dimens.fifteen,
-                      ),
-                      SvgPicture.asset(
-                        'assets/images/location_small.svg',
-                        color: Color(0xff54DF6C),
-                      ),
-                      SizedBox(
-                        width: Dimens.seven,
-                      ),
-                      Text(
-                        '${data.distance}',
-                        style: TextStyle(
-                            fontSize: Dimens.twelve,
-                            height: 1,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w600,
-                            color: lightGray_text),
-                      )
                     ],
                   ),
                   SizedBox(
@@ -237,71 +246,63 @@ class ItemPanelTower extends StatelessWidget {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                            onNavigationPressed(data);
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 3.1,
-                            padding: EdgeInsets.only(
-                                top: Dimens.twelve,
-                                bottom: Dimens.fifteen),
-                            decoration: BoxDecoration(
-                                color: Color(0xffF2F3F7),
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(Dimens.fifty))),
-                            alignment: Alignment.center,
-                            child: Text(
-                              AppLocalizations.of(context)
-                                  .translate("Navigate")
-                                  .toUpperCase(),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: Dimens.thrteen,
-                                  height: 1.5,
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xff848490)),
-                            ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          onNavigationPressed(data);
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 3.1,
+                          padding: EdgeInsets.only(
+                              top: Dimens.twelve, bottom: Dimens.fifteen),
+                          decoration: BoxDecoration(
+                              color: Color(0xffF2F3F7),
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(Dimens.fifty))),
+                          alignment: Alignment.center,
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate("Navigate")
+                                .toUpperCase(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: Dimens.thrteen,
+                                height: 1.5,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff848490)),
                           ),
                         ),
                       ),
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                            onDetailPressed(data);
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 3.1,
-                            padding: EdgeInsets.only(
-                                top: Dimens.twelve,
-                                bottom: Dimens.fifteen),
-                            decoration: BoxDecoration(
-                                color: primaryGreenColor,
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(Dimens.fifty))),
-                            alignment: Alignment.center,
-                            child: Text(
-                              AppLocalizations.of(context)
-                                  .translate("Details")
-                                  .toUpperCase(),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: Dimens.thrteen,
-                                  height: 1.5,
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white),
-                            ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          onDetailPressed(data);
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width / 3.1,
+                          padding: EdgeInsets.only(
+                              top: Dimens.twelve, bottom: Dimens.fifteen),
+                          decoration: BoxDecoration(
+                              color: primaryGreenColor,
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(Dimens.fifty))),
+                          alignment: Alignment.center,
+                          child: Text(
+                            AppLocalizations.of(context)
+                                .translate("Details")
+                                .toUpperCase(),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: Dimens.thrteen,
+                                height: 1.5,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
                           ),
                         ),
                       ),
@@ -320,11 +321,17 @@ class ItemPanelTower extends StatelessWidget {
                   Stack(
                     children: [
                       Container(
-                          margin: EdgeInsets.only(
-                              left: Dimens.twentyOne,
-                              right: Dimens.twentyOne,
-                              bottom: Dimens.twentyOne),
-                          child: Image.asset("assets/images/panelstation.png")),
+                        margin: EdgeInsets.only(
+                            left: Dimens.twentyOne,
+                            right: Dimens.twentyOne,
+                            bottom: Dimens.twentyOne),
+                        child: SizedBox(
+                            height: Dimens.twoHundredTwoFive,
+                            width: Dimens.seventy,
+                            child: SvgPicture.asset(
+                                'assets/images/panelstation.svg')),
+                      ),
+                      //Image.asset("assets/images/panelstation.png")
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -347,7 +354,7 @@ class ItemPanelTower extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                '${data.availablePowerbanks}',
+                                '${data.totalStaions}',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: Dimens.forteen,

@@ -37,7 +37,11 @@ class _FAQScreenState extends State<FAQScreen> {
 
   void loadShredPref() async {
     prefs = await SharedPreferences.getInstance();
-    await getHelpList();
+    if (prefs.getString('language_code') == 'de')
+      await getHelpList('de');
+    else {
+      await getHelpList('en');
+    }
   }
 
   @override
@@ -287,8 +291,9 @@ class _FAQScreenState extends State<FAQScreen> {
   List<RentalFaqs> powerbankFaqs;
   List<RentalFaqs> paymentsFaqs;
 
-  getHelpList() async {
-    await getHelpListApi(prefs.get('accessToken').toString()).then((response) {
+  getHelpList(String language_code) async {
+    await getHelpListApi(prefs.get('accessToken').toString(), language_code)
+        .then((response) {
       debugPrint(response.body);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);

@@ -2,17 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:provider/provider.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/app/settings/EditProfileDataScreen.dart';
 import 'package:recharge_now/auth/login_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
-import 'package:recharge_now/locale/AppLanguage.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/models/user_deatil_model.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/MyUtils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,226 +62,358 @@ class _SettingsScreenState extends State<SettingsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-        backgroundColor: Colors.white,
-        body: Container(
-            width: double.infinity,
-            height: double.infinity,
-            child: ModalProgressHUD(
-              child: SingleChildScrollView(
-                child: buildBodyUI(),
-              ),
-              inAsyncCall: _saving,
-            )));
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: ModalProgressHUD(
+          child: SingleChildScrollView(
+            child: buildBodyUI(),
+          ),
+          inAsyncCall: _saving,
+        ),
+      ),
+    );
   }
 
   buildBodyUI() {
     return userdetails == null
         ? Center(
-      child: CircularProgressIndicator(),
-    )
+            child: CircularProgressIndicator(),
+          )
         : Container(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height,
-      child: Column(
-        children: [
-          appBarView(
-              name: AppLocalizations.of(context).translate('SETTINGS'),
-              context: context,
-              callback: () {
-                Navigator.pop(context);
-              }),
-          Container(
-            margin: EdgeInsets.fromLTRB(
-                screenPadding, screenPadding, screenPadding, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('E-mail')
-                          .toUpperCase(),
-                      style: loginDetailText,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        editEmailButtonClick(
-                            AppLocalizations.of(context).translate(
-                                "Change E-mail Address"));
-                      },
-                      child: Container(
-                        decoration: MyUtils.showRoundCornerDecoration(),
-                        height: 45,
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width * .80,
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(left: 10, right: 10),
-                        child: Text(
-                          email.toString(),
-                          style: editTextStyle,
-                        ),
-                      ),
-                    ),
-                  ],
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [
+                appBarView(
+                    name: AppLocalizations.of(context).translate('SETTINGS'),
+                    context: context,
+                    callback: () {
+                      Navigator.pop(context);
+                    }),
+                // Container(
+                //   margin: EdgeInsets.fromLTRB(
+                //       screenPadding, screenPadding, screenPadding, 0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //     children: <Widget>[
+                //       Column(
+                //         mainAxisAlignment: MainAxisAlignment.start,
+                //         crossAxisAlignment: CrossAxisAlignment.start,
+                //         children: <Widget>[
+                //           Text(
+                //             AppLocalizations.of(context)
+                //                 .translate('E-mail')
+                //                 .toUpperCase(),
+                //             style: loginDetailText,
+                //           ),
+                //           SizedBox(
+                //             height: 10,
+                //           ),
+                //           InkWell(
+                //             onTap: () {
+                //               editEmailButtonClick(AppLocalizations.of(context)
+                //                   .translate("Change E-mail Address"));
+                //             },
+                //             child: Container(
+                //               decoration: MyUtils.showRoundCornerDecoration(),
+                //               height: 45,
+                //               width: MediaQuery.of(context).size.width * .80,
+                //               alignment: Alignment.centerLeft,
+                //               padding: EdgeInsets.only(left: 10, right: 10),
+                //               child: Text(
+                //                 email.toString(),
+                //                 style: editTextStyle,
+                //               ),
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //       /*        GestureDetector(
+                //         onTap: () {
+                //           editEmailButtonClick(AppLocalizations.of(context).translate("Change E-mail Address"));
+                //         },
+                //         child:
+                //         SvgPicture.asset("assets/images/edit.svg")),*/
+                //     ],
+                //   ),
+                // ),
+                SizedBox(
+                  height: 30,
                 ),
-                /*        GestureDetector(
-                        onTap: () {
-                          editEmailButtonClick(AppLocalizations.of(context).translate("Change E-mail Address"));
-                        },
-                        child:
-                        SvgPicture.asset("assets/images/edit.svg")),*/
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          InkWell(
-            onTap: () {
-              editMobileButtonClick(
-                  AppLocalizations.of(context).translate("Change Number"));
-            },
-            child: Container(
-              margin:
-              EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        AppLocalizations.of(context).translate('PHONENUMBER'),
-                        style: loginDetailText,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        decoration: MyUtils.showRoundCornerDecoration(),
-                        height: 45,
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width * .80,
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(left: 10, right: 10),
-                        child: Text(
-                          countryCode + mobile,
-                          style: editTextStyle,
+                InkWell(
+                  onTap: () {
+                    editMobileButtonClick(AppLocalizations.of(context)
+                        .translate("Change Number"));
+                  },
+                  child: Container(
+                    margin:
+                        EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('PHONENUMBER'),
+                              style: loginDetailText,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              decoration: MyUtils.showRoundCornerDecoration(),
+                              height: 45,
+                              width: MediaQuery.of(context).size.width * .80,
+                              alignment: Alignment.centerLeft,
+                              padding: EdgeInsets.only(left: 10, right: 10),
+                              child: Text(
+                                countryCode + mobile,
+                                style: editTextStyle,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  /*    GestureDetector(
+                        /*    GestureDetector(
                           onTap: () {
                             editMobileButtonClick(
                                 AppLocalizations.of(context).translate("Change Number"));
                           },
                           child:
                           SvgPicture.asset("assets/images/edit.svg")),*/
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Container(
-            margin:
-            EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  AppLocalizations.of(context).translate('batteryAlarm'),
-                  style: loginDetailText,
-                ),
-                Expanded(
-                  child: isLoading
-                      ? Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      child: SizedBox(
-                          width: 45,
-                          height: 45,
-                          child: Center(
-                              child: CircularProgressIndicator())),
-                    ),
-                  )
-                      : Container(
-                    height: 45,
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    child: CustomSwitch(
-                      value: isSwitched,
-                      onChanged: (value) {
-                        setState(() {
-                          sendAmarm(value);
-                          isSwitched = value;
-                          print(isSwitched);
-                        });
-                      },
-
+                      ],
                     ),
                   ),
                 ),
-                /*    GestureDetector(
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        AppLocalizations.of(context).translate('batteryAlarm'),
+                        style: loginDetailText,
+                      ),
+                      Expanded(
+                        child: isLoading
+                            ? Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: SizedBox(
+                                      width: 45,
+                                      height: 45,
+                                      child: Center(
+                                          child: CircularProgressIndicator())),
+                                ),
+                              )
+                            : Container(
+                                height: 45,
+                                alignment: Alignment.centerRight,
+                                padding: EdgeInsets.only(left: 10, right: 10),
+                                child: CustomSwitch(
+                                  value: isSwitched,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      sendAmarm(value);
+                                      isSwitched = value;
+                                      print(isSwitched);
+                                    });
+                                  },
+                                ),
+                              ),
+                      ),
+                      /*    GestureDetector(
                         onTap: () {
                           editMobileButtonClick(
                               AppLocalizations.of(context).translate("Change Number"));
                         },
                         child:
                         SvgPicture.asset("assets/images/edit.svg")),*/
-              ],
-            ),
-          ),
-          Container(
-            margin:
-            EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  AppLocalizations.of(context).translate('change language').toUpperCase(),
-                  style: loginDetailText,
+                    ],
+                  ),
                 ),
-                Expanded(
-                  child: isLoading
-                      ? Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10, right: 10),
-                      child: SizedBox(
-                          width: 45,
-                          height: 45,
-                          child: Center(
-                              child: CircularProgressIndicator())),
-                    ),
-                  )
-                      : Container(
-                    height: 45,
-                    alignment: Alignment.centerRight,
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    child: IconButton(
-                        onPressed: () async {
-                          Navigator.push(context, CupertinoPageRoute(
-                              builder: (BuildContext context) =>
-                                  ChangeLanguage()));
-                          /*var onClick = await showMenu(
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  padding: EdgeInsets.symmetric(vertical: Dimens.five),
+                  child: Divider(
+                    height: Dimens.one,
+                    color: Color(0xFFEBEBEB),
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('language')
+                            .toUpperCase(),
+                        style: loginDetailText,
+                      ),
+                      Expanded(
+                        child: isLoading
+                            ? Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: SizedBox(
+                                      width: 45,
+                                      height: 45,
+                                      child: Center(
+                                          child: CircularProgressIndicator())),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ChangeLanguage(),
+                                    ),
+                                  ).then((value){
+                                    setState(() {
+
+                                    });
+                                  });
+                                },
+                                child: Container(
+                                  height: 45,
+                                  alignment: Alignment.centerRight,
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: SizedBox(
+                                    width: 21,
+                                    height: 14,
+                                    child: Image.asset(
+                                      languagePath(),
+                                      package: 'country_code_picker',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ) /*IconButton(
+                                      onPressed: () async {
+                                        Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                                builder: (BuildContext context) =>
+                                                    ChangeLanguage()));
+                                        */ /*var onClick = await showMenu(
+                              context: context,
+                              position: RelativeRect.fromLTRB(
+                                  100, 400, 100, 0),
+                              items: [
+                                PopupMenuItem(
+                                  child: Text("Setting Language"),
+                                  value: 1,
+                                ),
+                                PopupMenuItem(
+                                  child: Text(
+                                    "English",
+                                    style: TextStyle(
+                                        color: Colors.black),
+                                  ),
+                                  value: 2,
+                                ),
+                                PopupMenuItem(
+                                  child: Text(
+                                    "Deutsch",
+                                    style: TextStyle(
+                                        color: Colors.black),
+                                  ),
+                                  value: 3,
+                                ),
+                              ],
+                          );
+                          if (onClick != null) {
+                              print("onClick$onClick");
+
+                              if (onClick == 2) {
+                                Provider.of<AppLanguage>(
+                                    context,
+                                    listen: false)
+                                    .changeLanguage(
+                                    Locale('en'));
+                              } else if (onClick == 3) {
+                                Provider.of<AppLanguage>(
+                                    context,
+                                    listen: false)
+                                    .changeLanguage(
+                                    Locale('de'));
+                              }
+                          }*/ /*
+                                      },
+                                      icon: Icon(Icons.language))*/
+                                  ,
+                                ),
+                              ),
+                      ),
+                      /*    GestureDetector(
+                        onTap: () {
+                          editMobileButtonClick(
+                              AppLocalizations.of(context).translate("Change Number"));
+                        },
+                        child:
+                        SvgPicture.asset("assets/images/edit.svg")),*/
+                    ],
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  padding: EdgeInsets.symmetric(vertical: Dimens.five),
+                  child: Divider(
+                    height: Dimens.one,
+                    color: Color(0xFFEBEBEB),
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('give_us_feedback')
+                            .toUpperCase(),
+                        style: loginDetailText,
+                      ),
+                      Expanded(
+                        child: isLoading
+                            ? Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: SizedBox(
+                                      width: 45,
+                                      height: 45,
+                                      child: Center(
+                                          child: CircularProgressIndicator())),
+                                ),
+                              )
+                            : Container(
+                                height: 45,
+                                alignment: Alignment.centerRight,
+                                padding: EdgeInsets.only(left: 10, right: 10),
+                                child: SvgPicture.asset(
+                                    "assets/images/give_us_feedback.svg") /*IconButton(
+                              onPressed: () async {
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ChangeLanguage()));
+                                */ /*var onClick = await showMenu(
                             context: context,
                             position: RelativeRect.fromLTRB(
                                 100, 400, 100, 0),
@@ -326,57 +456,283 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   .changeLanguage(
                                   Locale('de'));
                             }
-                          }*/
-                        },
-                        icon: Icon(Icons.language)),
-                  ),
-                ),
-                /*    GestureDetector(
+                          }*/ /*
+                              },
+                              icon: Icon(Icons.language))*/
+                                ,
+                              ),
+                      ),
+                      /*    GestureDetector(
                         onTap: () {
                           editMobileButtonClick(
                               AppLocalizations.of(context).translate("Change Number"));
                         },
                         child:
                         SvgPicture.asset("assets/images/edit.svg")),*/
-              ],
-            ),
-          ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: FlatButton(
-                minWidth: MediaQuery
-                    .of(context)
-                    .size
-                    .width - 60,
-                color: Color(0xffF2F3F7),
-                height: 50,
-                shape: RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.all(Radius.circular(50.0))),
-                onPressed: () {
-                  //Provider.of<AppLanguage>(context, listen: false).changeLanguage(Locale('en'));
-                  LogoutApi();
-                },
-                child: Text(
-                  AppLocalizations.of(context).translate('Logout'),
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.3,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Montserrat',
-                    color: Color(0xff848490),
+                    ],
                   ),
                 ),
-              ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  padding: EdgeInsets.symmetric(vertical: Dimens.five),
+                  child: Divider(
+                    height: Dimens.one,
+                    color: Color(0xFFEBEBEB),
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('terms_of_use')
+                            .toUpperCase(),
+                        style: loginDetailText,
+                      ),
+                      Expanded(
+                        child: isLoading
+                            ? Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: SizedBox(
+                                      width: 45,
+                                      height: 45,
+                                      child: Center(
+                                          child: CircularProgressIndicator())),
+                                ),
+                              )
+                            : Container(
+                                height: 45,
+                                alignment: Alignment.centerRight,
+                                padding: EdgeInsets.only(left: 10, right: 10),
+                                child: SvgPicture.asset(
+                                    "assets/images/term_and_services.svg") /*IconButton(
+                              onPressed: () async {
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ChangeLanguage()));
+                                */ /*var onClick = await showMenu(
+                            context: context,
+                            position: RelativeRect.fromLTRB(
+                                100, 400, 100, 0),
+                            items: [
+                              PopupMenuItem(
+                                child: Text("Setting Language"),
+                                value: 1,
+                              ),
+                              PopupMenuItem(
+                                child: Text(
+                                  "English",
+                                  style: TextStyle(
+                                      color: Colors.black),
+                                ),
+                                value: 2,
+                              ),
+                              PopupMenuItem(
+                                child: Text(
+                                  "Deutsch",
+                                  style: TextStyle(
+                                      color: Colors.black),
+                                ),
+                                value: 3,
+                              ),
+                            ],
+                          );
+                          if (onClick != null) {
+                            print("onClick$onClick");
+
+                            if (onClick == 2) {
+                              Provider.of<AppLanguage>(
+                                  context,
+                                  listen: false)
+                                  .changeLanguage(
+                                  Locale('en'));
+                            } else if (onClick == 3) {
+                              Provider.of<AppLanguage>(
+                                  context,
+                                  listen: false)
+                                  .changeLanguage(
+                                  Locale('de'));
+                            }
+                          }*/ /*
+                              },
+                              icon: Icon(Icons.language))*/
+                                ,
+                              ),
+                      ),
+                      /*    GestureDetector(
+                        onTap: () {
+                          editMobileButtonClick(
+                              AppLocalizations.of(context).translate("Change Number"));
+                        },
+                        child:
+                        SvgPicture.asset("assets/images/edit.svg")),*/
+                    ],
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  padding: EdgeInsets.symmetric(vertical: Dimens.five),
+                  child: Divider(
+                    height: Dimens.one,
+                    color: Color(0xFFEBEBEB),
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        AppLocalizations.of(context)
+                            .translate('evaluate_us')
+                            .toUpperCase(),
+                        style: loginDetailText,
+                      ),
+                      Expanded(
+                        child: isLoading
+                            ? Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10, right: 10),
+                                  child: SizedBox(
+                                      width: 45,
+                                      height: 45,
+                                      child: Center(
+                                          child: CircularProgressIndicator())),
+                                ),
+                              )
+                            : Container(
+                                height: 45,
+                                alignment: Alignment.centerRight,
+                                padding: EdgeInsets.only(left: 10, right: 10),
+                                child: SvgPicture.asset(
+                                    "assets/images/elevate_us.svg") /*IconButton(
+                              onPressed: () async {
+                                Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ChangeLanguage()));
+                                */ /*var onClick = await showMenu(
+                            context: context,
+                            position: RelativeRect.fromLTRB(
+                                100, 400, 100, 0),
+                            items: [
+                              PopupMenuItem(
+                                child: Text("Setting Language"),
+                                value: 1,
+                              ),
+                              PopupMenuItem(
+                                child: Text(
+                                  "English",
+                                  style: TextStyle(
+                                      color: Colors.black),
+                                ),
+                                value: 2,
+                              ),
+                              PopupMenuItem(
+                                child: Text(
+                                  "Deutsch",
+                                  style: TextStyle(
+                                      color: Colors.black),
+                                ),
+                                value: 3,
+                              ),
+                            ],
+                          );
+                          if (onClick != null) {
+                            print("onClick$onClick");
+
+                            if (onClick == 2) {
+                              Provider.of<AppLanguage>(
+                                  context,
+                                  listen: false)
+                                  .changeLanguage(
+                                  Locale('en'));
+                            } else if (onClick == 3) {
+                              Provider.of<AppLanguage>(
+                                  context,
+                                  listen: false)
+                                  .changeLanguage(
+                                  Locale('de'));
+                            }
+                          }*/ /*
+                              },
+                              icon: Icon(Icons.language))*/
+                                ,
+                              ),
+                      ),
+                      /*    GestureDetector(
+                        onTap: () {
+                          editMobileButtonClick(
+                              AppLocalizations.of(context).translate("Change Number"));
+                        },
+                        child:
+                        SvgPicture.asset("assets/images/edit.svg")),*/
+                    ],
+                  ),
+                ),
+                Container(
+                  margin:
+                      EdgeInsets.fromLTRB(screenPadding, 0, screenPadding, 0),
+                  padding: EdgeInsets.symmetric(vertical: Dimens.five),
+                  child: Divider(
+                    height: Dimens.one,
+                    color: Color(0xFFEBEBEB),
+                  ),
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: FlatButton(
+                      minWidth: MediaQuery.of(context).size.width - 60,
+                      color: Color(0xffF2F3F7),
+                      height: 50,
+                      shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(50.0))),
+                      onPressed: () {
+                        //Provider.of<AppLanguage>(context, listen: false).changeLanguage(Locale('en'));
+                        LogoutApi();
+                      },
+                      child: Text(
+                        AppLocalizations.of(context).translate('Logout'),
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 1.3,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Montserrat',
+                          color: Color(0xff848490),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 50.0,
+                )
+              ],
             ),
-          ),
-          SizedBox(
-            height: 50.0,
-          )
-        ],
-      ),
-    );
+          );
+  }
+
+  String languagePath() {
+    debugPrint('languagePathIs -- >  ${prefs.getString('language_code')}');
+    if (prefs.getString('language_code') == 'de') {
+      return 'flags/de.png';
+    } else {
+      return 'flags/gb.png';
+    }
   }
 
   onEditButtonCLick1(text) {
@@ -454,10 +810,7 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   logoutButtonUi() {
     return buttonGreyView(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        width: MediaQuery.of(context).size.width,
         height: 48,
         text: AppLocalizations.of(context).translate("Logout"),
         callback: () {
@@ -538,9 +891,8 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   editMobileButtonClick(text) async {
     results = await Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) =>
-            EditProfileDataScreen(
-                forText: text, mobile: mobile, countryCode: countryCode)));
+        builder: (BuildContext context) => EditProfileDataScreen(
+            forText: text, mobile: mobile, countryCode: countryCode)));
 
     if (results != null) {
       print("mobile " + results['mobile']);
@@ -574,7 +926,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         UserDetailsPojo userDetailsPojo =
-        UserDetailsPojo.fromJson(jsonResponse);
+            UserDetailsPojo.fromJson(jsonResponse);
         userdetails = userDetailsPojo.userDetails;
         // name=userdetails.
         prefs.setString('walletAmount', "" + userdetails.walletAmount);
@@ -603,7 +955,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   navigateToLoginScreen() {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => LoginScreen()),
-            (Route<dynamic> route) => false);
+        (Route<dynamic> route) => false);
   }
 
   LogoutApi() {
@@ -667,11 +1019,7 @@ class CustomSwitch extends StatefulWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  CustomSwitch({
-    Key key,
-    this.value,
-    this.onChanged})
-      : super(key: key);
+  CustomSwitch({Key key, this.value, this.onChanged}) : super(key: key);
 
   @override
   _CustomSwitchState createState() => _CustomSwitchState();
@@ -688,10 +1036,10 @@ class _CustomSwitchState extends State<CustomSwitch>
     _animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 60));
     _circleAnimation = AlignmentTween(
-        begin: widget.value ? Alignment.centerRight : Alignment.centerLeft,
-        end: widget.value ? Alignment.centerLeft : Alignment.centerRight)
+            begin: widget.value ? Alignment.centerRight : Alignment.centerLeft,
+            end: widget.value ? Alignment.centerLeft : Alignment.centerRight)
         .animate(CurvedAnimation(
-        parent: _animationController, curve: Curves.linear));
+            parent: _animationController, curve: Curves.linear));
   }
 
   @override
@@ -716,23 +1064,25 @@ class _CustomSwitchState extends State<CustomSwitch>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24.0),
               border: Border.all(color: Color(0xffEBEBEB), width: 1),
-              color: _circleAnimation.value ==
-                  Alignment.centerLeft
+              color: _circleAnimation.value == Alignment.centerLeft
                   ? Color(0xffF2F3F7)
-                  : Color(0xffF2F3F7),),
+                  : Color(0xffF2F3F7),
+            ),
             child: Padding(
               padding: const EdgeInsets.only(
                   top: 2.0, bottom: 2.0, right: 2.0, left: 2.0),
               child: Container(
-                alignment: widget.value
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
+                alignment:
+                    widget.value ? Alignment.centerRight : Alignment.centerLeft,
                 child: Container(
                   width: 20.0,
                   height: 20.0,
                   decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: primaryGreenColor),
+                    shape: BoxShape.circle,
+                    color: _circleAnimation.value == Alignment.centerLeft
+                        ? Color(0xffDADAE1)
+                        : primaryGreenColor,
+                  ),
                 ),
               ),
             ),

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'TimerBloc.dart';
+
 class HomeTimerBottomSheeet extends StatefulWidget {
   String rentalTime;
   String walletAmount;
@@ -20,53 +22,54 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
     with SingleTickerProviderStateMixin {
   int hours = 0;
   int minutes = 0;
+  int _endMinutes = 0;
   int days = 0;
-  AnimationController _controller;
-
+  // AnimationController _controller;
+  TimerBloc _timerBloc;
+  Timer _timer;
   var arr = [];
 
   @override
   void initState() {
     debugPrint(
         "HomeTimerBottomSheeet  widget   Rental Price  ${widget.rentalPrice}    Rental Time  ${widget.rentalTime}  Wallet Amount   ${widget.walletAmount}");
-
+    _timerBloc = new TimerBloc();
     arr = widget.rentalTime.split(':');
     if (arr.length == 2) {
       hours = int.parse(arr[0]);
       minutes = int.parse(arr[1]);
-      debugPrint(
-          "HomeTimerBottomSheeet     Hours  $hours    Minutes  $minutes");
-      hours = hours * 60;
       minutes = minutes + hours;
-      debugPrint("HomeTimerBottomSheeet     Minutes  $minutes");
-
-      _controller = AnimationController(
-          vsync: this, duration: Duration(minutes: minutes));
-      _controller.forward();
+      // _endMinutes = minutes + 1000;
+      debugPrint("timer    $minutes     $_endMinutes");
+      _timerBloc.progressSink.add(minutes);
+      _startTimer();
+      // _controller = AnimationController(
+      //     vsync: this, duration: Duration(minutes: minutes));
+      // _controller.forward();
     } else {
       days = int.parse(arr[0]);
       hours = int.parse(arr[1]);
       minutes = int.parse(arr[2]);
-      debugPrint(
-          "HomeTimerBottomSheeet     Days   $days   Hours  $hours    Minutes  $minutes");
       days = days * 24 * 60;
       hours = hours * 60;
       minutes = minutes + hours + days;
-
-      debugPrint("HomeTimerBottomSheeet     Minutes  $minutes");
-
-      _controller = AnimationController(
-          vsync: this, duration: Duration(minutes: minutes));
-      _controller.forward();
+      // _endMinutes = minutes + 1000;
+      debugPrint("timer    $minutes     $_endMinutes");
+      _timerBloc.progressSink.add(minutes);
+      _startTimer();
+      // _controller = AnimationController(
+      //     vsync: this, duration: Duration(minutes: minutes));
+      // _controller.forward();
     }
-    setState(() {});
+    // setState(() {});
 
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    // _controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
@@ -106,12 +109,12 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
             Padding(
               padding: EdgeInsets.only(top: 1, left: 12, right: 12, bottom: 2),
               child: Center(
-                child: Countdown(
-                  arr: arr,
-                  animation: StepTween(
-                    begin: minutes,
-                    end: 0,
-                  ).animate(_controller),
+                child: StreamBuilder<int>(
+                  initialData: 0,
+                  stream: _timerBloc.progressStream,
+                  builder: (context,snapshot){
+                    return Countdown(value: snapshot.data ?? 0,);
+                  },
                 ),
               ),
             ),
@@ -277,24 +280,42 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
       ),
     );
   }
+  _startTimer() {
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      _timerBloc.progressSink.add(++minutes);
+      debugPrint("increase_timing_1    $minutes");
+    });
+  }
+
+
+
 }
 
-class Countdown extends AnimatedWidget {
-  Countdown({Key key, this.animation, this.arr})
-      : super(key: key, listenable: animation);
-  Animation<int> animation;
-  var arr;
+
+
+class Countdown extends StatelessWidget {
+  // Countdown({Key key, this.animation, this.arr})
+  //     : super(key: key, listenable: animation);
+  // Animation<int> animation;
+  // var arr;
+  final int value;
+
+  Countdown({this.value});
 
   @override
   build(BuildContext context) {
-    Duration clockTimer = Duration(minutes: animation.value);
-    String timerText = "";
-    if (arr.length == 2) {
-      timerText = '${clockTimer.inHours.remainder(60).toString().padLeft(2, '0')} : ${(clockTimer.inMinutes.remainder(60) % 60).toString().padLeft(2, '0')}';
-    } else {
-      int hours = (clockTimer.inHours - (clockTimer.inDays * 24));
-      timerText = '${clockTimer.inDays.remainder(24).toString().padLeft(2, '0')} : ${hours.remainder(60).toString().padLeft(2, '0')} : ${(clockTimer.inMinutes.remainder(60)).toString().padLeft(2, '0')}';
-    }
+    Duration clockTimer = Duration(minutes: value);
+    int hours = (clockTimer.inHours - (clockTimer.inDays * 24));
+    String timerText =
+        '${clockTimer.inDays.remainder(24).toString().padLeft(2, '0')} : ${hours.remainder(60).toString().padLeft(2, '0')} : ${(clockTimer.inMinutes.remainder(60)).toString().padLeft(2, '0')}';
+    // String timerText = "";
+    // debugPrint("increase_timing:--    ${animation.value}");
+    // if (arr.length == 2) {
+    //   timerText =
+    //       '${clockTimer.inHours.remainder(60).toString().padLeft(2, '0')} : ${(clockTimer.inMinutes.remainder(60) % 60).toString().padLeft(2, '0')}';
+    // } else {
+    //
+    // }
     return Text(
       "$timerText",
       textAlign: TextAlign.center,

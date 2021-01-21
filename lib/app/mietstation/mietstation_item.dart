@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/color_list.dart';
 
 import 'near_by_stationlist_item.dart';
@@ -41,9 +43,21 @@ class MietStationItem extends StatelessWidget {
                                 style: BorderStyle.solid),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(12.0))),
-                        child: Image.asset(
-                          'assets/images/mietstation.png',
-                        )),
+                        child: CachedNetworkImage(
+                          imageUrl: nearbyLocation.imageFullPath,
+                          height: Dimens.seventy,
+                          width: Dimens.seventy,
+                          // errorWidget: (a, d, c) {
+                          //   return Image.asset(
+                          //     'assets/images/mietstation.png',
+                          //   );
+                          // },
+                          // placeholder: (a, b) {
+                          //   return Image.asset(
+                          //     'assets/images/mietstation.png',
+                          //   );
+                          // },
+                        ),),
                     SizedBox(
                       height: 12,
                     ),

@@ -38,6 +38,17 @@ class AppLanguage extends ChangeNotifier {
     notifyListeners();
   }
 
+  void changeLanguageFirstTime(context,Locale type) async {
+    print("typetype${type.languageCode}");
+    var prefs = await SharedPreferences.getInstance();
+    if (setappLocale == type || type == null) {
+      return;
+    }
+    setappLocale = type;
+    prefs.setString('language_code', type.languageCode);
+    notifyListeners();
+  }
+
   Future<String> getLanguage() async {
     var prefs = await SharedPreferences.getInstance();
     var lang = prefs.getString('language_code');

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:async';
@@ -10,10 +11,10 @@ import 'package:progress_dialog/progress_dialog.dart';
 // sarfrazmalik111@gmail.com
 // MSMalik099
 
-String BASE_URL = 'http://3.64.19.80/api/users';
-String PAYMENT_BASE_URL = 'http://3.64.19.80/api/payment';
+String BASE_URL = 'http://35.246.230.19/api/users';
+String PAYMENT_BASE_URL = 'http://35.246.230.19/api/payment';
 //www.rechargenow-dashboard.de
-String IMAGE_BASE_URL = 'http://3.64.19.80';
+String IMAGE_BASE_URL = 'http://35.246.230.19';
 //192.168.1.9
 
 /*Future<http.Response> createLoginRequestApi(Login login) async{
@@ -168,9 +169,10 @@ Future<http.Response> updateEmailApi(request, accessToken) async {
   return response;
 }
 
-Future<http.Response> getHelpListApi(accessToken) async {
+Future<http.Response> getHelpListApi(accessToken,language_code) async {
+  debugPrint("faqurl:-   $BASE_URL/get-help-list?language_code=$language_code");
   final response = await http.get(
-    '$BASE_URL/get-help-list',
+    '$BASE_URL/get-help-list?language_code=$language_code',
     headers: {
       HttpHeaders.contentTypeHeader: 'application/json',
       'accessToken': accessToken,

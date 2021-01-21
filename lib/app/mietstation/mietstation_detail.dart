@@ -155,16 +155,16 @@ class _MietStationState extends State<MietStationDetailScreen> {
                           imageUrl: widget.nearbyLocation.imageFullPath,
                           height: Dimens.eighty,
                           width: Dimens.eighty,
-                          errorWidget: (a, d, c) {
-                            return Image.asset(
-                              'assets/images/mietstation.png',
-                            );
-                          },
-                          placeholder: (a, b) {
-                            return Image.asset(
-                              'assets/images/mietstation.png',
-                            );
-                          },
+                          // errorWidget: (a, d, c) {
+                          //   return Image.asset(
+                          //     'assets/images/mietstation.png',
+                          //   );
+                          // },
+                          // placeholder: (a, b) {
+                          //   return Image.asset(
+                          //     'assets/images/mietstation.png',
+                          //   );
+                          // },
                         ),
                       )),
                 ),

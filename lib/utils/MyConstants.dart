@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 class MyConstants {
   static const String WEB_URL = 'https://www.ofypets.com/';

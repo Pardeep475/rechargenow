@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:recharge_now/app/home_screen.dart';
+import 'package:recharge_now/app/home_screen_new.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/Dimens.dart';
@@ -76,7 +77,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-        widget.isFromHome
+   /*     widget.isFromHome
             ? Positioned(
                 right: Dimens.twenty,
                 top: Dimens.oneTwentyFive,
@@ -108,7 +109,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                       )),
                 ),
               )
-            : Positioned(top: 120, child: SizedBox()),
+            : Positioned(top: 120, child: SizedBox()),*/
         Positioned(
           bottom: 0,
           left: 40,
@@ -159,7 +160,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-        widget.isFromHome
+        /*widget.isFromHome
             ? Positioned(
                 right: Dimens.twenty,
                 top: Dimens.oneTwentyFive,
@@ -191,7 +192,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                       )),
                 ),
               )
-            : Positioned(top: 120, child: SizedBox()),
+            : Positioned(top: 120, child: SizedBox()),*/
         Positioned(
           bottom: 0,
           left: 0,
@@ -242,7 +243,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-        widget.isFromHome
+        /*widget.isFromHome
             ? Positioned(
                 right: Dimens.twenty,
                 top: Dimens.oneTwentyFive,
@@ -274,7 +275,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                       )),
                 ),
               )
-            : Positioned(top: 120, child: SizedBox()),
+            : Positioned(top: 120, child: SizedBox()),*/
         Positioned(
           bottom: 0,
           left: 0,
@@ -325,7 +326,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
               width: 200,
               child: Image.asset('assets/images/logo.png')),
         ),
-        widget.isFromHome
+        /*widget.isFromHome
             ? Positioned(
           right: Dimens.twenty,
           top: Dimens.oneTwentyFive,
@@ -357,7 +358,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
                 )),
           ),
         )
-            : Positioned(top: 120, child: SizedBox()),
+            : Positioned(top: 120, child: SizedBox()),*/
         Positioned(
           bottom: 0,
           left: 0,
@@ -489,7 +490,7 @@ class _HowToWorkScreenState extends State<HowToWorkScreen> {
 
   void onDonePress() {
     Navigator.of(context).pushReplacement(
-        new MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
+        new MaterialPageRoute(builder: (BuildContext context) => HomeScreenNew()));
   }
 
   initViewPager(BuildContext context) {

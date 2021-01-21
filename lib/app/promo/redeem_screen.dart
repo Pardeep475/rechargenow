@@ -9,6 +9,7 @@ import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home_screen.dart';
+import '../home_screen_new.dart';
 
 class RedeemSuccess extends StatefulWidget {
   @override
@@ -134,7 +135,7 @@ class _RedeemSuccess extends State<RedeemSuccess> {
   void navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) => HomeScreen()),
+            builder: (context) => HomeScreenNew()),
             (Route<dynamic> route) => false);
   }
 }

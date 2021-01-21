@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 
-class CommonErrorDialog extends StatelessWidget{
-
+class CommonErrorDialog extends StatelessWidget {
   final String title, descriptions, text;
   final String img;
   final VoidCallback callback;
   final double;
   final isCrossIconShow;
 
-
-  CommonErrorDialog({this.title, this.descriptions, this.text, this.img,
-    this.callback, this.double, this.isCrossIconShow});
+  CommonErrorDialog(
+      {this.title,
+      this.descriptions,
+      this.text,
+      this.img,
+      this.callback,
+      this.double,
+      this.isCrossIconShow});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,9 @@ class CommonErrorDialog extends StatelessWidget{
         Container(
           padding: EdgeInsets.only(
               left: 20, top: (double + 25), right: 20, bottom: 20),
-          margin: EdgeInsets.only(top: double,),
+          margin: EdgeInsets.only(
+            top: double,
+          ),
           decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               color: Colors.white,
@@ -76,10 +82,9 @@ class CommonErrorDialog extends StatelessWidget{
                       text: text,
                       callback: () {
                         Navigator.of(context).pop();
-
+                        callback();
                       }),
-                  margin: EdgeInsets.only(
-                      left: 20, right: 20),
+                  margin: EdgeInsets.only(left: 20, right: 20),
                 ),
               ),
               SizedBox(
@@ -96,6 +101,4 @@ class CommonErrorDialog extends StatelessWidget{
       ],
     );
   }
-
-  
 }

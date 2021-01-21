@@ -124,7 +124,7 @@
   "Your battery has been unlocked": "Your battery has been unlocked",
   "Your battery is on slot": "Your battery is on slot",
   "Done": "Done",
-  "Scan to charge": "Scan to charge",
+  "Scan to charge": "SCAN QR-CODE",
   "Change Number": "Change Number",
   "Phone": "Phone",
   "Change E-mail Address": "Change E-mail Address",
@@ -235,6 +235,10 @@
   "USER_VIP_MSG": "You are now a VIP member of RechargeNow. Rent a Powerbank for free at every rental station",
   "INVALID_INPUT": "Incorrect data",
   "INVALID_INPUT_MSG": "You made a mistake with your login data. Try it again",
-  "FAILED_TXN_EXISTS": "Your payment method not correct, please contact our support"
+  "FAILED_TXN_EXISTS": "Your payment method not correct, please contact our support",
+  "give_us_feedback": "Give us feedback",
+  "evaluate_us": "EVALUATE US",
+  "terms_of_use": "TERMS OF USE",
+  "language": "LANGUAGE"
 
 }

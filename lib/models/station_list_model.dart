@@ -65,6 +65,7 @@ class MapLocation {
   String imageAvatarPath;
   String status;
   bool open;
+  int totalStaions;
 
   MapLocation({
     this.id,
@@ -99,6 +100,7 @@ class MapLocation {
     this.imageAvatarPath,
     this.status,
     this.open,
+    this.totalStaions,
   });
 
   factory MapLocation.fromJson(Map<String, dynamic> json) => MapLocation(
@@ -134,6 +136,7 @@ class MapLocation {
     imageAvatarPath: json["thumbnailPath"],
     status: json["status"],
     open:json["open"],
+    totalStaions:json["totalStations"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -169,6 +172,7 @@ class MapLocation {
     "thumbnailPath": imageAvatarPath,
     "status": status,
     "open": open,
+    "totalStations": totalStaions,
 
   };
 }

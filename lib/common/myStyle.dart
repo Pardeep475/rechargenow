@@ -60,7 +60,7 @@ TextStyle faqRsStyle = TextStyle(
 //login, addd prmo code
 TextStyle hintTextStyle = TextStyle(
     fontFamily: fontFamily,
-    fontSize: Dimens.twelve,
+    fontSize: Dimens.fifteen,
     fontWeight: FontWeight.w500,
     color: Color(0xFF9E9E9E),
     height: 1.2);

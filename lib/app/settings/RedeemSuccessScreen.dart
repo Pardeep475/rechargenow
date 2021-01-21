@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:recharge_now/app/home_screen_new.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
@@ -134,7 +135,7 @@ class _RedeemSuccess extends State<RedeemSuccess> {
   void navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) => HomeScreen()),
+            builder: (context) => HomeScreenNew()),
             (Route<dynamic> route) => false);
   }
 }

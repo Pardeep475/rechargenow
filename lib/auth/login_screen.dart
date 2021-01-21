@@ -14,6 +14,7 @@ import 'package:recharge_now/common/AllStrings.dart';
 import 'package:recharge_now/common/custom_dialog_box_error.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/my_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,26 +42,20 @@ class _LoginState extends State<LoginScreen> {
   bool _saving = false;
   String mobileNumber = "", countryCode = "+49";
 
-
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
-
-  void _setUpFirebase(){
+  void _setUpFirebase() {
     if (Platform.isIOS) iOS_Permission();
 
     _firebaseMessaging.getToken().then((token) {
       debugPrint("firebase_token    $token");
       prefs.setString('fcmtoken', token);
     });
-
-
   }
 
-
   void iOS_Permission() {
-
-    _firebaseMessaging.requestNotificationPermissions(
-        IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false));
+    _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
+        sound: true, badge: true, alert: true, provisional: false));
     _firebaseMessaging.onIosSettingsRegistered.first.then((settings) {
       debugPrint("firebase_token    ${settings.alert}");
       // if (settings.alert) {
@@ -70,7 +65,6 @@ class _LoginState extends State<LoginScreen> {
       });
       // }
     });
-
   }
 
   List<Item> users = <Item>[
@@ -100,21 +94,16 @@ class _LoginState extends State<LoginScreen> {
         )),
   ];
 
-
   bool _serviceEnabled = false;
   var location = new Location();
 
   @override
   void initState() {
-
     initPrefs();
     _setUpFirebase();
     super.initState();
     checkLocationServiceEnableOrDisable();
-
-
   }
-
 
   checkLocationServiceEnableOrDisable() async {
     _serviceEnabled = await location.serviceEnabled();
@@ -127,14 +116,10 @@ class _LoginState extends State<LoginScreen> {
     print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
   }
 
-
-
-
-   void convertSectoDay(int n) {
-
+  void convertSectoDay(int n) {
     var day = n / (24 * 3600);
     var arr = "10.296527777777778".split('.');
-    String hours = "0"+ int.parse(arr[1]).toString() ;
+    String hours = "0" + int.parse(arr[1]).toString();
     int hours2 = int.parse(hours);
     debugPrint("hours1    $hours2");
     int min = hours2 * 60;
@@ -144,7 +129,7 @@ class _LoginState extends State<LoginScreen> {
     var hour = n / 3600;
 
     n %= 3600;
-    var  minutes = n / 60 ;
+    var minutes = n / 60;
 
     n %= 60;
     var seconds = n;
@@ -154,9 +139,7 @@ class _LoginState extends State<LoginScreen> {
     // final d4 = Duration(days:day,seconds: seconds);
     // print(d4);
     // print(format(d4));
-
   }
-
 
   format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
 
@@ -177,6 +160,8 @@ class _LoginState extends State<LoginScreen> {
       height: 45,
       decoration: MyUtils.showRoundCornerDecoration(),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           SizedBox(
             width: 10,
@@ -211,21 +196,26 @@ class _LoginState extends State<LoginScreen> {
             margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
           ),
 
-          Container(
-            child: Flexible(
-                child: TextField(
-                    style: editTextStyle,
-                    onChanged: (text) {
-                      mobileNumber = text;
-                    },
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: AppLocalizations.of(context).translate('Enter phone number'),
-                        hintStyle: hintTextStyle)
-                    //flexible
-                    )), //flexible
+          Expanded(
+            child: TextField(
+              style: editTextStyle,
+              onChanged: (text) {
+                mobileNumber = text;
+              },
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.all(0),
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                hintText: AppLocalizations.of(context)
+                    .translate('Enter phone number'),
+                hintStyle: hintTextStyle,
+              ),
+            ),
           ), //container
         ], //widget
       ),
@@ -280,7 +270,8 @@ class _LoginState extends State<LoginScreen> {
               margin: EdgeInsets.only(
                   top: 13, left: screenPadding, right: screenPadding),
               child: Text(
-                AppLocalizations.of(context).translate('Please enter your Country your Phone Number'),
+                AppLocalizations.of(context)
+                    .translate('Please enter your Country your Phone Number'),
                 textAlign: TextAlign.center,
                 style: locationTitleStyle,
               ),
@@ -297,7 +288,9 @@ class _LoginState extends State<LoginScreen> {
                   LoginWithMobileNumberButtonClick();
                 },
                 child: buttonView(
-                  text: AppLocalizations.of(context).translate('LOGIN').toUpperCase(),
+                  text: AppLocalizations.of(context)
+                      .translate('LOGIN')
+                      .toUpperCase(),
                 )),
             SizedBox(
               height: 10,
@@ -313,11 +306,20 @@ class _LoginState extends State<LoginScreen> {
                   style: termsBoldText,
                   children: <TextSpan>[
                     TextSpan(
-                        text: AppLocalizations.of(context).translate('By clicking LOGIN you agree our'),
+                        text: AppLocalizations.of(context)
+                            .translate('By clicking LOGIN you agree our'),
                         style: termsText),
-                    TextSpan(text: AppLocalizations.of(context).translate('Terms of Use'), style: termsBoldText),
-                    TextSpan(text: AppLocalizations.of(context).translate('and'), style: termsText),
-                    TextSpan(text: AppLocalizations.of(context).translate('Privacy policy'), style: termsBoldText),
+                    TextSpan(
+                        text: AppLocalizations.of(context)
+                            .translate('Terms of Use'),
+                        style: termsBoldText),
+                    TextSpan(
+                        text: AppLocalizations.of(context).translate('and'),
+                        style: termsText),
+                    TextSpan(
+                        text: AppLocalizations.of(context)
+                            .translate('Privacy policy'),
+                        style: termsBoldText),
                   ],
                 ),
               ),
@@ -330,46 +332,33 @@ class _LoginState extends State<LoginScreen> {
 
   void LoginWithMobileNumberButtonClick() async {
     if (mobileNumber.trim().length == 0) {
-
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return CustomDialogBoxError(
-              title: AppLocalizations.of(context)
-                  .translate("ERROR OCCURRED"),
-              descriptions:"Please enter a valid mobile number",
-              text:
-              AppLocalizations.of(context).translate("Ok"),
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: "Please enter a valid mobile number",
+              text: AppLocalizations.of(context).translate("Ok"),
               img: "assets/images/something_went_wrong.svg",
               double: 37.0,
               isCrossIconShow: true,
-              callback: () {
-
-              },
+              callback: () {},
             );
           });
-
     } else if (mobileNumber.trim().length < 10) {
-
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return CustomDialogBoxError(
-              title: AppLocalizations.of(context)
-                  .translate("ERROR OCCURRED"),
-              descriptions:"Please enter a valid mobile number",
-              text:
-              AppLocalizations.of(context).translate("Ok"),
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: "Please enter a valid mobile number",
+              text: AppLocalizations.of(context).translate("Ok"),
               img: "assets/images/something_went_wrong.svg",
               double: 37.0,
               isCrossIconShow: true,
-              callback: () {
-
-              },
+              callback: () {},
             );
           });
-
-
     } else {
       await FirebaseAuth.instance.signOut();
       verfiyPhone();
@@ -411,22 +400,17 @@ class _LoginState extends State<LoginScreen> {
       print('${e.message}');
       dismissProgressDialog();
       if (e.code == 'invalid-phone-number') {
-
         showDialog(
             context: context,
             builder: (BuildContext context) {
               return CustomDialogBoxError(
-                title: AppLocalizations.of(context)
-                    .translate("ERROR OCCURRED"),
-                descriptions:"The provided phone number is not valid.",
-                text:
-                AppLocalizations.of(context).translate("Ok"),
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+                descriptions: "The provided phone number is not valid.",
+                text: AppLocalizations.of(context).translate("Ok"),
                 img: "assets/images/something_went_wrong.svg",
                 double: 37.0,
                 isCrossIconShow: true,
-                callback: () {
-
-                },
+                callback: () {},
               );
             });
 
@@ -436,18 +420,14 @@ class _LoginState extends State<LoginScreen> {
             context: context,
             builder: (BuildContext context) {
               return CustomDialogBoxError(
-                title: AppLocalizations.of(context)
-                    .translate("ERROR OCCURRED"),
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
                 descriptions: AppLocalizations.of(context)
                     .translate("something_went_wrong"),
-                text:
-                AppLocalizations.of(context).translate("Ok"),
+                text: AppLocalizations.of(context).translate("Ok"),
                 img: "assets/images/something_went_wrong.svg",
                 double: 37.0,
                 isCrossIconShow: true,
-                callback: () {
-
-                },
+                callback: () {},
               );
             });
       }
@@ -469,18 +449,14 @@ class _LoginState extends State<LoginScreen> {
           context: context,
           builder: (BuildContext context) {
             return CustomDialogBoxError(
-              title: AppLocalizations.of(context)
-                  .translate("ERROR OCCURRED"),
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
               descriptions: AppLocalizations.of(context)
                   .translate("something_went_wrong"),
-              text:
-              AppLocalizations.of(context).translate("Ok"),
+              text: AppLocalizations.of(context).translate("Ok"),
               img: "assets/images/something_went_wrong.svg",
               double: 37.0,
               isCrossIconShow: true,
-              callback: () {
-
-              },
+              callback: () {},
             );
           });
     });
@@ -525,17 +501,14 @@ class _LoginState extends State<LoginScreen> {
               context: context,
               builder: (BuildContext context) {
                 return CustomDialogBoxError(
-                  title: AppLocalizations.of(context)
-                      .translate("ERROR OCCURRED"),
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
                   descriptions: jsonResponse['message'].toString(),
-                  text:
-                  AppLocalizations.of(context).translate("Ok"),
+                  text: AppLocalizations.of(context).translate("Ok"),
                   img: "assets/images/something_went_wrong.svg",
                   double: 37.0,
                   isCrossIconShow: true,
-                  callback: () {
-
-                  },
+                  callback: () {},
                 );
               });
         } else if (jsonResponse['status'].toString() == "2") {
@@ -543,17 +516,14 @@ class _LoginState extends State<LoginScreen> {
               context: context,
               builder: (BuildContext context) {
                 return CustomDialogBoxError(
-                  title: AppLocalizations.of(context)
-                      .translate("ERROR OCCURRED"),
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
                   descriptions: jsonResponse['message'].toString(),
-                  text:
-                  AppLocalizations.of(context).translate("Ok"),
+                  text: AppLocalizations.of(context).translate("Ok"),
                   img: "assets/images/something_went_wrong.svg",
                   double: 37.0,
                   isCrossIconShow: true,
-                  callback: () {
-
-                  },
+                  callback: () {},
                 );
               });
         } else {
@@ -561,17 +531,14 @@ class _LoginState extends State<LoginScreen> {
               context: context,
               builder: (BuildContext context) {
                 return CustomDialogBoxError(
-                  title: AppLocalizations.of(context)
-                      .translate("ERROR OCCURRED"),
+                  title:
+                      AppLocalizations.of(context).translate("ERROR OCCURRED"),
                   descriptions: jsonResponse['message'].toString(),
-                  text:
-                  AppLocalizations.of(context).translate("Ok"),
+                  text: AppLocalizations.of(context).translate("Ok"),
                   img: "assets/images/something_went_wrong.svg",
                   double: 37.0,
                   isCrossIconShow: true,
-                  callback: () {
-
-                  },
+                  callback: () {},
                 );
               });
         }
@@ -585,18 +552,14 @@ class _LoginState extends State<LoginScreen> {
             context: context,
             builder: (BuildContext context) {
               return CustomDialogBoxError(
-                title: AppLocalizations.of(context)
-                    .translate("ERROR OCCURRED"),
+                title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
                 descriptions: AppLocalizations.of(context)
                     .translate("something_went_wrong"),
-                text:
-                AppLocalizations.of(context).translate("Ok"),
+                text: AppLocalizations.of(context).translate("Ok"),
                 img: "assets/images/something_went_wrong.svg",
                 double: 37.0,
                 isCrossIconShow: true,
-                callback: () {
-
-                },
+                callback: () {},
               );
             });
       }

@@ -1,22 +1,23 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:recharge_now/app/home_screen.dart';
 import 'package:recharge_now/auth/login_screen.dart';
 import 'package:recharge_now/auth/splash_screen.dart';
 import 'package:recharge_now/common/AllStrings.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLanguage.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
-import 'package:recharge_now/utils/MyConstants.dart';
 import 'package:recharge_now/utils/SizeConfig.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'location/dummy_location.dart';
+import 'app/home_screen_new.dart';
+
+Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
+  debugPrint("notification_message_is    $message");
+}
 
 void main() async {
   await WidgetsFlutterBinding.ensureInitialized();
@@ -24,24 +25,47 @@ void main() async {
   await Firebase.initializeApp();
   AppLanguage appLanguage = AppLanguage();
   appLanguage.fetchLocale();
+  // debugPaintSizeEnabled = false;
   await runApp(MyApp(
     appLanguage: appLanguage,
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   AppLanguage appLanguage;
 
   MyApp({this.appLanguage});
+
+  @override
+  State<StatefulWidget> createState() => _MyAppState(appLanguage: appLanguage);
+}
+
+class _MyAppState extends State<MyApp> {
+  AppLanguage appLanguage;
+  SharedPreferences _prefs;
+
+  _MyAppState({this.appLanguage});
 
   ThemeData appTheme = new ThemeData(
     hintColor: Colors.white,
     accentColor: primaryGreenColor,
   );
 
+  @override
+  void initState() {
+    super.initState();
+    loadShredPref();
+  }
+
+  loadShredPref() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  String languageCode = "";
+
   var routes = <String, WidgetBuilder>{
     "/Login": (BuildContext context) => LoginScreen(),
-    "/HomePage": (BuildContext context) => new HomeScreen(),
+    "/HomePage": (BuildContext context) => new HomeScreenNew(),
     //  "/SignUpScreen": (BuildContext context) => new SignUpScreen(),
     "/SplashScreen": (BuildContext context) => new SplashScreen(),
     "/LoginScreen": (BuildContext context) => new LoginScreen(),
@@ -64,10 +88,19 @@ class MyApp extends StatelessWidget {
               return MaterialApp(
                 title: AllString.app_name,
                 debugShowCheckedModeBanner: false,
-                home: SplashScreen(),
+                home: SplashScreen(languageCode: languageCode),
                 theme: appTheme,
                 routes: routes,
-                //debugShowCheckedModeBanner: false,
+                // localeResolutionCallback: (deviceLocale, supportedLocales) {
+                //   if (deviceLocale.countryCode != null) {
+                //     _prefs.setString("language_code_is",
+                //         "${deviceLocale.languageCode}_${deviceLocale.countryCode}");
+                //     languageCode =
+                //         "${deviceLocale.languageCode}_${deviceLocale.countryCode}";
+                //   }
+                //   debugPrint(
+                //       "current_locale_is  ${deviceLocale.countryCode}    ${deviceLocale.languageCode}");
+                // },
                 localizationsDelegates: [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,

@@ -107,7 +107,17 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
               decoration: BoxLooseDecoration(
                   radius: Radius.circular(5),
                   strokeWidth: 1,
-                  strokeColor: Color(0xFFEBEBEB),
+                  strokeColorBuilder: FixedColorListBuilder(
+                    [
+                      Color(0xFFEBEBEB),
+                      Color(0xFFEBEBEB),
+                      Color(0xFFEBEBEB),
+                      Color(0xFFEBEBEB),
+                      Color(0xFFEBEBEB),
+                      Color(0xFFEBEBEB),
+                    ]
+                  ),
+                  // strokeColor: Color(0xFFEBEBEB),
                   gapSpace: 8),
               onSubmit: (pin) {},
               onChanged: (pin) {

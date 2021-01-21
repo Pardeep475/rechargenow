@@ -117,13 +117,13 @@
   "Your battery is on slot": "Ihr Akku befindet sich im Steckplatz",
   "Done": "OK",
   "PROMOCODERECEIVED": "Du hast einen Bonus von X,XX€ erhalten!",
-  "Scan to charge": "Scannen om op te laden",
+  "Scan to charge": "QR-CODE SCANNEN",
   "Change Number": "Nummer wechseln",
   "Phone": "Telefon",
   "Adresse": "Adresse",
   "ScantheQRCode": "SCANNE DEN QR-CODE",
   "RETURNTITLE": "ÜBERALL ZURÜCKBRINGEN",
-  "RETURDESC": "Du kannst die Powerbank an jeder RechargeNow-Mietstationin ganz Europa zurückbringen.",
+  "RETURDESC": "Du kannst die Powerbank an jeder RechargeNow-Mietstation in ganz Europa zurückbringen.",
   "CHARGE ON THE GO": "UNTERWEGS LADEN",
   "CHARGEONDESC": "Entnehme die 4in1 Powerbank und lade deine Geräte ganz einfach unterwegs für nur 1,00€/Stunde & maximal 5,00€/Tag.",
   "Scan the QR-Code at the station to release a Powerbank": "Scanne den QR-Code an der Station, um eine Powerbankfreizugeben",
@@ -231,5 +231,9 @@
   "USER_VIP_MSG": "Du bist ab heute VIP Mitglied bei RechargeNow. Leihe an jeder Mietstation kostenlos eine Powerbank",
   "INVALID_INPUT": "Falsche Daten",
   "INVALID_INPUT_MSG": "Bei deinen Login-Daten ist dir ein Fehler unterlaufen. Probiere es erneut",
-  "FAILED_TXN_EXISTS": "Ihre Zahlungsmethode ist nicht korrekt. Bitte wenden Sie sich an unseren Support"
+  "FAILED_TXN_EXISTS": "Ihre Zahlungsmethode ist nicht korrekt. Bitte wenden Sie sich an unseren Support",
+  "give_us_feedback": "Gib uns feedback",
+  "evaluate_us": "BEWERTE UNS",
+  "terms_of_use": "NUTZUNGSBEDINGUNGEN",
+  "language": "SPRACHE"
 }

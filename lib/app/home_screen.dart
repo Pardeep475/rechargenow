@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:android_intent/android_intent.dart';
@@ -22,6 +21,7 @@ import 'package:recharge_now/app/notification/notification_list_screen.dart';
 import 'package:recharge_now/app/paymentscreens/add_payment_method_screen.dart';
 import 'package:recharge_now/app/promo/promo_screen.dart';
 import 'package:recharge_now/app/scan_bar_qr_code_screen.dart';
+import 'package:recharge_now/app/scan_bar_qr_code_screen_two.dart';
 import 'package:recharge_now/app/settings/SettingsScreen.dart';
 import 'package:recharge_now/auth/intro_screen.dart';
 import 'package:recharge_now/auth/login_screen.dart';
@@ -47,9 +47,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:platform/platform.dart';
+import '../main.dart';
 import 'bottomsheet/how_timer_bottomsheet.dart';
 import 'home_toolbar.dart';
-import 'mietstation/StationDetailsMarkerClickScreen.dart';
 import 'mietstation/mietstation_detail.dart';
 import 'mietstation/mietstation_list_scren.dart';
 import 'mietstation/near_by_stationlist_item.dart';
@@ -68,19 +68,10 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   var isBottomSheetButtonClickable = true;
   var location = new Location();
   var zoomLevel = 16.0;
-
-  /// Minimum zoom at which the markers will cluster
   final int _minClusterZoom = 0;
-
-  /// Maximum zoom at which the markers will cluster
   final int _maxClusterZoom = 19;
-
-  /// [Fluster] instance used to manage the clusters
   Fluster<MapMarker> _clusterManager;
-
-  /// Current map zoom. Initial zoom will be 15, street level
   double _currentZoom = 16;
-
   GoogleMapController mapController;
   LocationData _locationData;
   bool _serviceEnabled = false;
@@ -88,24 +79,12 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   var walletAmount = "";
   String result = "Hey there !";
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
-
-  /// Color of the cluster circle
   final Color _clusterColor = primaryGreenColor;
-
-  /// Color of the cluster text
   final Color _clusterTextColor = Colors.white;
-
-  // static Map<String, double> currentLocation;
   LocationData currentLocation;
-
   SharedPreferences prefs;
   Completer<GoogleMapController> _controller = Completer();
-
-  // LatLng _latlng1 = LatLng(52.520008,13.404954);
   LatLng _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
-
-  //static LatLng _latlng1 =  LatLng(28.6221846, 77.3830408);
-  //static LatLng _latlng1 =  LatLng(0.0, 0.0);
   final Set<Marker> _markers = {};
   LatLng _lastMapPosition;
   bool _saving = false;
@@ -116,11 +95,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   var iosLocationFirstTime = true;
   Timer timer;
 
+
   @override
   void initState() {
     super.initState();
     initbatteryInfo();
-    //init intercom
     initIntercom();
 
     _animateController =
@@ -152,12 +131,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         MyConstants.currentLong = currentLocation.longitude;
         prefs.setDouble("lat", _locationData.latitude);
         prefs.setDouble("long", _locationData.longitude);
-
         _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
         _lastMapPosition = _latlng1;
-        //code to animate the camera into current location
         if (animateFirstTime) {
-          //animateFirstTime = false;
           getStationsOnMapApi();
         }
         setMarker_OnCurrentLocation();
@@ -166,35 +142,31 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   getLocationData() async {
-    await Geolocator().getCurrentPosition().then((Position position) {
+    await Geolocator.getCurrentPosition().then((Position position) {
       setState(() {
         Position _currentPosition = position;
         MyConstants.currentLat = _currentPosition.latitude;
         MyConstants.currentLong = _currentPosition.longitude;
         _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
-        print("currentlocationFirstTime : " + _latlng1.toString());
-
         _lastMapPosition = _latlng1;
         CameraUpdate cameraUpdate =
             CameraUpdate.newLatLngZoom(_latlng1, zoomLevel);
-        mapController.animateCamera(cameraUpdate);
-        //  getStationsOnMapApi();
+        if (mapController != null) mapController.animateCamera(cameraUpdate);
       });
     }).catchError((e) {
-      print(e);
+      debugPrint(e);
     });
   }
 
   checkLocationServiceEnableOrDisable() async {
     _serviceEnabled = await location.serviceEnabled();
-    print("serviceEnabledLocation" + _serviceEnabled.toString());
+    debugPrint("serviceEnabledLocation" + _serviceEnabled.toString());
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
       _lastMapPosition = _latlng1;
       getStationsOnMapApi();
     } else if (_serviceEnabled) {
-      // locationChangeListener();
       _getCurrentLocation();
     }
   }
@@ -214,7 +186,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 if (value == 1) {
                   walletAmount = prefs.get('walletAmount').toString();
                   setState(() {});
-
                   _drawerKey.currentState.openDrawer();
                 } else if (value == 2) {
                   //notification click
@@ -222,7 +193,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              NotificationScreen()));
+                              NotificationScreen(),),);
                 }
               },
             ),
@@ -270,11 +241,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         prefs.get('userId').toString(), prefs.get('accessToken').toString());
     apicall.then((response) {
       isBottomSheetButtonClickable = true;
-
-      print(response.body);
+      final jsonResponse = json.decode(response.body);
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        log("GenRentalDetail${jsonResponse}");
         if (jsonResponse['status'].toString() == "1") {
           var rentalPrice = jsonResponse['rentalDetails']['rentalPrice'];
           rentalTime = jsonResponse['rentalDetails']['rentalTime'];
@@ -282,7 +250,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         } else if (jsonResponse['status'].toString() == "2") {
           debugPrint("rentBattery_PowerbankAPI   getRentalDetailsList   2");
           _showDifferentTypeOfDialogs(
-              jsonResponse['message'].toString(), context);
+              message: jsonResponse['message'] ?? "SOMETHING_WRONG",
+              context: context);
         } else if (jsonResponse['status'].toString() == "0") {
           prefs.setString(
               'walletAmount', jsonResponse['walletAmount'].toString());
@@ -295,11 +264,12 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           });
         }
       } else {
-        debugPrint("rentBattery_PowerbankAPI   else");
-        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
+        _showDifferentTypeOfDialogs(
+            message: jsonResponse["message"] ?? "SOMETHING_WRONG",
+            context: context);
       }
     }).catchError((error) {
-      print('error : $error');
+      _showDifferentTypeOfDialogs(message: error.toString(), context: context);
     });
   }
 
@@ -320,7 +290,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Container(
               height: 38,
               width: 110,
-              //margin: EdgeInsets.fromLTRB(20,20,20,0),
               decoration: new BoxDecoration(
                   color: Colors.black,
                   borderRadius: BorderRadius.only(
@@ -328,16 +297,13 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       topRight: const Radius.circular(10.0))),
               child: Center(
                   child: SizedBox(
-                      /*SvgPicture.asset(
-                       'assets/images/qr-code.svg',
-                     ),)*/
                       child: Transform.rotate(
                 angle: 135,
                 child: Icon(
                   Icons.keyboard_arrow_down,
                   color: Colors.white,
                 ),
-              )))),
+              ),),),),
         ),
       ),
     );
@@ -351,14 +317,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         height: 40,
         child: Container(
           width: 160,
-          //height: 30,
-          //padding: EdgeInsets.all(20),
           child: Image.asset(
             'assets/images/logo.png',
-            //fit: BoxFit.cover,
-            /*height: double.infinity,
-            width: double.infinity,*/
-            /* alignment: Alignment.center,*/
           ),
         ),
       ),
@@ -369,18 +329,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return GestureDetector(
         onTap: () {
           scanQR();
-
-          // var rentalPrice = "30";
-          // rentalTime = "01:07:40";
-          // walletAmount = "40";
-          // _modalBottomSheetMenu(rentalPrice, rentalTime);
-          // debugPrint(
-          //     "HomeTimerBottomSheeet     Rental Price  $rentalPrice    Rental Time  $rentalTime  Wallet Amount   $walletAmount");
-          // HomeTimerBottomSheeet(
-          //   rentalPrice: rentalPrice,
-          //   rentalTime: rentalTime,
-          //   walletAmount: walletAmount,
-          // );
         },
         child: Align(
           alignment: FractionalOffset.bottomCenter,
@@ -427,55 +375,43 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           fontWeight: FontWeight.w600),
                       textDirection: TextDirection.ltr),
                 ],
-              ))),
+              ),),),
         ));
   }
 
-//TODO: drawerbuttonUI method is used to side navigation
+
   drawerbuttonUI() {
     return Container(
       margin: EdgeInsets.fromLTRB(20, 10, 0, 0),
-      //width: 50.0,
-      //height: 50.0,
-      // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
       decoration: new BoxDecoration(
         shape: BoxShape.circle,
-        // You can use like this way or like the below line
         color: Colors.white,
       ),
       child: IconButton(
         icon: SvgPicture.asset(
           'assets/images/menu.svg',
         ),
-        // size: Size(300.0, 400.0),
         onPressed: () {},
       ), // You can add a Icon instead of text also, like below.
-      //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
     );
   }
 
   buttonStationsUI() {
     return Container(
       margin: EdgeInsets.fromLTRB(0, 10, 20, 0),
-      //width: 50.0,
-      //height: 50.0,
-      // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
       decoration: new BoxDecoration(
         shape: BoxShape.circle,
-        // You can use like this way or like the below line
         color: Colors.white,
       ),
       child: IconButton(
         icon: SvgPicture.asset(
           'assets/images/restaraunts.svg',
         ),
-        // size: Size(300.0, 400.0),
         onPressed: () {
           Navigator.of(context).push(new MaterialPageRoute(
               builder: (BuildContext context) => StationListScreen()));
         },
       ), // You can add a Icon instead of text also, like below.
-      //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
     );
   }
 
@@ -485,17 +421,8 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       icon: SvgPicture.asset(
         'assets/images/musicIcon.svg',
       ),
-      // size: Size(300.0, 400.0),
       onPressed: () async {
         await Intercom.displayMessenger();
-
-        // _currentLocation();
-        //_getCurrentLocation();
-        //showBottomSheet2(context);
-        /* Navigator.of(context).push(new MaterialPageRoute(
-              builder: (BuildContext context) => ContactScreen()));*/
-        /* Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ContactScreen1()),);*/
       },
       iconSize: 50.0,
     );
@@ -507,7 +434,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       icon: SvgPicture.asset(
         'assets/images/locator.svg',
       ),
-      // size: Size(300.0, 400.0),
       onPressed: () async {
         checkLocationServiceEnableOrDisable();
       },
@@ -519,7 +445,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return InkWell(
       onTap: () {
         _animateController.repeat();
-
         Timer(Duration(seconds: 2), () {
           _animateController.reset();
         });
@@ -531,32 +456,24 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         height: 50,
         width: 50,
         margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-        //width: 50.0,
-        //height: 50.0,
-        // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
         decoration: new BoxDecoration(
           shape: BoxShape.circle,
-          // You can use like this way or like the below line
           color: Colors.white,
         ),
         child: Center(
-          child: IconButton(
-            icon: SizedBox(
-              width: 24,
-              height: 24,
-              child: RotationTransition(
-                turns: Tween(begin: 0.0, end: 5.0).animate(_animateController),
-                child: SvgPicture.asset(
-                  'assets/images/refresh_icon.svg',
-                  color: primaryGreenColor,
-                ),
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: RotationTransition(
+              turns: Tween(begin: 0.0, end: 5.0).animate(_animateController),
+              child: SvgPicture.asset(
+                'assets/images/refresh_icon.svg',
+                color: primaryGreenColor,
               ),
             ),
-            // size: Size(300.0, 400.0),
           ),
         ), // You can add a Icon instead of text also, like below.
-        //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
-      ),
+        ),
     );
   }
 
@@ -575,7 +492,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 offset: Offset(0, 4),
                 blurRadius: 8)
           ],
-          borderRadius: BorderRadius.all(Radius.circular(150))),
+          borderRadius: BorderRadius.all(Radius.circular(150),),),
       child: Stack(
         children: <Widget>[
           Positioned(
@@ -592,7 +509,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     context,
                     MaterialPageRoute(
                         builder: (BuildContext context) =>
-                            StationListScreen()));
+                            StationListScreen(),),);
               },
               child: Row(
                 children: <Widget>[
@@ -656,7 +573,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             color: color_white,
             width: double.infinity,
             height: double.infinity,
-            child: navigationDrawer()));
+            child: navigationDrawer(),),);
   }
 
   Widget navigationDrawer() {
@@ -680,7 +597,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: Container(child: Icon(Icons.clear))),
+                          child: Container(child: Icon(Icons.clear),),),
                       SizedBox(
                         height: Dimens.twentyFive,
                       ),
@@ -690,9 +607,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: Image.asset(
                             'assets/images/logo.png',
                             fit: BoxFit.fill,
-                            /*height: double.infinity,
-            width: double.infinity,*/
-                            /* alignment: Alignment.center,*/
                           ),
                         ),
                       ),
@@ -736,7 +650,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
                       builder: (BuildContext context) =>
-                          AddPaymentMethodInitialScreen()));
+                          AddPaymentMethodInitialScreen(),),);
                 },
               ),
               ListTile(
@@ -758,7 +672,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => HistoryScreen()));
+                      builder: (BuildContext context) => HistoryScreen(),),);
                 },
               ),
               ListTile(
@@ -782,7 +696,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Navigator.of(context).push(new MaterialPageRoute(
                       builder: (BuildContext context) => HowToWorkScreen(
                             isFromHome: true,
-                          )));
+                          ),),);
                 },
               ),
               ListTile(
@@ -804,7 +718,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => PromoCodeScreen()));
+                      builder: (BuildContext context) => PromoCodeScreen(),),);
                 },
               ),
               ListTile(
@@ -826,7 +740,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => FAQScreen()));
+                      builder: (BuildContext context) => FAQScreen(),),);
                 },
               ),
               ListTile(
@@ -849,7 +763,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (BuildContext context) => SettingsScreen()));
+                      builder: (BuildContext context) => SettingsScreen(),),);
                 },
               ),
 
@@ -934,7 +848,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Visibility(
       visible: showGoogleMap,
       child: GoogleMap(
-        //onTap: _onAddMarker(),
         mapToolbarEnabled: false,
         rotateGesturesEnabled: true,
         zoomControlsEnabled: false,
@@ -945,9 +858,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         mapType: MapType.normal,
         markers: _markers,
-        //onMapCreated: _onMapCreated,
         onMapCreated: (controller) => _onMapCreated(controller),
-        //onCameraMove: _onCameraMove,
         onCameraMove: (position) => _updateMarkers(position.zoom),
         myLocationButtonEnabled: false,
         myLocationEnabled: true,
@@ -973,14 +884,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _onMapCreated(GoogleMapController controller) {
-    //_controller.complete(controller);
-    //setState(() {
     mapController = controller;
-
-    ///  });
   }
 
-  /// Inits [Fluster] and all the markers with network images and updates the loading state.
   void _initMarkers(List<MapLocation> locationList) async {
     _markers.clear();
     final Uint8List blackMarkerIcon =
@@ -1006,14 +912,14 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             title: "${locationList[i].name}",
             snippet: "${locationList[i].name}"),
         position: LatLng(double.parse(locationList[i].latitude),
-            double.parse(locationList[i].longitude)),
+            double.parse(locationList[i].longitude),),
       );
       // Marker
       markers.add(
         MapMarker(
             id: locationList[i].id.toString(),
             position: LatLng(double.parse(locationList[i].latitude),
-                double.parse(locationList[i].longitude)),
+                double.parse(locationList[i].longitude),),
             icon: locationList[i].open == true
                 ? BitmapDescriptor.fromBytes(greenMarkerIcon)
                 : BitmapDescriptor.fromBytes(blackMarkerIcon),
@@ -1023,18 +929,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _markers.add(resultMarker);
       setState(() {});
     }
-    /*for (LatLng markerLocation in locationList) {
-      final BitmapDescriptor markerImage =
-      await MapHelper.getMarkerImageFromUrl(_markerImageUrl);
 
-      markers.add(
-        MapMarker(
-          id: _markerLocations.indexOf(markerLocation).toString(),
-          position: markerLocation,
-          icon: markerImage,
-        ),
-      );
-    }*/
 
     _clusterManager = await MapHelper.initClusterManager(
       markers,
@@ -1045,17 +940,13 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     await _updateMarkers();
   }
 
-  /// Gets the markers and clusters to be displayed on the map for the current zoom level and
-  /// updates state.
   Future<void> _updateMarkers([double updatedZoom]) async {
     if (_clusterManager == null || updatedZoom == _currentZoom) return;
 
     if (updatedZoom != null) {
       _currentZoom = updatedZoom;
     }
-
     setState(() {
-      //_areMarkersLoading = true;
     });
 
     final updatedMarkers = await MapHelper.getClusterMarkers(
@@ -1071,14 +962,14 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ..addAll(updatedMarkers);
 
     setState(() {
-      //_areMarkersLoading = false;
+
     });
   }
 
   Future<void> scanQR() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ScanQrBarCodeScreen()),
+      MaterialPageRoute(builder: (context) => ScanQrBarCodeScreenTwo()),
     ).then((qrResult) {
       debugPrint("barcode_is_scanner_result   $qrResult");
       if (qrResult != null && qrResult != "" && qrResult != "-1") {
@@ -1091,18 +982,17 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   _getCurrentLocation() async {
     if (LocalPlatform().isIOS) {
       if (iosLocationFirstTime) {
-        await Geolocator().getCurrentPosition().then((Position position) {
+        await Geolocator.getCurrentPosition().then((Position position) {
           setState(() {
             Position _currentPosition = position;
             MyConstants.currentLat = _currentPosition.latitude;
             MyConstants.currentLong = _currentPosition.longitude;
             iosLocationFirstTime = false;
-
             _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
-            // print("currentlocationbuttonClick : "+_latlng1.toString());
             CameraUpdate cameraUpdate =
                 CameraUpdate.newLatLngZoom(_latlng1, zoomLevel);
-            mapController.animateCamera(cameraUpdate);
+            if (mapController != null)
+              mapController.animateCamera(cameraUpdate);
           });
         }).catchError((e) {
           print(e);
@@ -1110,12 +1000,12 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       } else {
         CameraUpdate cameraUpdate =
             CameraUpdate.newLatLngZoom(_latlng1, zoomLevel);
-        mapController.animateCamera(cameraUpdate);
+        if (mapController != null) mapController.animateCamera(cameraUpdate);
       }
     } else {
       CameraUpdate cameraUpdate =
           CameraUpdate.newLatLngZoom(_latlng1, zoomLevel);
-      mapController.animateCamera(cameraUpdate);
+      if (mapController != null) mapController.animateCamera(cameraUpdate);
     }
   }
 
@@ -1128,9 +1018,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _modalBottomSheetMenu(rentalPrice, rentalTime) {
     showModalBottomSheet(
-        /* shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),*/
         backgroundColor: Colors.transparent,
         context: context,
         builder: (builder) {
@@ -1149,13 +1036,13 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         color: Colors.black,
                         borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(10.0),
-                            topRight: const Radius.circular(10.0))),
+                            topRight: const Radius.circular(10.0),),),
                     child: Center(
                         child: SizedBox(
                             child: Icon(
                       Icons.keyboard_arrow_down,
                       color: Colors.white,
-                    )))),
+                    ),),),),
               ),
               HomeTimerBottomSheeet(
                 rentalPrice: rentalPrice,
@@ -1167,324 +1054,6 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
   }
 
-  // custumAlertDialogBatteryUnlocked(slotNumber, context) {}
-
-  // void custumBottomSheetMarkerClick(MapLocation data, context) {
-  //   showModalBottomSheet(
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(5.0),
-  //       ),
-  //       backgroundColor: Colors.transparent,
-  //       context: context,
-  //       builder: (builder) {
-  //         return Container(
-  //           height: 290.0,
-  //           child: Stack(
-  //             children: <Widget>[
-  //               Container(
-  //                   margin: EdgeInsets.fromLTRB(0, 60, 0, 0),
-  //                   //padding: EdgeInsets.all(8),
-  //                   decoration: BoxDecoration(
-  //                     color: Colors.white,
-  //                     borderRadius: BorderRadius.only(
-  //                         topLeft: const Radius.circular(15.0),
-  //                         topRight: const Radius.circular(15.0)),
-  //                     boxShadow: [
-  //                       BoxShadow(color: Colors.black12, blurRadius: 5)
-  //                     ],
-  //                   ),
-  //                   child: Container(
-  //                     margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-  //                     child: Stack(
-  //                       children: <Widget>[
-  //                         GestureDetector(
-  //                           onTap: () {
-  //                             Navigator.of(context).pop();
-  //                           },
-  //                           child: Align(
-  //                               alignment: Alignment.topRight,
-  //                               child: Icon(Icons.clear)),
-  //                         ),
-  //                         Column(
-  //                           mainAxisAlignment: MainAxisAlignment.start,
-  //                           children: <Widget>[
-  //                             Row(
-  //                               mainAxisSize: MainAxisSize.max,
-  //                               mainAxisAlignment: MainAxisAlignment.start,
-  //                               children: <Widget>[
-  //                                 Flexible(
-  //                                   child: Container(
-  //                                     margin: EdgeInsets.fromLTRB(8, 20, 8, 8),
-  //                                     padding: EdgeInsets.all(8),
-  //                                     child: Column(
-  //                                       mainAxisSize: MainAxisSize.max,
-  //                                       mainAxisAlignment:
-  //                                           MainAxisAlignment.start,
-  //                                       crossAxisAlignment:
-  //                                           CrossAxisAlignment.start,
-  //                                       children: <Widget>[
-  //                                         Text(data.name.toString(),
-  //                                             overflow: TextOverflow.ellipsis,
-  //                                             maxLines: 1,
-  //                                             style: TextStyle(
-  //                                                 fontSize: 16,
-  //                                                 fontWeight: FontWeight.bold)),
-  //                                         SizedBox(
-  //                                           height: 5,
-  //                                         ),
-  //                                         Text(data.category.toString(),
-  //                                             overflow: TextOverflow.ellipsis,
-  //                                             maxLines: 1,
-  //                                             style: TextStyle(
-  //                                                 fontSize: 14,
-  //                                                 color: primaryGreenColor,
-  //                                                 fontWeight: FontWeight.bold)),
-  //                                         SizedBox(
-  //                                           height: 10,
-  //                                         ),
-  //                                         Text(data.address.toString(),
-  //                                             overflow: TextOverflow.ellipsis,
-  //                                             maxLines: 1,
-  //                                             style: TextStyle(fontSize: 14)),
-  //                                         SizedBox(
-  //                                           height: 10,
-  //                                         ),
-  //                                         Row(
-  //                                           mainAxisSize: MainAxisSize.max,
-  //                                           //  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                                           children: <Widget>[
-  //                                             Row(
-  //                                               children: <Widget>[
-  //                                                 SizedBox(
-  //                                                   width: 15,
-  //                                                   height: 15,
-  //                                                   child: SvgPicture.asset(
-  //                                                     'assets/images/placeholder.svg',
-  //                                                   ),
-  //                                                 ),
-  //                                                 SizedBox(
-  //                                                   width: 5,
-  //                                                 ),
-  //                                                 Text(data.distance.toString(),
-  //                                                     style: TextStyle(
-  //                                                         fontSize: 10,
-  //                                                         color: Colors.black,
-  //                                                         fontWeight:
-  //                                                             FontWeight.bold))
-  //                                               ],
-  //                                             ),
-  //                                             SizedBox(
-  //                                               width: 20,
-  //                                             ),
-  //                                             Row(
-  //                                               children: <Widget>[
-  //                                                 SvgPicture.asset(
-  //                                                   'assets/images/battery-powerbank.svg',
-  //                                                 ),
-  //                                                 SizedBox(
-  //                                                   width: 5,
-  //                                                 ),
-  //                                                 Text(
-  //                                                     data.availablePowerbanks
-  //                                                             .toString() +
-  //                                                         " " +
-  //                                                         AppLocalizations.of(
-  //                                                                 context)
-  //                                                             .translate(
-  //                                                                 "Available"),
-  //                                                     style: TextStyle(
-  //                                                         fontSize: 10,
-  //                                                         color: Colors.black,
-  //                                                         fontWeight:
-  //                                                             FontWeight.bold))
-  //                                               ],
-  //                                             ),
-  //                                             SizedBox(
-  //                                               width: 20,
-  //                                             ),
-  //                                             Row(
-  //                                               children: <Widget>[
-  //                                                 SvgPicture.asset(
-  //                                                   'assets/images/Star.svg',
-  //                                                 ),
-  //                                                 SizedBox(
-  //                                                   width: 5,
-  //                                                 ),
-  //                                                 Text(
-  //                                                     data.freeSlots
-  //                                                             .toString() +
-  //                                                         " " +
-  //                                                         AppLocalizations.of(
-  //                                                                 context)
-  //                                                             .translate(
-  //                                                                 "Free"),
-  //                                                     style: TextStyle(
-  //                                                         fontSize: 10,
-  //                                                         color: Colors.black,
-  //                                                         fontWeight:
-  //                                                             FontWeight.bold))
-  //                                               ],
-  //                                             )
-  //                                           ],
-  //                                         ),
-  //                                       ],
-  //                                     ),
-  //                                   ),
-  //                                 ),
-  //                               ],
-  //                             ),
-  //                             SizedBox(
-  //                               height: 10,
-  //                             ),
-  //                             Container(
-  //                               margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-  //                               child: Row(
-  //                                 // mainAxisSize: MainAxisSize.max,
-  //                                 mainAxisAlignment:
-  //                                     MainAxisAlignment.spaceBetween,
-  //                                 children: <Widget>[
-  //                                   /*navigateButton(data),
-  //
-  //                     markerDetailsButton(data),*/
-  //                                   Expanded(
-  //                                     child: GestureDetector(
-  //                                       onTap: () {
-  //                                         Navigator.of(context).pop();
-  //                                         onStartNavigationClicked(data);
-  //                                       },
-  //                                       child: Container(
-  //                                         height: 45,
-  //                                         decoration: new BoxDecoration(
-  //                                           border: new Border.all(
-  //                                               width: .5, color: Colors.grey),
-  //                                           borderRadius:
-  //                                               const BorderRadius.all(
-  //                                             const Radius.circular(30.0),
-  //                                           ),
-  //                                         ),
-  //                                         child: Center(
-  //                                           child: new Text(
-  //                                               AppLocalizations.of(context)
-  //                                                   .translate("Navigate"),
-  //                                               style: new TextStyle(
-  //                                                   color: Colors.black,
-  //                                                   //fontWeight: FontWeight.bold,
-  //                                                   fontSize: 14.0,
-  //                                                   fontWeight:
-  //                                                       FontWeight.bold)),
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                   ),
-  //                                   SizedBox(
-  //                                     width: 10,
-  //                                   ),
-  //                                   Expanded(
-  //                                     child: GestureDetector(
-  //                                       onTap: () {
-  //                                         Navigator.of(context).pop();
-  //                                         Navigator.of(context).push(
-  //                                             new MaterialPageRoute(
-  //                                                 builder: (BuildContext
-  //                                                         context) =>
-  //                                                     StationDetailsMarkerClickScreen(
-  //                                                         nearbyLocation:
-  //                                                             data)));
-  //                                       },
-  //                                       child: Container(
-  //                                         decoration: new BoxDecoration(
-  //                                           color: primaryGreenColor,
-  //                                           /* border: new Border.all(
-  //                         width: .5,
-  //                         color:Colors.grey),*/
-  //                                           borderRadius:
-  //                                               const BorderRadius.all(
-  //                                             const Radius.circular(30.0),
-  //                                           ),
-  //                                         ),
-  //                                         height: 45,
-  //                                         child: Center(
-  //                                           child: new Text(
-  //                                               AppLocalizations.of(context)
-  //                                                   .translate("Details"),
-  //                                               style: new TextStyle(
-  //                                                   color: Colors.white,
-  //                                                   //fontWeight: FontWeight.bold,
-  //                                                   fontSize: 14.0,
-  //                                                   fontWeight:
-  //                                                       FontWeight.bold)),
-  //                                         ),
-  //                                       ),
-  //                                     ),
-  //                                   ),
-  //                                 ],
-  //                               ),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   )),
-  //
-  //               //center logo code
-  //               Align(
-  //                 alignment: Alignment.topCenter,
-  //                 child: Container(
-  //                   //margin: EdgeInsets.only(top: 200),
-  //                   padding: EdgeInsets.all(10),
-  //                   child: Card(
-  //                     elevation: 5,
-  //                     shape: RoundedRectangleBorder(
-  //                       borderRadius: BorderRadius.all(Radius.circular(45)),
-  //                       // side: BorderSide(width: 1, color: Colors.grey)
-  //                     ),
-  //                     child: Container(
-  //                       //color: primaryGreenColor,
-  //                       //margin: EdgeInsets.fromLTRB(20,0,0,0),
-  //                       width: 90.0,
-  //                       height: 90.0,
-  //                       // padding: const EdgeInsets.all(20.0),//I used some padding without fixed width and height
-  //
-  //                       decoration: new BoxDecoration(
-  //                           shape: BoxShape.circle,
-  //                           image: new DecorationImage(
-  //                               fit: BoxFit.fill,
-  //                               image: new NetworkImage(
-  //                                   data.imageFullPath.toString())))
-  //                       /*child: IconButton(
-  //                    icon:  Image.network(IMAGE_BASE_URL+data.imageAvatarPath.toString()
-  //                      //,fit: BoxFit.cover,
-  //                    ),
-  //                    // size: Size(300.0, 400.0),
-  //                    onPressed: () {
-  //
-  //                    },
-  //                  )*/
-  //                       , // You can add a Icon instead of text also, like below.
-  //                       //child: new Icon(Icons.arrow_forward, size: 50.0, color: Colors.black38)),
-  //                     ),
-  //                   ),
-  //                 ), /*Container(
-  //                color: primaryGreenColor,
-  //                //padding: EdgeInsets.all(10),
-  //                child: SizedBox(
-  //                    width: 80,
-  //                    height: 80,
-  //                    child:  Image.asset("assets/images/logo.png"))*/ /*Image.network(IMAGE_BASE_URL+data.imageAvatarPath))*/ /*
-  //
-  //              */ /*Image.network(
-  //                                           MyConstants.SERVICE_IMAGE+datum.image,
-  //                                           width: 60,
-  //                                           height: 60,
-  //                                           fit:BoxFit.fill )*/ /*
-  //            )*/
-  //               ),
-  //             ],
-  //           ),
-  //         );
-  //       });
-  // }
-
   rentBattery_PowerbankAPI(userId, deviceId) async {
     MyUtils.showLoaderDialog(context);
     var req = {"userId": userId, "deviceId": deviceId};
@@ -1492,15 +1061,17 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     await rentBattery_PowerbankApi(
             jsonReqString, prefs.get('accessToken').toString())
         .then((response) {
-      debugPrint("rentBattery_PowerbankAPI   ${response.body}");
+      final jsonResponse = json.decode(response.body);
       if (response.statusCode == 200) {
         Navigator.pop(context);
-        final jsonResponse = json.decode(response.body);
+
         if (jsonResponse['status'].toString() == "1") {
           setState(() {
             showBottomSheet = true;
           });
-          _showDifferentTypeOfDialogs("SUCCESS", context,
+          _showDifferentTypeOfDialogs(
+              message: "SUCCESS",
+              context: context,
               currncy: jsonResponse['slotNumber']);
         } else if (jsonResponse['status'].toString() == "3") {
           debugPrint("rentBattery_PowerbankAPI   3");
@@ -1521,19 +1092,18 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 );
               });
         } else {
-          debugPrint("rentBattery_PowerbankAPI   else    200");
           _showDifferentTypeOfDialogs(
-              jsonResponse['message'].toString(), context);
+              message: jsonResponse['message'] ?? "SOMETHING_WRONG",
+              context: context);
         }
       } else {
-        debugPrint("rentBattery_PowerbankAPI   else");
         Navigator.pop(context);
-        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
+        _showDifferentTypeOfDialogs(
+            message: jsonResponse['message'] ?? "SOMETHING_WRONG",
+            context: context);
       }
     }).catchError((onError) {
-      debugPrint("rentBattery_PowerbankAPI   catch");
       Navigator.pop(context);
-      _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
 
@@ -1542,11 +1112,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void loadShredPref() async {
     prefs = await SharedPreferences.getInstance();
     timer = Timer.periodic(
-        Duration(seconds: 60), (Timer t) => getStationsOnMapApi());
-    // getStationsOnMapApi();
+        Duration(seconds: 60), (Timer t) => getStationsOnMapApi(),);
     walletAmount = await prefs.get('walletAmount').toString();
     isNotificationSent = await prefs.getBool('isNotificationSent');
-    print(prefs.get('accessToken').toString());
     if (prefs.get("isRental") == true) {
       showBottomSheet = true;
       setState(() {});
@@ -1570,16 +1138,15 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     prefs.setDouble("lat", _locationData.latitude);
     prefs.setDouble("long", _locationData.longitude);
 
-    print("onLocationChanged Splash : " +
+    debugPrint("onLocationChanged Splash : " +
         MyConstants.currentLat.toString() +
         " : " +
         MyConstants.currentLong.toString());
   }
 
   getTestNotification() {
-    // testNotificaitonFired
     print("accesstoken " + prefs.get('accessToken').toString());
-    var apicall = testNotificaitonFired(prefs.get('accessToken').toString());
+    var apicall = testNotificaitonFired(prefs.get('accessToken').toString(),);
     apicall.then((value) {
       debugPrint('status_12345 ---->     ${value.body}');
     });
@@ -1605,24 +1172,18 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     };
     var jsonReqString = json.encode(req);
     print("accesstoken " + prefs.get('accessToken').toString());
-
-    print(jsonReqString);
-
     await getMapLocationsApi(jsonReqString, prefs.get('accessToken').toString())
         .then((response) {
+      final jsonResponse = json.decode(response.body);
+      StationsListPojo stationsListPojo =
+          StationsListPojo.fromJson(jsonResponse);
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        print(jsonResponse.toString());
-
         if (jsonResponse['status'] == 0 &&
             jsonResponse['message'].compareTo('ILLEGAL_ACCESS') == 0) {
           debugPrint('status_12345 ---->     ${jsonResponse['status']}');
           prefs.setBool('is_login', false);
           navigateToLoginScreen();
         }
-
-        StationsListPojo stationsListPojo =
-            StationsListPojo.fromJson(jsonResponse);
         if (stationsListPojo.status == 0 &&
             stationsListPojo.message.compareTo('ILLEGAL_ACCESS') == 0) {
           prefs.setBool('is_login', false);
@@ -1635,18 +1196,19 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           if (animateFirstTime) {
             CameraUpdate cameraUpdate =
                 CameraUpdate.newLatLngZoom(_latlng1, zoomLevel);
-            mapController.animateCamera(cameraUpdate);
+            if (mapController != null)
+              mapController.animateCamera(cameraUpdate);
             animateFirstTime = false;
           }
           setState(() {});
         }
       } else {
         debugPrint("rentBattery_PowerbankAPI   getStationsOnMapApi else");
-        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
+        _showDifferentTypeOfDialogs(
+            message: stationsListPojo.message, context: context);
       }
     }).catchError((onError) {
       debugPrint("rentBattery_PowerbankAPI   getStationsOnMapApi catchError");
-      _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
 
@@ -1654,22 +1216,20 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     await getUserDetailsApi(
             prefs.get('userId').toString(), prefs.get('accessToken').toString())
         .then((response) {
-      print(response.body);
+      final jsonResponse = json.decode(response.body);
+      UserDetailsPojo userDetailsPojo = UserDetailsPojo.fromJson(jsonResponse);
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        UserDetailsPojo userDetailsPojo =
-            UserDetailsPojo.fromJson(jsonResponse);
         UserDetails userdetails = userDetailsPojo.userDetails;
         prefs.setString('walletAmount', userdetails.walletAmount.toString());
         prefs.setBool('isRental', userDetailsPojo.isRental);
         setState(() {});
       } else {
         debugPrint("rentBattery_PowerbankAPI   getDetailsApi");
-        _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
+        _showDifferentTypeOfDialogs(
+            message: userDetailsPojo.message, context: context);
       }
     }).catchError((value) {
       debugPrint("rentBattery_PowerbankAPI   getDetailsApi catchError");
-      _showDifferentTypeOfDialogs("SOMETHING_WRONG", context);
     });
   }
 
@@ -1684,13 +1244,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void onMarkerClick(MapLocation data, BuildContext context) {
-    //
     showBottomSheet2(context, data);
-    //custumBottomSheetMarkerClick(data, context);
-    //custumAlertDialogMarkerClick1(data,context);
-    /* Navigator.of(context).push(new MaterialPageRoute(
-        builder: (BuildContext context) => OfferListScreen(offerDataList:data,distance:data.distance,latitude:data.latitude,longitude:data.longitude)));
-    */
   }
 
   onStartNavigationClicked(MapLocation data) async {
@@ -1730,35 +1284,28 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (LocalPlatform().isIOS) iOS_Permission();
 
     _firebaseMessaging.getToken().then((token) {
-      print("fcmtoken:" + token);
-      // Intercom.sendTokenToIntercom(token);
-
-      var fcmtoken = token;
       prefs.setString('fcmtoken', token);
     });
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print('on message $message');
+        print('on_message $message');
         var _message;
         if (Theme.of(context).platform == TargetPlatform.iOS) {
-          _message = message['aps']['alert'];
+          _message = message['notification'];
         } else {
           _message = message['notification'];
         }
-
+        print('on_message $message       2');
         showFirebaseMesgDialog(_message, context);
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
-        // if(message['notification']['title']=="test"){
-        /*Navigator.of(context).pushReplacement(new MaterialPageRoute(
-            builder: (BuildContext context) => SubPage()));*/
-        //  }
       },
       onLaunch: (Map<String, dynamic> message) async {
         print('on launch $message');
       },
+      // onBackgroundMessage: myBackgroundMessageHandler,
     );
   }
 
@@ -1767,102 +1314,20 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         sound: true, badge: true, alert: true, provisional: false));
     _firebaseMessaging.onIosSettingsRegistered.first.then((settings) {
       debugPrint("firebase_token    ${settings.alert}");
-      // if (settings.alert) {
       _firebaseMessaging.getToken().then((token) {
         debugPrint("firebase_token    $token");
         prefs.setString('fcmtoken', token);
       });
-      // }
     });
   }
 
-  // SOMETHING_WRONG
-  // POWERBANK_RENTED_ALREADY
-  // POWERBANK_RETURNED
-  // POWERBANK_RETURNED_MSG
-  // RENTAL_PERIOD_EXCEEDED
-  // POWERBANK_SOLD_MSG
-  // STATION_OFFLINE
-
   showFirebaseMesgDialog(message, context) {
-    debugPrint("rentBattery_PowerbankAPI   showFirebaseMesgDialog");
-    _showDifferentTypeOfDialogs(message["title"], context);
-    // showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return CustomDialogBoxError(
-    //         title:
-    //         AppLocalizations.of(context).translate("ERROR OCCURRED"),
-    //         descriptions: jsonResponse['message'].toString(),
-    //         text: AppLocalizations.of(context).translate("Ok"),
-    //         img: "assets/images/something_went_wrong.svg",
-    //         double: 37.0,
-    //         isCrossIconShow: true,
-    //         callback: () {},
-    //       );
-    //     });
-
-    // Dialog myDialog = Dialog(
-    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-    //   //this right here
-    //   child: Container(
-    //     margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
-    //     height: message['title'] == "POWERBANK ZURCKGEGEBEN" ? 480 : 350.0,
-    //     // width: 600.0,
-    //
-    //     child: Column(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       children: <Widget>[
-    //         SizedBox(
-    //           height: 10,
-    //         ),
-    //         Align(
-    //           alignment: Alignment.center,
-    //           child: message['title'] == "POWERBANK ZURCKGEGEBEN"
-    //               ? SizedBox(
-    //                   width: 200,
-    //                   height: 250,
-    //                   child: Image.asset(
-    //                     'assets/images/return_powerbank.png',
-    //                   ),
-    //                 )
-    //               : SvgPicture.asset(
-    //                   'assets/images/battery-unlocked.svg',
-    //                 ),
-    //         ),
-    //         SizedBox(
-    //           height: 20,
-    //         ),
-    //         Text(
-    //           message['title'],
-    //           style: TextStyle(
-    //               color: Colors.black,
-    //               fontSize: 16,
-    //               fontWeight: FontWeight.bold),
-    //         ),
-    //         SizedBox(
-    //           height: 15,
-    //         ),
-    //         Text(
-    //           message['body'],
-    //           textAlign: TextAlign.center,
-    //           style: TextStyle(color: Colors.grey),
-    //         ),
-    //         SizedBox(
-    //           height: 20,
-    //         ),
-    //         closeButton()
-    //       ],
-    //     ),
-    //   ),
-    // );
-    // return showDialog(
-    //     barrierDismissible: false,
-    //     context: context,
-    //     builder: (BuildContext context) => myDialog);
+    _showDifferentTypeOfDialogs(
+        title: message["title"], message: message['body'], context: context);
   }
 
-  _showDifferentTypeOfDialogs(message, context, {String currncy}) {
+  _showDifferentTypeOfDialogs(
+      {String title, String message, BuildContext context, String currncy}) {
     switch (message) {
       case "SOMETHING_WRONG":
         {
@@ -2034,9 +1499,11 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           openDialogWithSlideInAnimation(
             context: context,
             itemWidget: CommonErrorDialog(
-              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
-              descriptions: AppLocalizations.of(context)
-                  .translate("something_went_wrong"),
+              title: title ??
+                  AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: message ??
+                  AppLocalizations.of(context)
+                      .translate("something_went_wrong"),
               text: AppLocalizations.of(context).translate("Ok"),
               img: "assets/images/something_went_wrong.svg",
               double: 37.0,
@@ -2049,31 +1516,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  void showBottomSheetTimer(BuildContext context) {
-    showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (BuildContext context) {
-          return HomeTimerBottomSheeet();
-        });
-  }
-
   void showBottomSheet2(BuildContext context, MapLocation data) {
-    // openDialogWithSlideInAnimation(
-    //   context: context,
-    //   itemWidget: ItemPanelTower(
-    //     data: data,
-    //     onDetailPressed: (MapLocation value) {
-    //       debugPrint("on detail pressed    ${value.name}");
-    //       _onDetailMarkerClick(context, value);
-    //     },
-    //     onNavigationPressed: (MapLocation value) {
-    //       debugPrint("on navigation pressed  ${value.name}");
-    //       _onNavigatorMarkerClick(value);
-    //     },
-    //   ),
-    // );
-
     switch (data.freeSlots) {
       case 6:
         openDialogWithSlideInAnimation(
@@ -2088,7 +1531,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 debugPrint("on navigation pressed  ${value.name}");
                 _onNavigatorMarkerClick(value);
               },
-            ));
+            ),);
         break;
       case 8:
         openDialogWithSlideInAnimation(
@@ -2103,7 +1546,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 debugPrint("on navigation pressed  ${value.name}");
                 _onNavigatorMarkerClick(value);
               },
-            ));
+            ),);
         break;
       case 12:
         openDialogWithSlideInAnimation(
@@ -2118,7 +1561,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 debugPrint("on navigation pressed  ${value.name}");
                 _onNavigatorMarkerClick(value);
               },
-            ));
+            ),);
         break;
       case 24:
         openDialogWithSlideInAnimation(
@@ -2133,7 +1576,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 debugPrint("on navigation pressed  ${value.name}");
                 _onNavigatorMarkerClick(value);
               },
-            ));
+            ),);
         break;
       case 48:
         openDialogWithSlideInAnimation(
@@ -2148,7 +1591,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 debugPrint("on navigation pressed  ${value.name}");
                 _onNavigatorMarkerClick(value);
               },
-            ));
+            ),);
         break;
       default:
         {
@@ -2164,24 +1607,9 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   debugPrint("on navigation pressed  ${value.name}");
                   _onNavigatorMarkerClick(value);
                 },
-              ));
+              ),);
         }
     }
-
-    // showModalBottomSheet<void>(
-    //     context: context,
-    //     backgroundColor: Colors.transparent,
-    //     builder: (BuildContext context) {
-    //       var filePath = "assets/images/slot6station.png";
-    //       var isLongImage = false;
-    //
-    //
-    //       return BottomSheetWidget(
-    //         data,
-    //         slotTypeFilePath: filePath,
-    //         isLongImage: isLongImage,
-    //       );
-    //     });
   }
 
   void _onNavigatorMarkerClick(MapLocation data) async {
@@ -2204,7 +1632,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       intent.launch();
     } else {
       String url =
-          "https://www.google.com/maps/dir/?api=1&origin=" /*+ origin */ +
+          "https://www.google.com/maps/dir/?api=1&origin="  +
               "&destination=" +
               destination +
               "&travelmode=driving&dir_action=navigate";
@@ -2264,14 +1692,12 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void dispose() {
     timer?.cancel();
     _animateController.dispose();
-
     super.dispose();
   }
 
   void initbatteryInfo() async {
     Battery _battery = Battery();
     var batteryLevel = await _battery.batteryLevel;
-    print("batteryLevel$batteryLevel");
     isNotificationSent = await prefs.getBool('isNotificationSent');
     if (batteryLevel < 20 &&
         isNotificationSent != null &&

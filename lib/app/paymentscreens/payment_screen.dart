@@ -116,7 +116,7 @@ class PaymentState extends State<Payments> {
   }
 
   createBillingAgreementApi() async {
-    var apicall = await getCreateBillingAgreementApi(
+   await getCreateBillingAgreementApi(
             prefs.get('userId').toString(), prefs.get('accessToken').toString())
         .then((response) {
       print(response.body);
@@ -343,9 +343,24 @@ class PaymentState extends State<Payments> {
             Flexible(
               child: GestureDetector(
                 onTap: () {
-                  showAlertDialog1(context, creditCardList[index].id);
-                  // showAlertDialog(context, creditCardList[index].id);
-                  // showAlertDialog1(context, "123123");
+                  // showAlertDialog1(context, creditCardList[index].id);
+                  openDialogWithSlideInAnimation(
+                    context: context,
+                    itemWidget: CommonErrorDialog(
+                      title: AppLocalizations.of(context)
+                          .translate("Remove payment method?"),
+                      descriptions: AppLocalizations.of(context).translate(
+                          "Are you sure you want to delete your payment method?"),
+                      text: AppLocalizations.of(context).translate("Ok"),
+                      img: "assets/images/something_went_wrong.svg",
+                      double: 37.0,
+                      isCrossIconShow: false,
+                      callback: () {
+                        debugPrint("delete_card   ${creditCardList[index].id.toString()}");
+                        deleteCreditCard(creditCardList[index].id.toString());
+                      },
+                    ),
+                  );
                 },
                 child: Container(
                   height: Dimens.twentySeven,

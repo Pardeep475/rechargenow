@@ -11,19 +11,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ChangeLanguage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-
     return _ChangeLanguageState();
   }
 }
 
 class _ChangeLanguageState extends State<ChangeLanguage> {
-
-
   @override
   void initState() {
     initPrefs();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,65 +29,93 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       body: Column(
         children: [
           appBarViewEndBtn(
-              name: AppLocalizations.of(context).translate('change language').toUpperCase(),
+              name: AppLocalizations.of(context)
+                  .translate('change language')
+                  .toUpperCase(),
               context: context,
               callback: () {
                 Navigator.pop(context);
               }),
           Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30,top: 24),
-            child: InkWell(
-              onTap: (){
-                isEnglish=false;
-                setState(() {
-
-                });
-
-              },
-              child: Row(
-                children: [
-                  CustomButtom(isEnglish==true?false:true),
-                  SizedBox(width: 22,),
-                  SvgPicture.asset('assets/images/germanflag.svg',allowDrawingOutsideViewBox: true,),
-                  SizedBox(width: 12,),
-                  Text('Deutsch',style: TextStyle(
-                    color: Color(0xff2F2F2F),
-                    fontWeight: FontWeight.w400,fontSize: 14,height: 1.5
-
-                  ),)
-                ],
-              ),
+            padding: const EdgeInsets.only(left: 30, right: 30, top: 24),
+            child: Row(
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      isEnglish = false;
+                      setState(() {});
+                    },
+                    child: CustomButtom(isEnglish == true ? false : true)),
+                SizedBox(
+                  width: 17,
+                ),
+                SizedBox(
+                  width: 21,
+                  height: 14,
+                  child: Image.asset(
+                    'flags/de.png',
+                    package: 'country_code_picker',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                // SvgPicture.asset('assets/images/germanflag.svg',allowDrawingOutsideViewBox: true,),
+                SizedBox(
+                  width: 12,
+                ),
+                Text(
+                  'Deutsch',
+                  style: TextStyle(
+                      color: Color(0xff2F2F2F),
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      height: 1.5),
+                )
+              ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30,top: 30),
-            child: InkWell(
-              onTap: (){
-                isEnglish=true;
+            padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+            child: Row(
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      isEnglish = true;
 
-                setState(() {
-
-                });
-              },
-              child: Row(
-                children: [
-                  CustomButtom(isEnglish==true?true:false),
-                  SizedBox(width: 22,),
-                  SvgPicture.asset('assets/images/image.svg'),    SizedBox(width: 12,),
-                  Text('English',style: TextStyle(
+                      setState(() {});
+                    },
+                    child: CustomButtom(isEnglish == true ? true : false)),
+                SizedBox(
+                  width: 17,
+                ),
+                SizedBox(
+                  width: 21,
+                  height: 14,
+                  child: Image.asset(
+                    'flags/gb.png',
+                    package: 'country_code_picker',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(
+                  width: 12,
+                ),
+                Text(
+                  'English',
+                  style: TextStyle(
                       color: Color(0xff2F2F2F),
-                      fontWeight: FontWeight.w400,fontSize: 14,height: 1.5
-
-                  ),)
-                ],
-              ),
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      height: 1.5),
+                )
+              ],
             ),
           ),
           Expanded(
             child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40,horizontal: 24),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
                   child: GestureDetector(
                       onTap: () {
                         onSaveClick();
@@ -97,9 +123,9 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                       child: Container(
                         margin: EdgeInsets.only(bottom: 20),
                         child: custumButtonWithShape(
-                            AppLocalizations.of(context).translate("Save Changes"),
+                            AppLocalizations.of(context)
+                                .translate("Save Changes"),
                             primaryGreenColor),
-
                       )),
                 )),
           ),
@@ -107,33 +133,26 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       ),
     );
   }
-var isEnglish=true;
-  void initPrefs()async {
-    SharedPreferences predfs=await SharedPreferences.getInstance();
-    if(predfs.getString('language_code')=='en'){
-      isEnglish=true;
-    }else{
-      isEnglish=false;
+
+  var isEnglish = true;
+
+  void initPrefs() async {
+    SharedPreferences predfs = await SharedPreferences.getInstance();
+    if (predfs.getString('language_code') == 'de') {
+      isEnglish = false;
+    } else {
+      isEnglish = true;
     }
-    setState(() {
-
-    });
-
+    setState(() {});
   }
 
   void onSaveClick() {
-    if(isEnglish){
-      Provider.of<AppLanguage>(
-          context,
-          listen: false)
-          .changeLanguage(
-          Locale('en'));
-    }else{
-      Provider.of<AppLanguage>(
-          context,
-          listen: false)
-          .changeLanguage(
-          Locale('de'));
+    if (isEnglish) {
+      Provider.of<AppLanguage>(context, listen: false)
+          .changeLanguage(Locale('en'));
+    } else {
+      Provider.of<AppLanguage>(context, listen: false)
+          .changeLanguage(Locale('de'));
     }
     Navigator.pop(context);
   }
@@ -141,7 +160,9 @@ var isEnglish=true;
 
 class CustomButtom extends StatelessWidget {
   bool isActive;
+
   CustomButtom(this.isActive);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -151,11 +172,13 @@ class CustomButtom extends StatelessWidget {
       child: Container(
         height: 16,
         width: 16,
-        decoration:
-        BoxDecoration(color: isActive?primaryGreenColor:Color(0xffF2F2F2), shape: BoxShape.circle),
+        decoration: BoxDecoration(
+            color: isActive ? primaryGreenColor : Color(0xffF2F2F2),
+            shape: BoxShape.circle),
       ),
       decoration:
           BoxDecoration(color: Color(0xffF2F2F2), shape: BoxShape.circle),
     );
   }
 }
+//flags/${json['code'].toLowerCase()}.png
