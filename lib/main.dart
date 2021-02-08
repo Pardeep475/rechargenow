@@ -24,7 +24,7 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await Firebase.initializeApp();
   AppLanguage appLanguage = AppLanguage();
-  appLanguage.fetchLocale();
+  await appLanguage.fetchLocale();
   // debugPaintSizeEnabled = false;
   await runApp(MyApp(
     appLanguage: appLanguage,
@@ -91,16 +91,6 @@ class _MyAppState extends State<MyApp> {
                 home: SplashScreen(languageCode: languageCode),
                 theme: appTheme,
                 routes: routes,
-                // localeResolutionCallback: (deviceLocale, supportedLocales) {
-                //   if (deviceLocale.countryCode != null) {
-                //     _prefs.setString("language_code_is",
-                //         "${deviceLocale.languageCode}_${deviceLocale.countryCode}");
-                //     languageCode =
-                //         "${deviceLocale.languageCode}_${deviceLocale.countryCode}";
-                //   }
-                //   debugPrint(
-                //       "current_locale_is  ${deviceLocale.countryCode}    ${deviceLocale.languageCode}");
-                // },
                 localizationsDelegates: [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
@@ -120,4 +110,35 @@ class _MyAppState extends State<MyApp> {
     );
     return matApp;
   }
+
+  localeResolutionCallback(Locale locale, Iterable<Locale> supportedLocales) {
+    if (locale == null) {
+      debugPrint("*language locale is null!!!");
+      return supportedLocales.first;
+    }
+
+    for (Locale supportedLocale in supportedLocales) {
+      if (supportedLocale.languageCode == locale.languageCode ||
+          supportedLocale.countryCode == locale.countryCode) {
+        debugPrint("*language ok $supportedLocale");
+        return supportedLocale;
+      }
+    }
+
+    debugPrint("*language to fallback ${supportedLocales.first}");
+    return supportedLocales.first;
+  }
+}
+
+var languagesItsms = [
+  LanguageItem('English', true, "en"),
+  LanguageItem('Deutsch', false, "de"),
+];
+
+class LanguageItem {
+  String language_name;
+  bool isSelected;
+  var localeName;
+
+  LanguageItem(this.language_name, this.isSelected, this.localeName);
 }

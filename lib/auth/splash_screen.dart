@@ -7,11 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:recharge_now/auth/intro_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLanguage.dart';
-import 'package:recharge_now/utils/MyConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 
 class SplashScreen extends StatefulWidget {
   final String languageCode;
@@ -50,10 +48,26 @@ class _SplashScreenState extends State<SplashScreen> {
     String locale = await Devicelocale.currentLocale;
     debugPrint('device_local-->   ${languages.toString()}');
     debugPrint('device_local-->   ${locale.toString()}');
-
+    AppLanguage _appLanguage = AppLanguage();
     prefs = await SharedPreferences.getInstance();
     Future.delayed(Duration(milliseconds: 800)).then((value) async {
       if (prefs.get("isSkip") != null) {
+        // String value = prefs.getString("language_code");
+        // if (value == null) {
+        //   _appLanguage.changeLanguage(Locale('en'));
+        //   // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
+        //   //   Locale('en'),
+        //   // );
+        // } else {
+        //   if (value == "de") {
+        //     _appLanguage.changeLanguage(Locale('de'));
+        //   } else {
+        //     _appLanguage.changeLanguage(Locale('en'));
+        //     // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
+        //     //   Locale('en'),
+        //     // );
+        //   }
+        // }
         if (prefs.getBool('is_login') != null &&
             prefs.getBool('is_login') == true) {
           Navigator.of(context).pushReplacementNamed('/HomePage');
@@ -61,29 +75,27 @@ class _SplashScreenState extends State<SplashScreen> {
           Navigator.of(context).pushReplacementNamed('/LoginScreen');
         }
       } else {
-        String locale = await Devicelocale.currentLocale;
-        if (locale == "de_DE") {
-          prefs.setString('language_code', 'de');
-          Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-            Locale('de'),
-          );
-        } else {
-          prefs.setString('language_code', 'en');
-          Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-            Locale('en'),
-          );
-        }
-
-        // debugPrint(
-        //     "current_locale_is  splash $languageCode    ${prefs.getString('language_code_is')}");
-        // if (prefs.getString('language_code_is') == "de_DE") {
-        //   prefs.setString('language_code','de');
-        //   Provider.of<AppLanguage>(context, listen: false)
-        //       .changeLanguage(Locale('de'),);
-        // }else{
-        //   prefs.setString('language_code','en');
-        //   Provider.of<AppLanguage>(context, listen: false)
-        //       .changeLanguage(Locale('en'),);
+        // List languages = await Devicelocale.preferredLanguages;
+        // if (languages.length > 0) {
+        //   if (languages[0].contains("de")) {
+        //     _appLanguage.changeLanguage(Locale('de'));
+        //     // prefs.setString('language_code', 'de');
+        //     // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
+        //     //   Locale('de'),
+        //     // );
+        //   } else {
+        //     _appLanguage.changeLanguage(Locale('en'));
+        //     // prefs.setString('language_code', 'en');
+        //     // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
+        //     //   Locale('en'),
+        //     // );
+        //   }
+        // } else {
+        //   _appLanguage.changeLanguage(Locale('en'));
+        //   // prefs.setString('language_code', 'en');
+        //   // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
+        //   //   Locale('en'),
+        //   // );
         // }
         Navigator.of(context).pushReplacement(
           new MaterialPageRoute(
@@ -96,65 +108,55 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-  checkLocationServiceEnableOrDisable() async {
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-
-    _serviceEnabled = await location.serviceEnabled();
-    print("serviceEnabled" + _serviceEnabled.toString());
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (Platform.isIOS) {
-        // startTime();
-      } else if (Platform.isAndroid) {
-        if (!_serviceEnabled) {
-          //checkLocationServiceEnableOrDisable();
-          MyConstants.currentLat = prefs.getDouble("lat") != null
-              ? prefs.getDouble("lat")
-              : MyConstants.currentLat;
-          MyConstants.currentLong = prefs.getDouble("long") != null
-              ? prefs.getDouble("long")
-              : MyConstants.currentLong;
-          //   startTime();
-        } else {
-          getLocation();
-        }
-      }
-    } else if (_serviceEnabled) {
-      if (Platform.isIOS) {
-        // startTime();
-      } else if (Platform.isAndroid) {
-        getLocation();
-      }
-    }
-    print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
-
-    //_permissionGranted = await location.hasPermission();
-    // print('_permissionGranted.toString()>>> '+_permissionGranted.toString());
-
-    /*if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }*/
-  }
-
-  getLocation() async {
-    LocationData _locationData;
-
-    _locationData = await location.getLocation();
-
-    MyConstants.currentLat = _locationData.latitude;
-    MyConstants.currentLong = _locationData.longitude;
-    prefs.setDouble("lat", _locationData.latitude);
-    prefs.setDouble("long", _locationData.longitude);
-
-    print("onLocationChanged Splash : " +
-        MyConstants.currentLat.toString() +
-        " : " +
-        MyConstants.currentLong.toString());
-  }
+  // checkLocationServiceEnableOrDisable() async {
+  //   bool _serviceEnabled;
+  //   PermissionStatus _permissionGranted;
+  //
+  //   _serviceEnabled = await location.serviceEnabled();
+  //   print("serviceEnabled" + _serviceEnabled.toString());
+  //   if (!_serviceEnabled) {
+  //     _serviceEnabled = await location.requestService();
+  //     if (Platform.isIOS) {
+  //       // startTime();
+  //     } else if (Platform.isAndroid) {
+  //       if (!_serviceEnabled) {
+  //         //checkLocationServiceEnableOrDisable();
+  //         MyConstants.currentLat = prefs.getDouble("lat") != null
+  //             ? prefs.getDouble("lat")
+  //             : MyConstants.currentLat;
+  //         MyConstants.currentLong = prefs.getDouble("long") != null
+  //             ? prefs.getDouble("long")
+  //             : MyConstants.currentLong;
+  //         //   startTime();
+  //       } else {
+  //         getLocation();
+  //       }
+  //     }
+  //   } else if (_serviceEnabled) {
+  //     if (Platform.isIOS) {
+  //       // startTime();
+  //     } else if (Platform.isAndroid) {
+  //       getLocation();
+  //     }
+  //   }
+  //   print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
+  // }
+  //
+  // getLocation() async {
+  //   LocationData _locationData;
+  //
+  //   _locationData = await location.getLocation();
+  //
+  //   MyConstants.currentLat = _locationData.latitude;
+  //   MyConstants.currentLong = _locationData.longitude;
+  //   prefs.setDouble("lat", _locationData.latitude);
+  //   prefs.setDouble("long", _locationData.longitude);
+  //
+  //   print("onLocationChanged Splash : " +
+  //       MyConstants.currentLat.toString() +
+  //       " : " +
+  //       MyConstants.currentLong.toString());
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -7,12 +7,10 @@ import 'package:pin_input_text_field/pin_input_text_field.dart';
 
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/auth/release_location.dart';
-import 'package:recharge_now/common/AllStrings.dart';
 import 'package:recharge_now/common/custom_dialog_box_error.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
-import 'package:recharge_now/utils/my_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CodeVerificationScreen extends StatefulWidget {
@@ -107,16 +105,14 @@ class _CodeVerificationScreenState extends State<CodeVerificationScreen> {
               decoration: BoxLooseDecoration(
                   radius: Radius.circular(5),
                   strokeWidth: 1,
-                  strokeColorBuilder: FixedColorListBuilder(
-                    [
-                      Color(0xFFEBEBEB),
-                      Color(0xFFEBEBEB),
-                      Color(0xFFEBEBEB),
-                      Color(0xFFEBEBEB),
-                      Color(0xFFEBEBEB),
-                      Color(0xFFEBEBEB),
-                    ]
-                  ),
+                  strokeColorBuilder: FixedColorListBuilder([
+                    Color(0xFFEBEBEB),
+                    Color(0xFFEBEBEB),
+                    Color(0xFFEBEBEB),
+                    Color(0xFFEBEBEB),
+                    Color(0xFFEBEBEB),
+                    Color(0xFFEBEBEB),
+                  ]),
                   // strokeColor: Color(0xFFEBEBEB),
                   gapSpace: 8),
               onSubmit: (pin) {},

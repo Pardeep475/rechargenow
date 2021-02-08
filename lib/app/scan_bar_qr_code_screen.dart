@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flashlight/flashlight.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +21,6 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
   var _hasFlashlight = false;
   var isturnon = false;
   String _qrCode = "";
-
-
 
   @override
   initState() {
@@ -47,7 +47,8 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
                 alignment: Alignment.centerRight,
                 child: FlatButton(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(Dimens.fiftyFive))),
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(Dimens.fiftyFive))),
                   onPressed: () {
                     Navigator.pop(context, null);
                   },
@@ -64,7 +65,7 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
             ),
           ),
           Padding(
-            padding:  EdgeInsets.all(Dimens.ten),
+            padding: EdgeInsets.all(Dimens.ten),
             child: Text(
               AppLocalizations.of(context).translate('Scan the QR-Code'),
               textAlign: TextAlign.center,
@@ -77,9 +78,10 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
             ),
           ),
           Padding(
-            padding:  EdgeInsets.all(Dimens.eighteen),
+            padding: EdgeInsets.all(Dimens.eighteen),
             child: Text(
-              AppLocalizations.of(context).translate('scan code to activate location'),
+              AppLocalizations.of(context)
+                  .translate('scan code to activate location'),
               textAlign: TextAlign.center,
               style: TextStyle(
                   height: 1.4,
@@ -101,13 +103,14 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
                   color: Color(0xff666666),
                   image: DecorationImage(
                       image: AssetImage('assets/images/Subtract.png'))),
-              padding:  EdgeInsets.all(Dimens.thrteen),
+              padding: EdgeInsets.all(Dimens.thrteen),
               child: Builder(
                 builder: (context) {
                   return Container(
-                      width: Dimens.twoEighty,
-                      height: Dimens.twoEighty,
+                    width: Dimens.twoEighty,
+                    height: Dimens.twoEighty,
                     child: QRBarScannerCamera(
+                      fit: Platform.isIOS ? BoxFit.fill : BoxFit.cover,
                       onError: (context, error) => Text(
                         error.toString(),
                         style: TextStyle(color: Colors.red),
@@ -171,6 +174,4 @@ class _ScanQrBarState extends State<ScanQrBarCodeScreen> {
       Navigator.pop(context, code);
     }
   }
-
-
 }

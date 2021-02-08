@@ -8,6 +8,8 @@ import 'package:battery/battery.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fluster/fluster.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -45,6 +47,7 @@ import 'notification/notification_list_screen.dart';
 import 'paymentscreens/add_payment_method_screen.dart';
 import 'promo/promo_screen.dart';
 import 'settings/SettingsScreen.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class HomeScreenNew extends StatefulWidget {
   @override
@@ -78,13 +81,16 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   bool isNotificationSent = false;
   Timer timer;
   bool _isCameraMove = false;
+  String _mapStyle;
 
   @override
   void initState() {
     super.initState();
-    // initbatteryInfo();
+    _initBatteryInfo();
     _initIntercom();
-
+    rootBundle.loadString('assets/myStyle.txt').then((string) {
+      _mapStyle = string;
+    });
     _animateController =
         AnimationController(vsync: this, duration: Duration(seconds: 2));
 
@@ -207,13 +213,25 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         ),
         mapType: MapType.normal,
         markers: _markers,
+        // gestureRecognizers: Set()
+        //   ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
+        //   ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()))
+        //   ..add(Factory<HorizontalDragGestureRecognizer>(() => HorizontalDragGestureRecognizer()))
+        //   ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer())),
         onMapCreated: (controller) {
           _onMapCreated(controller);
         },
         onCameraMove: (position) {
-          debugPrint("On_Camera_Move     $position");
+          debugPrint("On_Camera_Move     On_Camera_Move");
+          _isCameraMove = true;
           _updateMarkers(position.zoom);
         },
+        // onCameraMoveStarted: (){
+        //   _isCameraMove = true;
+        // },
+        // onCameraIdle: (){
+        //   _isCameraMove = true;
+        // },
         // options: GoogleMapOptions(
         //   cameraPosition: CameraPosition(
         //     target: LatLng(25.334206, 55.388947),
@@ -229,6 +247,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
   void _onMapCreated(GoogleMapController controller) async {
     _mapController = controller;
+    _mapController.setMapStyle(_mapStyle);
     debugPrint("map_controller      onMap Created   $isLocationOn");
     if (isLocationOn) {
       if (Platform.isAndroid) {
@@ -261,34 +280,118 @@ class _HomeScreenNewState extends State<HomeScreenNew>
       debugPrint("serviceEnabledLocation   ${_serviceEnabled.toString()}");
       _getCurrentLocation();
     }
+
+    // CameraPosition _currentCameraPosition = CameraPosition(
+    //     target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+    //     zoom: _zoomLevel);
+    //
+    // _mapController.animateCamera(
+    //     CameraUpdate.newCameraPosition(_currentCameraPosition));
   }
 
   _getCurrentLocation() async {
-    debugPrint("serviceEnabledLocation   _getCurrentLocation 1");
-    await Geolocator.getCurrentPosition().then((Position position) {
-      debugPrint("serviceEnabledLocation   _getCurrentLocation 2");
-      Position _currentPosition = position;
-      _prefs.setDouble("lat", _currentPosition.latitude);
-      _prefs.setDouble("long", _currentPosition.longitude);
-      MyConstants.currentLat = _currentPosition.latitude;
-      MyConstants.currentLong = _currentPosition.longitude;
+    debugPrint("map_controller      onMap Created   $isLocationOn");
+    Location location = new Location();
+    currentLocation = await location.getLocation();
+    debugPrint(
+        "map_controller      ${currentLocation.latitude}   ${currentLocation.longitude}");
+    location.onLocationChanged.listen((LocationData cLoc) {
+      debugPrint(
+          "map_controller  location changed  ${cLoc.latitude}   ${cLoc.longitude}");
+      if (_latlng1.latitude != cLoc.latitude &&
+          _latlng1.longitude != cLoc.longitude &&
+          (currentLocation == null ||
+              currentLocation.latitude != cLoc.latitude &&
+                  currentLocation.longitude != cLoc.longitude)) {
+        currentLocation = cLoc;
+        // double _distance = calculateDistance(
+        //     currentLocation.latitude,
+        //     currentLocation.longitude,
+        //     currentLocation.latitude,
+        //     currentLocation.longitude);
+        //
+        /*if (!_isCameraMove) {
+          if (_mapController != null) {
+            debugPrint("map_controller     _isCameraMove  false");
+            MyConstants.currentLat = currentLocation.latitude;
+            MyConstants.currentLong = currentLocation.longitude;
+            _prefs.setDouble("lat", currentLocation.latitude);
+            _prefs.setDouble("long", currentLocation.longitude);
+            CameraPosition _currentCameraPosition = CameraPosition(
+                target:
+                LatLng(MyConstants.currentLong, MyConstants.currentLong),
+                zoom: _zoomLevel);
+            _mapController.animateCamera(
+                CameraUpdate.newCameraPosition(_currentCameraPosition));
+            _isCameraMove = true;
+          }
+        } else if (*/ /*_distance > 1000 &&*/ /* _isCameraMove) {
+          if (_mapController != null) {
+            debugPrint("map_controller     _isCameraMove  true");
+            _prefs.setDouble("lat", currentLocation.latitude);
+            _prefs.setDouble("long", currentLocation.longitude);
+            MyConstants.currentLat = currentLocation.latitude;
+            MyConstants.currentLong = currentLocation.longitude;
+            CameraPosition _currentCameraPosition = CameraPosition(
+                target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+                zoom: _zoomLevel);
+            _mapController.animateCamera(
+                CameraUpdate.newCameraPosition(_currentCameraPosition));
+          }
+        }*/
 
-      if (_mapController != null) {
-        debugPrint(
-            "serviceEnabledLocation   _getCurrentLocation 3   ${MyConstants.currentLat} ${MyConstants.currentLong}");
-        CameraPosition _currentCameraPosition = CameraPosition(
-            target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-            zoom: _zoomLevel);
-
-        Future.delayed(Duration(milliseconds: 100), () {
+        if (_mapController != null && !_isCameraMove) {
+          debugPrint("map_controller     _isCameraMove  false");
+          MyConstants.currentLat = currentLocation.latitude;
+          MyConstants.currentLong = currentLocation.longitude;
+          _prefs.setDouble("lat", currentLocation.latitude);
+          _prefs.setDouble("long", currentLocation.longitude);
+          CameraPosition _currentCameraPosition = CameraPosition(
+              target: LatLng(MyConstants.currentLong, MyConstants.currentLong),
+              zoom: _zoomLevel);
           _mapController.animateCamera(
               CameraUpdate.newCameraPosition(_currentCameraPosition));
-        });
+          _isCameraMove = true;
+        }
       }
-    }).catchError((e) {
-      debugPrint(e);
-      debugPrint("serviceEnabledLocation   _getCurrentLocation 4");
     });
+
+    // Location location = new Location();
+    // location.onLocationChanged.listen((LocationData cLoc) {
+    //   debugPrint("map_controller   ${cLoc.latitude}");
+    //   debugPrint("serviceEnabledLocation   _getCurrentLocation 2");
+    //   // Position _currentPosition = position;
+    //   _prefs.setDouble("lat", cLoc.latitude);
+    //   _prefs.setDouble("long", cLoc.longitude);
+    //   MyConstants.currentLat = cLoc.latitude;
+    //   MyConstants.currentLong = cLoc.longitude;
+    //
+    //   if (_mapController != null) {
+    //     debugPrint(
+    //         "serviceEnabledLocation   _getCurrentLocation 3   ${MyConstants.currentLat} ${MyConstants.currentLong}");
+    //     // CameraPosition _currentCameraPosition = CameraPosition(
+    //     //     target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+    //     //     zoom: _zoomLevel);
+    //     Future.delayed(Duration(milliseconds: 100), () {
+    //       _mapController.animateCamera(CameraUpdate.newCameraPosition(
+    //         CameraPosition(
+    //           bearing: 0,
+    //           target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+    //           zoom: _zoomLevel,
+    //         ),
+    //       ));
+    //
+    //     });
+    //   }
+    // });
+
+    // debugPrint("serviceEnabledLocation   _getCurrentLocation 1");
+    // await Geolocator.getCurrentPosition().then((Position position) {
+    //
+    // }).catchError((e) {
+    //   debugPrint(e);
+    //   debugPrint("serviceEnabledLocation   _getCurrentLocation 4");
+    // });
   }
 
   _locationUpdatedInAndroid() async {
@@ -422,7 +525,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
                   height: Dimens.twenty,
                 ),
                 trailing: Text(
-                  _walletAmount,
+                  _walletAmount ?? "0,00€",
                   style: TextStyle(
                       fontFamily: "Montserrat",
                       fontWeight: FontWeight.w600,
@@ -756,7 +859,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
         _getStationsOnMapApi();
         _getDetailsApi();
-        _isCameraMove = true;
+        // _isCameraMove = true;
       },
       child: Container(
         height: 50,
@@ -814,16 +917,16 @@ class _HomeScreenNewState extends State<HomeScreenNew>
       onPressed: () async {
         debugPrint("map_controller     ");
         // Safety check if mapController not null
+        _isCameraMove = false;
         if (_mapController != null) {
           debugPrint("map_controller     not null");
           CameraPosition _currentCameraPosition = CameraPosition(
               target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
               zoom: _zoomLevel);
-          ;
 
           _mapController.animateCamera(
               CameraUpdate.newCameraPosition(_currentCameraPosition));
-          _isCameraMove = true;
+          // _isCameraMove = true;
         }
       },
       iconSize: 50.0,
@@ -997,7 +1100,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   _getStationsOnMapApi() async {
     var betteryAlarm = _prefs.getBool('betteryAlarm');
     if (betteryAlarm != null && betteryAlarm) {
-      _initbatteryInfo();
+      _initBatteryInfo();
     }
     var req = {
       "latitude": MyConstants.currentLat.toString(),
@@ -1244,7 +1347,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   }
 
 // battery functionality
-  void _initbatteryInfo() async {
+  void _initBatteryInfo() async {
     Battery _battery = Battery();
     var batteryLevel = await _battery.batteryLevel;
     isNotificationSent = await _prefs.getBool('isNotificationSent');
@@ -1269,10 +1372,10 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
   void _initMarkers(List<MapLocation> locationList) async {
     _markers.clear();
-    final Uint8List blackMarkerIcon =
-        await getBytesFromAsset('assets/images/black_marker.png', Dimens.oneTwentyFive.toInt());
-    final Uint8List greenMarkerIcon =
-        await getBytesFromAsset('assets/images/green_marker.png', Dimens.oneTwentyFive.toInt());
+    final Uint8List blackMarkerIcon = await getBytesFromAsset(
+        'assets/images/black_marker.png', Dimens.oneTwentyFive.toInt());
+    final Uint8List greenMarkerIcon = await getBytesFromAsset(
+        'assets/images/green_marker.png', Dimens.oneTwentyFive.toInt());
     final List<MapMarker> markers = [];
 
     for (int i = 0; i < locationList.length; i++) {
@@ -1339,7 +1442,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
     if (updatedZoom != null) {
       _currentZoom = updatedZoom;
     }
-    setState(() {});
+    // setState(() {});
 
     final updatedMarkers = await MapHelper.getClusterMarkers(
       _clusterManager,
@@ -1468,14 +1571,23 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        print('on_message $message');
         var _message;
-        if (Theme.of(context).platform == TargetPlatform.iOS) {
-          _message = message['notification'];
+        // if (Theme.of(context).platform == TargetPlatform.iOS) {
+        //   _message = message['notification'];
+        // } else {
+        //   _message = message['notification'];
+        // }
+
+        if (message['notification'] == null) {
+          _message = message["aps"]['alert'];
         } else {
           _message = message['notification'];
         }
-        print('on_message $message       2');
+
+        // print('on_message ${message["aps"]['alert']['title']}');
+        // print('on_message ${message["aps"]['alert']['body']}');
+        // print('on_message ${message['notification']["title"]}');
+        // print('on_message ${message['notification']['body']}');
         showFirebaseMesgDialog(_message, context);
       },
       onResume: (Map<String, dynamic> message) async {
@@ -1504,4 +1616,28 @@ class _HomeScreenNewState extends State<HomeScreenNew>
     _showDifferentTypeOfDialogs(
         title: message["title"], message: message['body'], context: context);
   }
+
+// void initbatteryInfo() async {
+//   Battery _battery = Battery();
+//   var batteryLevel = await _battery.batteryLevel;
+//   isNotificationSent = await _prefs.getBool('isNotificationSent');
+//   if (batteryLevel < 20 &&
+//       isNotificationSent != null &&
+//       !isNotificationSent) {
+//     _prefs.setBool('isNotificationSent', true);
+//     sendBatterAlarmToServer();
+//   } else if (batteryLevel > 20) {
+//     _prefs.setBool('isNotificationSent', false);
+//   }
+// }
+//
+// sendBatterAlarmToServer() async {
+//   await sendAlarm(
+//       prefs.get('userId').toString(), prefs.get('accessToken').toString())
+//       .then((response) {
+//     print(response.body);
+//     if (response.statusCode == 200) {}
+//   }).catchError((onError) {});
+// }
+
 }

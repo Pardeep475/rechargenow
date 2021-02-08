@@ -1517,7 +1517,7 @@ class HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void showBottomSheet2(BuildContext context, MapLocation data) {
-    switch (data.freeSlots) {
+    switch (data.stationSlots) {
       case 6:
         openDialogWithSlideInAnimation(
             context: context,

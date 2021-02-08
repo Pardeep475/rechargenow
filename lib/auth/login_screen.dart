@@ -10,11 +10,9 @@ import 'package:location/location.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/auth/code_verification_screen.dart';
-import 'package:recharge_now/common/AllStrings.dart';
 import 'package:recharge_now/common/custom_dialog_box_error.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
-import 'package:recharge_now/utils/Dimens.dart';
 import 'package:recharge_now/utils/MyCustumUIs.dart';
 import 'package:recharge_now/utils/my_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -100,9 +98,11 @@ class _LoginState extends State<LoginScreen> {
   @override
   void initState() {
     initPrefs();
-    _setUpFirebase();
     super.initState();
-    checkLocationServiceEnableOrDisable();
+    Future.delayed(Duration(milliseconds: 400),(){
+      checkLocationServiceEnableOrDisable();
+      _setUpFirebase();
+    });
   }
 
   checkLocationServiceEnableOrDisable() async {

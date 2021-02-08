@@ -96,6 +96,7 @@ flutter:
     - assets/images/
     - assets/locale/localization_en.json
     - assets/locale/localization_de.json
+    - assets/myStyle.txt
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
