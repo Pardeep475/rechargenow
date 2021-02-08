@@ -26,6 +26,7 @@ import 'package:recharge_now/common/CustomDialogBox.dart';
 import 'package:recharge_now/common/custom_widgets/common_error_dialog.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
+import 'package:recharge_now/location/gesture_detector_on_map.dart';
 import 'package:recharge_now/models/station_list_model.dart';
 import 'package:recharge_now/models/user_deatil_model.dart';
 import 'package:recharge_now/utils/Dimens.dart';
@@ -49,6 +50,10 @@ import 'promo/promo_screen.dart';
 import 'settings/SettingsScreen.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+const double CAMERA_ZOOM = 16;
+const double CAMERA_TILT = 80;
+const double CAMERA_BEARING = 30;
+
 class HomeScreenNew extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _HomeScreenNewState();
@@ -59,6 +64,8 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
   AnimationController _animateController;
   GoogleMapController _mapController;
+
+  // Completer<GoogleMapController> _controller = Completer();
   LatLng _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
   SharedPreferences _prefs;
   String _walletAmount = "";
@@ -77,11 +84,15 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   var rentalTime;
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool isLocationOn = true;
-  LocationData currentLocation;
   bool isNotificationSent = false;
   Timer timer;
+
   bool _isCameraMove = false;
   String _mapStyle;
+
+  // for my custom marker pins
+  BitmapDescriptor currentLocationIcon;
+  LocationData currentLocation;
 
   @override
   void initState() {
@@ -96,10 +107,13 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
     loadShredPref();
     firebaseCloudMessaging_Listeners();
+
+
   }
 
   void loadShredPref() async {
     _prefs = await SharedPreferences.getInstance();
+    _updateLanguage();
     timer = Timer.periodic(
       Duration(seconds: 60),
       (Timer t) => _getStationsOnMapApi(),
@@ -134,6 +148,17 @@ class _HomeScreenNewState extends State<HomeScreenNew>
     if (isLocationOn == null) {
       isLocationOn = true;
     }
+
+    if (isLocationOn) {
+      if (Platform.isAndroid) {
+        // _locationUpdatedInAndroid();
+        _getCurrentLocation();
+      } else {
+        debugPrint("map_controller      IOS   $isLocationOn");
+        _locationUpdatedInIOS();
+      }
+    }
+
     debugPrint("isLocationOn   $isLocationOn");
     return Scaffold(
       key: _drawerKey,
@@ -199,7 +224,19 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
   // map ui
   _mapViewUI() {
-    debugPrint("isLocationOn   $isLocationOn");
+    // debugPrint("isLocationOn   $isLocationOn");
+    //
+    CameraPosition initialCameraPosition =
+        CameraPosition(zoom: CAMERA_ZOOM, tilt: CAMERA_TILT, target: _latlng1);
+    // if (currentLocation != null) {
+    //   initialCameraPosition = CameraPosition(
+    //       target: LatLng(currentLocation.latitude,
+    //           currentLocation.longitude),
+    //       zoom: CAMERA_ZOOM,
+    //       tilt: CAMERA_TILT,
+    //   );
+    // }
+
     return Visibility(
       visible: true,
       child: GoogleMap(
@@ -207,38 +244,25 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         rotateGesturesEnabled: true,
         zoomControlsEnabled: false,
         compassEnabled: true,
-        initialCameraPosition: CameraPosition(
-          target: _latlng1,
-          zoom: _zoomLevel,
-        ),
+        initialCameraPosition: initialCameraPosition,
         mapType: MapType.normal,
         markers: _markers,
-        // gestureRecognizers: Set()
-        //   ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer()))
-        //   ..add(Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()))
-        //   ..add(Factory<HorizontalDragGestureRecognizer>(() => HorizontalDragGestureRecognizer()))
-        //   ..add(Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer())),
+        gestureRecognizers: Set()
+          ..add(Factory<DragGestureRecognizer>(() => GestureDetectorOnMap(() {
+                _isCameraMove = true;
+                debugPrint("gesture_detector_on_map:-   $_isCameraMove");
+              }))),
         onMapCreated: (controller) {
-          _onMapCreated(controller);
+          // _onMapCreated(controller);
+          // _controller.complete(controller);
+          _mapController = controller;
+          _mapController.setMapStyle(_mapStyle);
+          // _updateMarkers(CAMERA_ZOOM);
         },
         onCameraMove: (position) {
           debugPrint("On_Camera_Move     On_Camera_Move");
-          _isCameraMove = true;
-          _updateMarkers(position.zoom);
+          // _isCameraMove = true;
         },
-        // onCameraMoveStarted: (){
-        //   _isCameraMove = true;
-        // },
-        // onCameraIdle: (){
-        //   _isCameraMove = true;
-        // },
-        // options: GoogleMapOptions(
-        //   cameraPosition: CameraPosition(
-        //     target: LatLng(25.334206, 55.388947),
-        //     zoom: 16.0,
-        //   ),
-        // ),
-
         myLocationButtonEnabled: false,
         myLocationEnabled: isLocationOn,
       ),
@@ -280,81 +304,108 @@ class _HomeScreenNewState extends State<HomeScreenNew>
       debugPrint("serviceEnabledLocation   ${_serviceEnabled.toString()}");
       _getCurrentLocation();
     }
-
-    // CameraPosition _currentCameraPosition = CameraPosition(
-    //     target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-    //     zoom: _zoomLevel);
-    //
-    // _mapController.animateCamera(
-    //     CameraUpdate.newCameraPosition(_currentCameraPosition));
   }
 
   _getCurrentLocation() async {
-    debugPrint("map_controller      onMap Created   $isLocationOn");
     Location location = new Location();
     currentLocation = await location.getLocation();
-    debugPrint(
-        "map_controller      ${currentLocation.latitude}   ${currentLocation.longitude}");
     location.onLocationChanged.listen((LocationData cLoc) {
-      debugPrint(
-          "map_controller  location changed  ${cLoc.latitude}   ${cLoc.longitude}");
-      if (_latlng1.latitude != cLoc.latitude &&
-          _latlng1.longitude != cLoc.longitude &&
-          (currentLocation == null ||
-              currentLocation.latitude != cLoc.latitude &&
-                  currentLocation.longitude != cLoc.longitude)) {
-        currentLocation = cLoc;
-        // double _distance = calculateDistance(
-        //     currentLocation.latitude,
-        //     currentLocation.longitude,
-        //     currentLocation.latitude,
-        //     currentLocation.longitude);
-        //
-        /*if (!_isCameraMove) {
-          if (_mapController != null) {
-            debugPrint("map_controller     _isCameraMove  false");
-            MyConstants.currentLat = currentLocation.latitude;
-            MyConstants.currentLong = currentLocation.longitude;
-            _prefs.setDouble("lat", currentLocation.latitude);
-            _prefs.setDouble("long", currentLocation.longitude);
-            CameraPosition _currentCameraPosition = CameraPosition(
-                target:
-                LatLng(MyConstants.currentLong, MyConstants.currentLong),
-                zoom: _zoomLevel);
-            _mapController.animateCamera(
-                CameraUpdate.newCameraPosition(_currentCameraPosition));
-            _isCameraMove = true;
-          }
-        } else if (*/ /*_distance > 1000 &&*/ /* _isCameraMove) {
-          if (_mapController != null) {
-            debugPrint("map_controller     _isCameraMove  true");
-            _prefs.setDouble("lat", currentLocation.latitude);
-            _prefs.setDouble("long", currentLocation.longitude);
-            MyConstants.currentLat = currentLocation.latitude;
-            MyConstants.currentLong = currentLocation.longitude;
-            CameraPosition _currentCameraPosition = CameraPosition(
-                target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-                zoom: _zoomLevel);
-            _mapController.animateCamera(
-                CameraUpdate.newCameraPosition(_currentCameraPosition));
-          }
-        }*/
-
-        if (_mapController != null && !_isCameraMove) {
-          debugPrint("map_controller     _isCameraMove  false");
-          MyConstants.currentLat = currentLocation.latitude;
-          MyConstants.currentLong = currentLocation.longitude;
-          _prefs.setDouble("lat", currentLocation.latitude);
-          _prefs.setDouble("long", currentLocation.longitude);
-          CameraPosition _currentCameraPosition = CameraPosition(
-              target: LatLng(MyConstants.currentLong, MyConstants.currentLong),
-              zoom: _zoomLevel);
-          _mapController.animateCamera(
-              CameraUpdate.newCameraPosition(_currentCameraPosition));
-          _isCameraMove = true;
-        }
+      currentLocation = cLoc;
+      _prefs.setDouble("lat", currentLocation.latitude);
+      _prefs.setDouble("long", currentLocation.longitude);
+      MyConstants.currentLat = currentLocation.latitude;
+      MyConstants.currentLong = currentLocation.longitude;
+      CameraPosition _currentCameraPosition = CameraPosition(
+        zoom: CAMERA_ZOOM,
+        target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+      );
+      if (!_isCameraMove) {
+        _mapController.animateCamera(
+            CameraUpdate.newCameraPosition(_currentCameraPosition));
       }
+
+      _updateMarkers(CAMERA_ZOOM);
     });
+
+    // debugPrint("map_controller      onMap Created   $isLocationOn");
+    // // Location location = new Location();
+    // currentLocation = await location.getLocation();
+    // debugPrint(
+    //     "map_controller      ${currentLocation.latitude}   ${currentLocation.longitude}");
+    // location.onLocationChanged.listen((LocationData cLoc) {
+    //   debugPrint(
+    //       "map_controller  location changed  ${cLoc.latitude}   ${cLoc.longitude}");
+    //   currentLocation = cLoc;
+    //   CameraPosition _currentCameraPosition = CameraPosition(
+    //       target: LatLng(MyConstants.currentLong, MyConstants.currentLong),
+    //       zoom: _zoomLevel);
+    //   _mapController.animateCamera(
+    //       CameraUpdate.newCameraPosition(_currentCameraPosition));
+    //
+    //   //
+    //   // if (_latlng1.latitude != cLoc.latitude &&
+    //   //     _latlng1.longitude != cLoc.longitude &&
+    //   //     (currentLocation == null ||
+    //   //         currentLocation.latitude != cLoc.latitude &&
+    //   //             currentLocation.longitude != cLoc.longitude)) {
+    //   //   currentLocation = cLoc;
+    //   //   // double _distance = calculateDistance(
+    //   //   //     currentLocation.latitude,
+    //   //   //     currentLocation.longitude,
+    //   //   //     currentLocation.latitude,
+    //   //   //     currentLocation.longitude);
+    //   //   //
+    //   //   /*if (!_isCameraMove) {
+    //   //     if (_mapController != null) {
+    //   //       debugPrint("map_controller     _isCameraMove  false");
+    //   //       MyConstants.currentLat = currentLocation.latitude;
+    //   //       MyConstants.currentLong = currentLocation.longitude;
+    //   //       _prefs.setDouble("lat", currentLocation.latitude);
+    //   //       _prefs.setDouble("long", currentLocation.longitude);
+    //   //       CameraPosition _currentCameraPosition = CameraPosition(
+    //   //           target:
+    //   //           LatLng(MyConstants.currentLong, MyConstants.currentLong),
+    //   //           zoom: _zoomLevel);
+    //   //       _mapController.animateCamera(
+    //   //           CameraUpdate.newCameraPosition(_currentCameraPosition));
+    //   //       _isCameraMove = true;
+    //   //     }
+    //   //   } else if (*/ /*_distance > 1000 &&*/ /* _isCameraMove) {
+    //   //     if (_mapController != null) {
+    //   //       debugPrint("map_controller     _isCameraMove  true");
+    //   //       _prefs.setDouble("lat", currentLocation.latitude);
+    //   //       _prefs.setDouble("long", currentLocation.longitude);
+    //   //       MyConstants.currentLat = currentLocation.latitude;
+    //   //       MyConstants.currentLong = currentLocation.longitude;
+    //   //       CameraPosition _currentCameraPosition = CameraPosition(
+    //   //           target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+    //   //           zoom: _zoomLevel);
+    //   //       _mapController.animateCamera(
+    //   //           CameraUpdate.newCameraPosition(_currentCameraPosition));
+    //   //     }
+    //   //   }*/
+    //   //
+    //   //   // if (_mapController != null /*&& !_isCameraMove*/) {
+    //   //   //   // debugPrint("map_controller     _isCameraMove  false");
+    //   //   //   if(MyConstants.currentLat != currentLocation.latitude && MyConstants.currentLong != currentLocation.longitude){
+    //   //   //     MyConstants.currentLat = currentLocation.latitude;
+    //   //   //     MyConstants.currentLong = currentLocation.longitude;
+    //   //   //     _prefs.setDouble("lat", currentLocation.latitude);
+    //   //   //     _prefs.setDouble("long", currentLocation.longitude);
+    //   //   //     CameraPosition _currentCameraPosition = CameraPosition(
+    //   //   //         target: LatLng(MyConstants.currentLong, MyConstants.currentLong),
+    //   //   //         zoom: _zoomLevel);
+    //   //   //     _mapController.animateCamera(
+    //   //   //         CameraUpdate.newCameraPosition(_currentCameraPosition));
+    //   //   //   }
+    //   //   //
+    //   //   //   // _isCameraMove = true;
+    //   //   // }
+    //   //
+    //   //   currentLocation = cLoc;
+    //   //
+    //   // }
+    // });
 
     // Location location = new Location();
     // location.onLocationChanged.listen((LocationData cLoc) {
@@ -395,7 +446,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   }
 
   _locationUpdatedInAndroid() async {
-    debugPrint("map_controller      onMap Created   $isLocationOn");
+    /* debugPrint("map_controller      onMap Created   $isLocationOn");
     Location location = new Location();
     currentLocation = await location.getLocation();
     debugPrint(
@@ -445,7 +496,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
           }
         }
       }
-    });
+    });*/
   }
 
   // navigation drawer
@@ -923,10 +974,8 @@ class _HomeScreenNewState extends State<HomeScreenNew>
           CameraPosition _currentCameraPosition = CameraPosition(
               target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
               zoom: _zoomLevel);
-
           _mapController.animateCamera(
               CameraUpdate.newCameraPosition(_currentCameraPosition));
-          // _isCameraMove = true;
         }
       },
       iconSize: 50.0,
@@ -1477,6 +1526,32 @@ class _HomeScreenNewState extends State<HomeScreenNew>
       }
     }).catchError((value) {
       debugPrint("rentBattery_PowerbankAPI   getDetailsApi catchError");
+    });
+  }
+
+  _updateLanguage() {
+    //   "{
+    //   ""id"":1,
+    //   ""language"":""en""
+    // }"
+
+    //   "{
+    //   ""status"":1,
+    //   ""message"":""Success""
+    // }"
+
+    var req = {
+      "id": _prefs.get('userId').toString(),
+      "language": _prefs.getString('language_code')
+    };
+    var jsonReqString = json.encode(req);
+    debugPrint("languageApiResponse:-   $jsonReqString");
+    var apicall =
+        updateLanguage(jsonReqString, _prefs.get('accessToken').toString());
+    apicall.then((response) {
+      debugPrint("languageApiResponse:-   ${response.body}");
+    }).catchError((value) {
+      debugPrint("languageApiResponse   getDetailsApi catchError");
     });
   }
 

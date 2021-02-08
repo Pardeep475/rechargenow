@@ -48,10 +48,10 @@ class ItemSlotSixStation extends StatelessWidget {
                 top: Dimens.sixty,
               ),
               decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                 ),
+                shape: BoxShape.rectangle,
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Column(
                 children: [
                   SizedBox(
@@ -118,11 +118,11 @@ class ItemSlotSixStation extends StatelessWidget {
                             child: Text(
                               data.open
                                   ? AppLocalizations.of(context)
-                                  .translate("Open")
-                                  .toUpperCase()
+                                      .translate("Open")
+                                      .toUpperCase()
                                   : AppLocalizations.of(context)
-                                  .translate("Close")
-                                  .toUpperCase(),
+                                      .translate("Close")
+                                      .toUpperCase(),
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -182,7 +182,8 @@ class ItemSlotSixStation extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                SvgPicture.asset('assets/images/battery_small.svg'),
+                                SvgPicture.asset(
+                                    'assets/images/battery_small.svg'),
                                 SizedBox(
                                   width: Dimens.seven,
                                 ),
@@ -198,7 +199,8 @@ class ItemSlotSixStation extends StatelessWidget {
                                 SizedBox(
                                   width: Dimens.fifteen,
                                 ),
-                                SvgPicture.asset('assets/images/star_small.svg'),
+                                SvgPicture.asset(
+                                    'assets/images/star_small.svg'),
                                 SizedBox(
                                   width: Dimens.seven,
                                 ),
@@ -252,8 +254,7 @@ class ItemSlotSixStation extends StatelessWidget {
                         child: Container(
                           width: MediaQuery.of(context).size.width / 3.1,
                           padding: EdgeInsets.only(
-                              top: Dimens.twelve,
-                              bottom: Dimens.fifteen),
+                              top: Dimens.twelve, bottom: Dimens.fifteen),
                           decoration: BoxDecoration(
                               color: Color(0xffF2F3F7),
                               borderRadius: BorderRadius.all(
@@ -283,8 +284,7 @@ class ItemSlotSixStation extends StatelessWidget {
                         child: Container(
                           width: MediaQuery.of(context).size.width / 3.1,
                           padding: EdgeInsets.only(
-                              top: Dimens.twelve,
-                              bottom: Dimens.fifteen),
+                              top: Dimens.twelve, bottom: Dimens.fifteen),
                           decoration: BoxDecoration(
                               color: primaryGreenColor,
                               borderRadius: BorderRadius.all(
@@ -324,7 +324,12 @@ class ItemSlotSixStation extends StatelessWidget {
                               left: Dimens.seven,
                               right: Dimens.seven,
                               bottom: Dimens.seven),
-                          child: Image.asset("assets/images/slot6station.png")),
+                          child: SizedBox(
+                            height: 110,
+                            width: 168,
+                            child: SvgPicture.asset(
+                                'assets/images/slot6station.svg'),
+                          )),
                       // Image.asset("assets/images/slot6station.png"),
                       Positioned(
                         bottom: 0,

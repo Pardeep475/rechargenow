@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:recharge_now/apiService/web_service.dart';
+import 'package:recharge_now/common/custom_widgets/common_error_dialog.dart';
 import 'package:recharge_now/common/myStyle.dart';
 import 'package:recharge_now/locale/AppLanguage.dart';
 import 'package:recharge_now/locale/AppLocalizations.dart';
@@ -16,6 +20,8 @@ class ChangeLanguage extends StatefulWidget {
 }
 
 class _ChangeLanguageState extends State<ChangeLanguage> {
+  bool _isLoaderVisible = false;
+
   @override
   void initState() {
     initPrefs();
@@ -26,110 +32,228 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
+      body: Stack(
         children: [
-          appBarViewEndBtn(
-              name: AppLocalizations.of(context)
-                  .translate('change language')
-                  .toUpperCase(),
-              context: context,
-              callback: () {
-                Navigator.pop(context);
-              }),
-          Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 24),
-            child: Row(
-              children: [
-                GestureDetector(
-                    onTap: () {
-                      isEnglish = false;
-                      setState(() {});
-                    },
-                    child: CustomButtom(isEnglish == true ? false : true)),
-                SizedBox(
-                  width: 17,
+          Column(
+            children: [
+              appBarViewEndBtn(
+                  name: AppLocalizations.of(context)
+                      .translate('change language')
+                      .toUpperCase(),
+                  context: context,
+                  callback: () {
+                    Navigator.pop(context);
+                  }),
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30, top: 24),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          isEnglish = false;
+                          setState(() {});
+                        },
+                        child: CustomButtom(isEnglish == true ? false : true)),
+                    SizedBox(
+                      width: 17,
+                    ),
+                    SizedBox(
+                      width: 21,
+                      height: 14,
+                      child: Image.asset(
+                        'flags/de.png',
+                        package: 'country_code_picker',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    // SvgPicture.asset('assets/images/germanflag.svg',allowDrawingOutsideViewBox: true,),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    Text(
+                      'Deutsch',
+                      style: TextStyle(
+                          color: Color(0xff2F2F2F),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          height: 1.5),
+                    )
+                  ],
                 ),
-                SizedBox(
-                  width: 21,
-                  height: 14,
-                  child: Image.asset(
-                    'flags/de.png',
-                    package: 'country_code_picker',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                // SvgPicture.asset('assets/images/germanflag.svg',allowDrawingOutsideViewBox: true,),
-                SizedBox(
-                  width: 12,
-                ),
-                Text(
-                  'Deutsch',
-                  style: TextStyle(
-                      color: Color(0xff2F2F2F),
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      height: 1.5),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
-            child: Row(
-              children: [
-                GestureDetector(
-                    onTap: () {
-                      isEnglish = true;
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          isEnglish = true;
 
-                      setState(() {});
-                    },
-                    child: CustomButtom(isEnglish == true ? true : false)),
-                SizedBox(
-                  width: 17,
+                          setState(() {});
+                        },
+                        child: CustomButtom(isEnglish == true ? true : false)),
+                    SizedBox(
+                      width: 17,
+                    ),
+                    SizedBox(
+                      width: 21,
+                      height: 14,
+                      child: Image.asset(
+                        'flags/gb.png',
+                        package: 'country_code_picker',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    Text(
+                      'English',
+                      style: TextStyle(
+                          color: Color(0xff2F2F2F),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          height: 1.5),
+                    )
+                  ],
                 ),
-                SizedBox(
-                  width: 21,
-                  height: 14,
-                  child: Image.asset(
-                    'flags/gb.png',
-                    package: 'country_code_picker',
-                    fit: BoxFit.cover,
+              ),
+              Expanded(
+                child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 40, horizontal: 24),
+                      child: GestureDetector(
+                          onTap: () {
+                            onSaveClick();
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 20),
+                            child: custumButtonWithShape(
+                                AppLocalizations.of(context)
+                                    .translate("Save Changes"),
+                                primaryGreenColor),
+                          )),
+                    )),
+              ),
+            ],
+          ),
+          _isLoaderVisible
+              ? Positioned(
+                  top: MediaQuery.of(context).size.height / 2,
+                  left: MediaQuery.of(context).size.width / 2,
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
-                ),
-                SizedBox(
-                  width: 12,
-                ),
-                Text(
-                  'English',
-                  style: TextStyle(
-                      color: Color(0xff2F2F2F),
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      height: 1.5),
                 )
-              ],
-            ),
-          ),
-          Expanded(
-            child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
-                  child: GestureDetector(
-                      onTap: () {
-                        onSaveClick();
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: custumButtonWithShape(
-                            AppLocalizations.of(context)
-                                .translate("Save Changes"),
-                            primaryGreenColor),
-                      )),
-                )),
-          ),
+              : SizedBox()
         ],
+        // child: Column(
+        //   children: [
+        //     appBarViewEndBtn(
+        //         name: AppLocalizations.of(context)
+        //             .translate('change language')
+        //             .toUpperCase(),
+        //         context: context,
+        //         callback: () {
+        //           Navigator.pop(context);
+        //         }),
+        //     Padding(
+        //       padding: const EdgeInsets.only(left: 30, right: 30, top: 24),
+        //       child: Row(
+        //         children: [
+        //           GestureDetector(
+        //               onTap: () {
+        //                 isEnglish = false;
+        //                 setState(() {});
+        //               },
+        //               child: CustomButtom(isEnglish == true ? false : true)),
+        //           SizedBox(
+        //             width: 17,
+        //           ),
+        //           SizedBox(
+        //             width: 21,
+        //             height: 14,
+        //             child: Image.asset(
+        //               'flags/de.png',
+        //               package: 'country_code_picker',
+        //               fit: BoxFit.cover,
+        //             ),
+        //           ),
+        //           // SvgPicture.asset('assets/images/germanflag.svg',allowDrawingOutsideViewBox: true,),
+        //           SizedBox(
+        //             width: 12,
+        //           ),
+        //           Text(
+        //             'Deutsch',
+        //             style: TextStyle(
+        //                 color: Color(0xff2F2F2F),
+        //                 fontWeight: FontWeight.w400,
+        //                 fontSize: 14,
+        //                 height: 1.5),
+        //           )
+        //         ],
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
+        //       child: Row(
+        //         children: [
+        //           GestureDetector(
+        //               onTap: () {
+        //                 isEnglish = true;
+        //
+        //                 setState(() {});
+        //               },
+        //               child: CustomButtom(isEnglish == true ? true : false)),
+        //           SizedBox(
+        //             width: 17,
+        //           ),
+        //           SizedBox(
+        //             width: 21,
+        //             height: 14,
+        //             child: Image.asset(
+        //               'flags/gb.png',
+        //               package: 'country_code_picker',
+        //               fit: BoxFit.cover,
+        //             ),
+        //           ),
+        //           SizedBox(
+        //             width: 12,
+        //           ),
+        //           Text(
+        //             'English',
+        //             style: TextStyle(
+        //                 color: Color(0xff2F2F2F),
+        //                 fontWeight: FontWeight.w400,
+        //                 fontSize: 14,
+        //                 height: 1.5),
+        //           )
+        //         ],
+        //       ),
+        //     ),
+        //     Expanded(
+        //       child: Align(
+        //           alignment: Alignment.bottomCenter,
+        //           child: Padding(
+        //             padding:
+        //                 const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+        //             child: GestureDetector(
+        //                 onTap: () {
+        //                   onSaveClick();
+        //                 },
+        //                 child: Container(
+        //                   margin: EdgeInsets.only(bottom: 20),
+        //                   child: custumButtonWithShape(
+        //                       AppLocalizations.of(context)
+        //                           .translate("Save Changes"),
+        //                       primaryGreenColor),
+        //                 )),
+        //           )),
+        //     ),
+        //   ],
+        // ),
       ),
     );
   }
@@ -148,13 +272,77 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
 
   void onSaveClick() {
     if (isEnglish) {
-      Provider.of<AppLanguage>(context, listen: false)
-          .changeLanguage(Locale('en'));
+      _updateLanguage("en");
+
+      // Provider.of<AppLanguage>(context, listen: false)
+      //     .changeLanguage(Locale('en'));
     } else {
-      Provider.of<AppLanguage>(context, listen: false)
-          .changeLanguage(Locale('de'));
+      _updateLanguage("de");
+      // Provider.of<AppLanguage>(context, listen: false)
+      //     .changeLanguage(Locale('de'));
     }
-    Navigator.pop(context);
+    // Navigator.pop(context);
+  }
+
+  _updateLanguage(String value) async {
+    //   "{
+    //   ""id"":1,
+    //   ""language"":""en""
+    // }"
+
+    //   "{
+    //   ""status"":1,
+    //   ""message"":""Success""
+    // }"
+
+    setState(() {
+      _isLoaderVisible = true;
+    });
+
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    var req = {"id": _prefs.get('userId').toString(), "language": value};
+    var jsonReqString = json.encode(req);
+    debugPrint("languageApiResponse:-   $jsonReqString");
+    var apicall =
+        updateLanguage(jsonReqString, _prefs.get('accessToken').toString());
+    apicall.then((response) {
+      setState(() {
+        _isLoaderVisible = false;
+      });
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse['status'].toString() == "1") {
+          if (isEnglish) {
+            Provider.of<AppLanguage>(context, listen: false)
+                .changeLanguage(Locale('en'));
+          } else {
+            Provider.of<AppLanguage>(context, listen: false)
+                .changeLanguage(Locale('de'));
+          }
+          Navigator.pop(context);
+        } else {
+          openDialogWithSlideInAnimation(
+            context: context,
+            itemWidget: CommonErrorDialog(
+              title: AppLocalizations.of(context).translate("ERROR OCCURRED"),
+              descriptions: jsonResponse['message'],
+              text: AppLocalizations.of(context).translate("Ok"),
+              img: "assets/images/something_went_wrong.svg",
+              double: 37.0,
+              isCrossIconShow: true,
+              callback: () {},
+            ),
+          );
+        }
+      }
+
+      debugPrint("languageApiResponse:-   ${response.body}");
+    }).catchError((value) {
+      setState(() {
+        _isLoaderVisible = false;
+      });
+      debugPrint("languageApiResponse   getDetailsApi catchError");
+    });
   }
 }
 

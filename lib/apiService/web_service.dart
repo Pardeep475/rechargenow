@@ -325,3 +325,13 @@ Future<http.Response> sendAlarm(userId, accessToken) async {
   );
   return response;
 }
+
+Future<http.Response> updateLanguage(request, accessToken) async {
+  final response = await http.post('$BASE_URL/update-language',
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'accessToken': accessToken,
+      },
+      body: request);
+  return response;
+}

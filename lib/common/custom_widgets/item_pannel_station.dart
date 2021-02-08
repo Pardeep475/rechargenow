@@ -331,7 +331,7 @@ class ItemPanelTower extends StatelessWidget {
                             child: SvgPicture.asset(
                                 'assets/images/panelstation.svg')),
                       ),
-                      //Image.asset("assets/images/panelstation.png")
+
                       Positioned(
                         bottom: 0,
                         right: 0,
