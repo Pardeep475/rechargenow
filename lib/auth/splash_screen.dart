@@ -1,12 +1,8 @@
 import 'dart:async';
-import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:recharge_now/auth/intro_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
-import 'package:recharge_now/locale/AppLanguage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
@@ -44,30 +40,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   loadShredPref() async {
-    List languages = await Devicelocale.preferredLanguages;
-    String locale = await Devicelocale.currentLocale;
-    debugPrint('device_local-->   ${languages.toString()}');
-    debugPrint('device_local-->   ${locale.toString()}');
-    AppLanguage _appLanguage = AppLanguage();
     prefs = await SharedPreferences.getInstance();
     Future.delayed(Duration(milliseconds: 800)).then((value) async {
       if (prefs.get("isSkip") != null) {
-        // String value = prefs.getString("language_code");
-        // if (value == null) {
-        //   _appLanguage.changeLanguage(Locale('en'));
-        //   // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-        //   //   Locale('en'),
-        //   // );
-        // } else {
-        //   if (value == "de") {
-        //     _appLanguage.changeLanguage(Locale('de'));
-        //   } else {
-        //     _appLanguage.changeLanguage(Locale('en'));
-        //     // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-        //     //   Locale('en'),
-        //     // );
-        //   }
-        // }
         if (prefs.getBool('is_login') != null &&
             prefs.getBool('is_login') == true) {
           Navigator.of(context).pushReplacementNamed('/HomePage');
@@ -75,28 +50,6 @@ class _SplashScreenState extends State<SplashScreen> {
           Navigator.of(context).pushReplacementNamed('/LoginScreen');
         }
       } else {
-        // List languages = await Devicelocale.preferredLanguages;
-        // if (languages.length > 0) {
-        //   if (languages[0].contains("de")) {
-        //     _appLanguage.changeLanguage(Locale('de'));
-        //     // prefs.setString('language_code', 'de');
-        //     // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-        //     //   Locale('de'),
-        //     // );
-        //   } else {
-        //     _appLanguage.changeLanguage(Locale('en'));
-        //     // prefs.setString('language_code', 'en');
-        //     // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-        //     //   Locale('en'),
-        //     // );
-        //   }
-        // } else {
-        //   _appLanguage.changeLanguage(Locale('en'));
-        //   // prefs.setString('language_code', 'en');
-        //   // Provider.of<AppLanguage>(context, listen: false).changeLanguage(
-        //   //   Locale('en'),
-        //   // );
-        // }
         Navigator.of(context).pushReplacement(
           new MaterialPageRoute(
             builder: (BuildContext context) => HowToWorkScreen(

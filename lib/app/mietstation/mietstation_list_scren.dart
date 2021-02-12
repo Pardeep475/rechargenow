@@ -76,7 +76,9 @@ class _StationListScreenState extends State<StationListScreen> {
   listViewMietstation() {
     return Expanded(
       child: ListView.builder(
-          padding: EdgeInsets.symmetric(vertical:10,),
+          padding: EdgeInsets.symmetric(
+            vertical: 10,
+          ),
           itemCount: maplocationList.length,
           itemBuilder: (BuildContext context, int position) {
             return maplocationList == null ||
@@ -158,9 +160,7 @@ class _StationListScreenState extends State<StationListScreen> {
 
     var req = {
       "latitude": MyConstants.currentLat.toString(),
-      "longitude": MyConstants.currentLong.toString()
-      // "latitude": "30.7320822",
-      //"longitude": "76.76264739999999"
+      "longitude": MyConstants.currentLong.toString(),
     };
     var jsonReqString = json.encode(req);
     print(jsonReqString);

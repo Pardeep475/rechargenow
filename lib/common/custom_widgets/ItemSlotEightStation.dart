@@ -197,7 +197,10 @@ class ItemSlotEightStation extends StatelessWidget {
                                   width: Dimens.fifteen,
                                 ),
                                 SvgPicture.asset(
-                                    'assets/images/star_small.svg'),
+                                    'assets/images/star_small.svg',
+                                  color: Color(0xFF54DF6C),
+
+                                ),
                                 SizedBox(
                                   width: Dimens.seven,
                                 ),

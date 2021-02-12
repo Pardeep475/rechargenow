@@ -51,8 +51,8 @@ import 'settings/SettingsScreen.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 const double CAMERA_ZOOM = 16;
-const double CAMERA_TILT = 80;
-const double CAMERA_BEARING = 30;
+// const double CAMERA_TILT = 80;
+// const double CAMERA_BEARING = 30;
 
 class HomeScreenNew extends StatefulWidget {
   @override
@@ -93,6 +93,9 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   // for my custom marker pins
   BitmapDescriptor currentLocationIcon;
   LocationData currentLocation;
+  bool isLocationDisable = null;
+
+  bool isBottomSheetOpen = false;
 
   @override
   void initState() {
@@ -107,15 +110,13 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
     loadShredPref();
     firebaseCloudMessaging_Listeners();
-
-
   }
 
   void loadShredPref() async {
     _prefs = await SharedPreferences.getInstance();
     _updateLanguage();
     timer = Timer.periodic(
-      Duration(seconds: 60),
+      Duration(seconds: 10),
       (Timer t) => _getStationsOnMapApi(),
     );
     _walletAmount = await _prefs.get('walletAmount').toString();
@@ -127,6 +128,13 @@ class _HomeScreenNewState extends State<HomeScreenNew>
     _latlng1 = LatLng(MyConstants.currentLat, MyConstants.currentLong);
     if (_prefs.get("isRental") == true) {
       showBottomSheet = true;
+      debugPrint(
+          "check_showBottomSheet:-   loadShredPref  isRental = true  $showBottomSheet");
+      setState(() {});
+    } else {
+      showBottomSheet = false;
+      debugPrint(
+          "check_showBottomSheet:-   loadShredPref   isRental = true  $showBottomSheet");
       setState(() {});
     }
     _getDetailsApi();
@@ -226,8 +234,8 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   _mapViewUI() {
     // debugPrint("isLocationOn   $isLocationOn");
     //
-    CameraPosition initialCameraPosition =
-        CameraPosition(zoom: CAMERA_ZOOM, tilt: CAMERA_TILT, target: _latlng1);
+    CameraPosition initialCameraPosition = CameraPosition(
+        zoom: CAMERA_ZOOM /*, tilt: CAMERA_TILT*/, target: _latlng1);
     // if (currentLocation != null) {
     //   initialCameraPosition = CameraPosition(
     //       target: LatLng(currentLocation.latitude,
@@ -248,10 +256,14 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         mapType: MapType.normal,
         markers: _markers,
         gestureRecognizers: Set()
-          ..add(Factory<DragGestureRecognizer>(() => GestureDetectorOnMap(() {
+          ..add(
+            Factory<DragGestureRecognizer>(
+              () => GestureDetectorOnMap(() {
                 _isCameraMove = true;
                 debugPrint("gesture_detector_on_map:-   $_isCameraMove");
-              }))),
+              }),
+            ),
+          ),
         onMapCreated: (controller) {
           // _onMapCreated(controller);
           // _controller.complete(controller);
@@ -269,20 +281,6 @@ class _HomeScreenNewState extends State<HomeScreenNew>
     );
   }
 
-  void _onMapCreated(GoogleMapController controller) async {
-    _mapController = controller;
-    _mapController.setMapStyle(_mapStyle);
-    debugPrint("map_controller      onMap Created   $isLocationOn");
-    if (isLocationOn) {
-      if (Platform.isAndroid) {
-        _locationUpdatedInAndroid();
-      } else {
-        debugPrint("map_controller      IOS   $isLocationOn");
-        _locationUpdatedInIOS();
-      }
-    }
-  }
-
   double calculateDistance(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295;
     var c = cos;
@@ -293,15 +291,22 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   }
 
   _locationUpdatedInIOS() async {
+    if (isLocationDisable != null) {
+      if (isLocationDisable == false) {
+        return;
+      }
+    }
     Location location = new Location();
     bool _serviceEnabled = await location.serviceEnabled();
     debugPrint("serviceEnabledLocation   ${_serviceEnabled.toString()}");
     if (!_serviceEnabled) {
-      debugPrint("serviceEnabledLocation   ${_serviceEnabled.toString()}");
+      debugPrint("serviceEnabledLocation   false");
       _serviceEnabled = await location.requestService();
-      _getCurrentLocation();
+      isLocationDisable = _serviceEnabled;
+      // _getCurrentLocation();
     } else if (_serviceEnabled) {
-      debugPrint("serviceEnabledLocation   ${_serviceEnabled.toString()}");
+      debugPrint("serviceEnabledLocation   true");
+      isLocationDisable = _serviceEnabled;
       _getCurrentLocation();
     }
   }
@@ -320,183 +325,14 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
       );
       if (!_isCameraMove) {
-        _mapController.animateCamera(
-            CameraUpdate.newCameraPosition(_currentCameraPosition));
+        if (_mapController != null) {
+          _mapController.animateCamera(
+              CameraUpdate.newCameraPosition(_currentCameraPosition));
+        }
       }
 
       _updateMarkers(CAMERA_ZOOM);
     });
-
-    // debugPrint("map_controller      onMap Created   $isLocationOn");
-    // // Location location = new Location();
-    // currentLocation = await location.getLocation();
-    // debugPrint(
-    //     "map_controller      ${currentLocation.latitude}   ${currentLocation.longitude}");
-    // location.onLocationChanged.listen((LocationData cLoc) {
-    //   debugPrint(
-    //       "map_controller  location changed  ${cLoc.latitude}   ${cLoc.longitude}");
-    //   currentLocation = cLoc;
-    //   CameraPosition _currentCameraPosition = CameraPosition(
-    //       target: LatLng(MyConstants.currentLong, MyConstants.currentLong),
-    //       zoom: _zoomLevel);
-    //   _mapController.animateCamera(
-    //       CameraUpdate.newCameraPosition(_currentCameraPosition));
-    //
-    //   //
-    //   // if (_latlng1.latitude != cLoc.latitude &&
-    //   //     _latlng1.longitude != cLoc.longitude &&
-    //   //     (currentLocation == null ||
-    //   //         currentLocation.latitude != cLoc.latitude &&
-    //   //             currentLocation.longitude != cLoc.longitude)) {
-    //   //   currentLocation = cLoc;
-    //   //   // double _distance = calculateDistance(
-    //   //   //     currentLocation.latitude,
-    //   //   //     currentLocation.longitude,
-    //   //   //     currentLocation.latitude,
-    //   //   //     currentLocation.longitude);
-    //   //   //
-    //   //   /*if (!_isCameraMove) {
-    //   //     if (_mapController != null) {
-    //   //       debugPrint("map_controller     _isCameraMove  false");
-    //   //       MyConstants.currentLat = currentLocation.latitude;
-    //   //       MyConstants.currentLong = currentLocation.longitude;
-    //   //       _prefs.setDouble("lat", currentLocation.latitude);
-    //   //       _prefs.setDouble("long", currentLocation.longitude);
-    //   //       CameraPosition _currentCameraPosition = CameraPosition(
-    //   //           target:
-    //   //           LatLng(MyConstants.currentLong, MyConstants.currentLong),
-    //   //           zoom: _zoomLevel);
-    //   //       _mapController.animateCamera(
-    //   //           CameraUpdate.newCameraPosition(_currentCameraPosition));
-    //   //       _isCameraMove = true;
-    //   //     }
-    //   //   } else if (*/ /*_distance > 1000 &&*/ /* _isCameraMove) {
-    //   //     if (_mapController != null) {
-    //   //       debugPrint("map_controller     _isCameraMove  true");
-    //   //       _prefs.setDouble("lat", currentLocation.latitude);
-    //   //       _prefs.setDouble("long", currentLocation.longitude);
-    //   //       MyConstants.currentLat = currentLocation.latitude;
-    //   //       MyConstants.currentLong = currentLocation.longitude;
-    //   //       CameraPosition _currentCameraPosition = CameraPosition(
-    //   //           target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-    //   //           zoom: _zoomLevel);
-    //   //       _mapController.animateCamera(
-    //   //           CameraUpdate.newCameraPosition(_currentCameraPosition));
-    //   //     }
-    //   //   }*/
-    //   //
-    //   //   // if (_mapController != null /*&& !_isCameraMove*/) {
-    //   //   //   // debugPrint("map_controller     _isCameraMove  false");
-    //   //   //   if(MyConstants.currentLat != currentLocation.latitude && MyConstants.currentLong != currentLocation.longitude){
-    //   //   //     MyConstants.currentLat = currentLocation.latitude;
-    //   //   //     MyConstants.currentLong = currentLocation.longitude;
-    //   //   //     _prefs.setDouble("lat", currentLocation.latitude);
-    //   //   //     _prefs.setDouble("long", currentLocation.longitude);
-    //   //   //     CameraPosition _currentCameraPosition = CameraPosition(
-    //   //   //         target: LatLng(MyConstants.currentLong, MyConstants.currentLong),
-    //   //   //         zoom: _zoomLevel);
-    //   //   //     _mapController.animateCamera(
-    //   //   //         CameraUpdate.newCameraPosition(_currentCameraPosition));
-    //   //   //   }
-    //   //   //
-    //   //   //   // _isCameraMove = true;
-    //   //   // }
-    //   //
-    //   //   currentLocation = cLoc;
-    //   //
-    //   // }
-    // });
-
-    // Location location = new Location();
-    // location.onLocationChanged.listen((LocationData cLoc) {
-    //   debugPrint("map_controller   ${cLoc.latitude}");
-    //   debugPrint("serviceEnabledLocation   _getCurrentLocation 2");
-    //   // Position _currentPosition = position;
-    //   _prefs.setDouble("lat", cLoc.latitude);
-    //   _prefs.setDouble("long", cLoc.longitude);
-    //   MyConstants.currentLat = cLoc.latitude;
-    //   MyConstants.currentLong = cLoc.longitude;
-    //
-    //   if (_mapController != null) {
-    //     debugPrint(
-    //         "serviceEnabledLocation   _getCurrentLocation 3   ${MyConstants.currentLat} ${MyConstants.currentLong}");
-    //     // CameraPosition _currentCameraPosition = CameraPosition(
-    //     //     target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-    //     //     zoom: _zoomLevel);
-    //     Future.delayed(Duration(milliseconds: 100), () {
-    //       _mapController.animateCamera(CameraUpdate.newCameraPosition(
-    //         CameraPosition(
-    //           bearing: 0,
-    //           target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-    //           zoom: _zoomLevel,
-    //         ),
-    //       ));
-    //
-    //     });
-    //   }
-    // });
-
-    // debugPrint("serviceEnabledLocation   _getCurrentLocation 1");
-    // await Geolocator.getCurrentPosition().then((Position position) {
-    //
-    // }).catchError((e) {
-    //   debugPrint(e);
-    //   debugPrint("serviceEnabledLocation   _getCurrentLocation 4");
-    // });
-  }
-
-  _locationUpdatedInAndroid() async {
-    /* debugPrint("map_controller      onMap Created   $isLocationOn");
-    Location location = new Location();
-    currentLocation = await location.getLocation();
-    debugPrint(
-        "map_controller      ${currentLocation.latitude}   ${currentLocation.longitude}");
-    location.onLocationChanged.listen((LocationData cLoc) {
-      debugPrint(
-          "map_controller  location changed  ${cLoc.latitude}   ${cLoc.longitude}");
-      if (_latlng1.latitude != cLoc.latitude &&
-          _latlng1.longitude != cLoc.longitude &&
-          (currentLocation == null ||
-              currentLocation.latitude != cLoc.latitude &&
-                  currentLocation.longitude != cLoc.longitude)) {
-        currentLocation = cLoc;
-        double _distance = calculateDistance(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            currentLocation.latitude,
-            currentLocation.longitude);
-        //
-        if (!_isCameraMove) {
-          if (_mapController != null) {
-            debugPrint("map_controller     _isCameraMove  false");
-            MyConstants.currentLat = currentLocation.latitude;
-            MyConstants.currentLong = currentLocation.longitude;
-            _prefs.setDouble("lat", currentLocation.latitude);
-            _prefs.setDouble("long", currentLocation.longitude);
-            CameraPosition _currentCameraPosition = CameraPosition(
-                target:
-                    LatLng(MyConstants.currentLong, MyConstants.currentLong),
-                zoom: _zoomLevel);
-            _mapController.animateCamera(
-                CameraUpdate.newCameraPosition(_currentCameraPosition));
-            _isCameraMove = true;
-          }
-        } else if (_distance > 1000 && _isCameraMove) {
-          if (_mapController != null) {
-            debugPrint("map_controller     _isCameraMove  true");
-            _prefs.setDouble("lat", currentLocation.latitude);
-            _prefs.setDouble("long", currentLocation.longitude);
-            MyConstants.currentLat = currentLocation.latitude;
-            MyConstants.currentLong = currentLocation.longitude;
-            CameraPosition _currentCameraPosition = CameraPosition(
-                target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-                zoom: _zoomLevel);
-            _mapController.animateCamera(
-                CameraUpdate.newCameraPosition(_currentCameraPosition));
-          }
-        }
-      }
-    });*/
   }
 
   // navigation drawer
@@ -965,21 +801,56 @@ class _HomeScreenNewState extends State<HomeScreenNew>
       icon: SvgPicture.asset(
         'assets/images/locator.svg',
       ),
-      onPressed: () async {
-        debugPrint("map_controller     ");
-        // Safety check if mapController not null
-        _isCameraMove = false;
-        if (_mapController != null) {
-          debugPrint("map_controller     not null");
-          CameraPosition _currentCameraPosition = CameraPosition(
-              target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
-              zoom: _zoomLevel);
-          _mapController.animateCamera(
-              CameraUpdate.newCameraPosition(_currentCameraPosition));
-        }
+      onPressed: () {
+        _updateLocationOnButtonClick();
       },
       iconSize: 50.0,
     );
+  }
+
+  _updateLocationOnButtonClick() async {
+    _isCameraMove = false;
+    if (_mapController != null) {
+      debugPrint("map_controller     not null");
+      Location location = new Location();
+      if (Platform.isIOS) {
+        location.requestService().then((value) async {
+          debugPrint("latlong:-   $value");
+          if (value) {
+            await Geolocator.getCurrentPosition()
+                .then((Position position) async {
+              debugPrint(
+                  "latlong:-   ${position.latitude}    ${position.latitude}");
+              SharedPreferences _prefs = await SharedPreferences.getInstance();
+              _prefs.setDouble("lat", position.latitude);
+              _prefs.setDouble("long", position.longitude);
+              MyConstants.currentLat = position.latitude;
+              MyConstants.currentLong = position.longitude;
+              CameraPosition _currentCameraPosition = CameraPosition(
+                  target:
+                      LatLng(MyConstants.currentLat, MyConstants.currentLong),
+                  zoom: _zoomLevel);
+              _mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(_currentCameraPosition));
+            });
+          }
+        });
+      } else {
+        location.requestPermission().then((value) {
+          debugPrint("latlong:-   $value");
+        });
+        currentLocation = await location.getLocation();
+        MyConstants.currentLat = currentLocation.latitude;
+        MyConstants.currentLong = currentLocation.longitude;
+        debugPrint(
+            "latlong:-   ${currentLocation.latitude}   ${currentLocation.longitude}");
+        CameraPosition _currentCameraPosition = CameraPosition(
+            target: LatLng(MyConstants.currentLat, MyConstants.currentLong),
+            zoom: _zoomLevel);
+        _mapController.animateCamera(
+            CameraUpdate.newCameraPosition(_currentCameraPosition));
+      }
+    }
   }
 
 // scan button ui
@@ -1058,14 +929,17 @@ class _HomeScreenNewState extends State<HomeScreenNew>
     var jsonReqString = json.encode(req);
     await rentBattery_PowerbankApi(
             jsonReqString, _prefs.get('accessToken').toString())
-        .then((response) {
+        .then((response) async {
       final jsonResponse = json.decode(response.body);
       if (response.statusCode == 200) {
         Navigator.pop(context);
 
         if (jsonResponse['status'].toString() == "1") {
+          await _prefs.setBool("isRental", true);
           setState(() {
             showBottomSheet = true;
+            debugPrint(
+                "check_showBottomSheet:-   _rentBattery_PowerbankAPI   isRental = true  $showBottomSheet");
           });
           _showDifferentTypeOfDialogs(
               message: "SUCCESS",
@@ -1107,6 +981,8 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
   // bottom sheets
   bottomSheetButtonUi() {
+    debugPrint(
+        "check_showBottomSheet:-   bottomSheetButtonUi    $showBottomSheet");
     return Visibility(
       visible: showBottomSheet,
       maintainAnimation: true,
@@ -1206,7 +1082,10 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   }
 
   _showDifferentTypeOfDialogs(
-      {String title, String message, BuildContext context, String currncy}) {
+      {String title,
+      String message,
+      BuildContext context,
+      String currncy}) async {
     switch (message) {
       case "SOMETHING_WRONG":
         {
@@ -1246,6 +1125,15 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         break;
       case "POWERBANK_RETURNED":
         {
+          await _prefs.setBool("isRental", false);
+          showBottomSheet = false;
+          if (isBottomSheetOpen) {
+            isBottomSheetOpen = false;
+            Navigator.pop(context);
+          }
+          debugPrint(
+              "check_showBottomSheet:-   POWERBANK_RETURNED   isRental = false  $showBottomSheet  ${_prefs.getBool("isRental")}");
+          setState(() {});
           debugPrint("firebasemessegeis     ->      POWERBANK_RETURNED");
           openDialogWithSlideInAnimation(
             context: context,
@@ -1264,6 +1152,15 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         break;
       case "POWERBANK_RETURNED_MSG":
         {
+          await _prefs.setBool("isRental", false);
+          showBottomSheet = false;
+          if (isBottomSheetOpen) {
+            isBottomSheetOpen = false;
+            Navigator.pop(context);
+          }
+          debugPrint(
+              "check_showBottomSheet:-   POWERBANK_RETURNED   isRental = false  $showBottomSheet   ${_prefs.getBool("isRental")}");
+          setState(() {});
           debugPrint("firebasemessegeis     ->      POWERBANK_RETURNED_MSG");
           openDialogWithSlideInAnimation(
             context: context,
@@ -1530,16 +1427,6 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   }
 
   _updateLanguage() {
-    //   "{
-    //   ""id"":1,
-    //   ""language"":""en""
-    // }"
-
-    //   "{
-    //   ""status"":1,
-    //   ""message"":""Success""
-    // }"
-
     var req = {
       "id": _prefs.get('userId').toString(),
       "language": _prefs.getString('language_code')
@@ -1558,13 +1445,15 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   _getRentalDetailsList() {
     var apicall = getCurrentRentalDetailsApi(
         _prefs.get('userId').toString(), _prefs.get('accessToken').toString());
-    apicall.then((response) {
+    apicall.then((response) async {
       isBottomSheetButtonClickable = true;
       final jsonResponse = json.decode(response.body);
       if (response.statusCode == 200) {
         if (jsonResponse['status'].toString() == "1") {
           var rentalPrice = jsonResponse['rentalDetails']['rentalPrice'];
           rentalTime = jsonResponse['rentalDetails']['rentalTime'];
+          debugPrint(
+              "check_showBottomSheet:-   _getRentalDetailsList  1 isRental = false  $showBottomSheet");
           _modalBottomSheetMenu(rentalPrice, rentalTime);
         } else if (jsonResponse['status'].toString() == "2") {
           debugPrint("rentBattery_PowerbankAPI   getRentalDetailsList   2");
@@ -1574,12 +1463,18 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         } else if (jsonResponse['status'].toString() == "0") {
           _prefs.setString(
               'walletAmount', jsonResponse['walletAmount'].toString());
+          await _prefs.setBool("isRental", false);
           setState(() {
             showBottomSheet = false;
+            debugPrint(
+                "check_showBottomSheet:-   _getRentalDetailsList  0 isRental = false  $showBottomSheet");
           });
         } else {
+          await _prefs.setBool("isRental", false);
           setState(() {
             showBottomSheet = false;
+            debugPrint(
+                "check_showBottomSheet:-   _getRentalDetailsList else  isRental = false  $showBottomSheet");
           });
         }
       } else {
@@ -1593,6 +1488,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
   }
 
   void _modalBottomSheetMenu(rentalPrice, rentalTime) {
+    isBottomSheetOpen = true;
     showModalBottomSheet(
         backgroundColor: Colors.transparent,
         context: context,
@@ -1602,6 +1498,7 @@ class _HomeScreenNewState extends State<HomeScreenNew>
             children: <Widget>[
               GestureDetector(
                 onTap: () {
+                  isBottomSheetOpen = false;
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -1652,18 +1549,28 @@ class _HomeScreenNewState extends State<HomeScreenNew>
         // } else {
         //   _message = message['notification'];
         // }
+        print('on_message ${message}');
 
-        if (message['notification'] == null) {
-          _message = message["aps"]['alert'];
+        if (message['MESSAGE_KEY'] != null) {
+          _showDifferentTypeOfDialogs(
+              title: message["TITLE_KEY"],
+              message: message["MESSAGE_KEY"],
+              context: context);
         } else {
-          _message = message['notification'];
+          if (message['notification'] == null) {
+            _message = message["aps"]['alert'];
+          } else {
+            _message = message['notification'];
+          }
+
+          showFirebaseMesgDialog(_message, context);
         }
 
         // print('on_message ${message["aps"]['alert']['title']}');
         // print('on_message ${message["aps"]['alert']['body']}');
         // print('on_message ${message['notification']["title"]}');
-        // print('on_message ${message['notification']['body']}');
-        showFirebaseMesgDialog(_message, context);
+        // print('on_message ${message['notification']}');
+        // showFirebaseMesgDialog(_message, context);
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
@@ -1689,30 +1596,8 @@ class _HomeScreenNewState extends State<HomeScreenNew>
 
   showFirebaseMesgDialog(message, context) {
     _showDifferentTypeOfDialogs(
-        title: message["title"], message: message['body'], context: context);
+        title: message["data"]["title"],
+        message: message["data"]['body'],
+        context: context);
   }
-
-// void initbatteryInfo() async {
-//   Battery _battery = Battery();
-//   var batteryLevel = await _battery.batteryLevel;
-//   isNotificationSent = await _prefs.getBool('isNotificationSent');
-//   if (batteryLevel < 20 &&
-//       isNotificationSent != null &&
-//       !isNotificationSent) {
-//     _prefs.setBool('isNotificationSent', true);
-//     sendBatterAlarmToServer();
-//   } else if (batteryLevel > 20) {
-//     _prefs.setBool('isNotificationSent', false);
-//   }
-// }
-//
-// sendBatterAlarmToServer() async {
-//   await sendAlarm(
-//       prefs.get('userId').toString(), prefs.get('accessToken').toString())
-//       .then((response) {
-//     print(response.body);
-//     if (response.statusCode == 200) {}
-//   }).catchError((onError) {});
-// }
-
 }

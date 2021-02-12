@@ -183,7 +183,7 @@ class _MietStationState extends State<MietStationDetailScreen> {
                   children: <Widget>[
                     SvgPicture.asset(
                       'assets/images/location_small.svg',
-                      color: Color(0xff54DF6C),
+                      color: Color(0xFF54DF6C),
                       fit: BoxFit.cover,
                     ),
                     SizedBox(

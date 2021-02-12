@@ -40,10 +40,9 @@ class _LoginState extends State<LoginScreen> {
   bool _saving = false;
   String mobileNumber = "", countryCode = "+49";
 
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-
   void _setUpFirebase() {
-    if (Platform.isIOS) iOS_Permission();
+    FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+    if (Platform.isIOS) iOS_Permission(_firebaseMessaging);
 
     _firebaseMessaging.getToken().then((token) {
       debugPrint("firebase_token    $token");
@@ -51,7 +50,7 @@ class _LoginState extends State<LoginScreen> {
     });
   }
 
-  void iOS_Permission() {
+  void iOS_Permission(FirebaseMessaging _firebaseMessaging) {
     _firebaseMessaging.requestNotificationPermissions(IosNotificationSettings(
         sound: true, badge: true, alert: true, provisional: false));
     _firebaseMessaging.onIosSettingsRegistered.first.then((settings) {
@@ -92,29 +91,30 @@ class _LoginState extends State<LoginScreen> {
         )),
   ];
 
-  bool _serviceEnabled = false;
-  var location = new Location();
+  // bool _serviceEnabled = false;
+  // var location = new Location();
 
   @override
   void initState() {
     initPrefs();
     super.initState();
-    Future.delayed(Duration(milliseconds: 400),(){
-      checkLocationServiceEnableOrDisable();
+
+    Future.delayed(Duration(milliseconds: 1000), () {
+      // checkLocationServiceEnableOrDisable();
       _setUpFirebase();
     });
   }
 
-  checkLocationServiceEnableOrDisable() async {
-    _serviceEnabled = await location.serviceEnabled();
-    print("serviceEnabled" + _serviceEnabled.toString());
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-    } else if (_serviceEnabled) {
-      print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
-    }
-    print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
-  }
+  // checkLocationServiceEnableOrDisable() async {
+  //   _serviceEnabled = await location.serviceEnabled();
+  //   print("serviceEnabled" + _serviceEnabled.toString());
+  //   if (!_serviceEnabled) {
+  //     _serviceEnabled = await location.requestService();
+  //   } else if (_serviceEnabled) {
+  //     print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
+  //   }
+  //   print("_serviceEnabled.toString()--- " + _serviceEnabled.toString());
+  // }
 
   void convertSectoDay(int n) {
     var day = n / (24 * 3600);

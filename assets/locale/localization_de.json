@@ -235,5 +235,17 @@
   "give_us_feedback": "Gib uns feedback",
   "evaluate_us": "BEWERTE UNS",
   "terms_of_use": "NUTZUNGSBEDINGUNGEN",
-  "language": "SPRACHE"
+  "language": "SPRACHE",
+  "Start": "Start",
+  "End": "Ende",
+  "Taken": "Entnommen",
+  "RENT PERIOD": "Mietzeit",
+  "Submitted": "Abgegeben",
+  "LOCATION": "STANDORT",
+  "Current Rental Time": "Aktuelle Mietzeit",
+  "Days": "Tage",
+  "Minutes": "Minuten",
+  "Rental Price": "Mietgebühr",
+  "Wallet Credit": "Wallet Guthaben"
+
 }

@@ -239,6 +239,16 @@
   "give_us_feedback": "Give us feedback",
   "evaluate_us": "EVALUATE US",
   "terms_of_use": "TERMS OF USE",
-  "language": "LANGUAGE"
-
+  "language": "LANGUAGE",
+  "Start": "Start",
+  "End": "End",
+  "Taken": "Taken",
+  "RENT PERIOD": "Rental period",
+  "Submitted": "Submitted",
+  "LOCATION": "LOCATION",
+  "Current Rental Time": "Current Rental Time",
+  "Days": "Days",
+  "Minutes": "Minutes",
+  "Rental Price": "Rental Price",
+  "Wallet Credit": "Wallet Credit"
 }

@@ -13,9 +13,10 @@ class MietStationItem extends StatelessWidget {
 
   MietStationItem({this.nearbyLocation});
 
-  display(){
+  display() {
     var display = "50";
-    var message = "You have received a bonus of $display for the friend request";
+    var message =
+        "You have received a bonus of $display for the friend request";
   }
 
   @override
@@ -34,37 +35,42 @@ class MietStationItem extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     Container(
-                        height: 70.0,
-                        width: 70.0,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Color(0xffEBEBEB),
-                                width: 1,
-                                style: BorderStyle.solid),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12.0))),
-                        child: CachedNetworkImage(
-                          imageUrl: nearbyLocation.imageFullPath,
-                          height: Dimens.seventy,
-                          width: Dimens.seventy,
-                          // errorWidget: (a, d, c) {
-                          //   return Image.asset(
-                          //     'assets/images/mietstation.png',
-                          //   );
-                          // },
-                          // placeholder: (a, b) {
-                          //   return Image.asset(
-                          //     'assets/images/mietstation.png',
-                          //   );
-                          // },
-                        ),),
+                      height: 70.0,
+                      width: 70.0,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Color(0xffEBEBEB),
+                              width: 1,
+                              style: BorderStyle.solid),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(12.0))),
+                      child: CachedNetworkImage(
+                        imageUrl: nearbyLocation.imageFullPath,
+                        height: Dimens.seventy,
+                        width: Dimens.seventy,
+                        // errorWidget: (a, d, c) {
+                        //   return Image.asset(
+                        //     'assets/images/mietstation.png',
+                        //   );
+                        // },
+                        // placeholder: (a, b) {
+                        //   return Image.asset(
+                        //     'assets/images/mietstation.png',
+                        //   );
+                        // },
+                      ),
+                    ),
                     SizedBox(
                       height: 12,
                     ),
                     Text(
                       nearbyLocation.open
-                          ? AppLocalizations.of(context).translate("Open").toUpperCase()
-                          : AppLocalizations.of(context).translate("Close").toUpperCase(),
+                          ? AppLocalizations.of(context)
+                              .translate("Open")
+                              .toUpperCase()
+                          : AppLocalizations.of(context)
+                              .translate("Close")
+                              .toUpperCase(),
                       style: TextStyle(
                           fontSize: 11.0,
                           height: 1.5,
@@ -115,7 +121,9 @@ class MietStationItem extends StatelessWidget {
                       ),
                       Row(
                         children: <Widget>[
-                          SvgPicture.asset('assets/images/battery_small.svg'),
+                          SvgPicture.asset(
+                            'assets/images/battery_small.svg',
+                          ),
                           SizedBox(
                             width: 7.0,
                           ),
@@ -131,7 +139,10 @@ class MietStationItem extends StatelessWidget {
                           SizedBox(
                             width: 15.0,
                           ),
-                          SvgPicture.asset('assets/images/star_small.svg'),
+                          SvgPicture.asset(
+                            'assets/images/star_small.svg',
+                            color: Color(0xFF54DF6C),
+                          ),
                           SizedBox(
                             width: 7.0,
                           ),

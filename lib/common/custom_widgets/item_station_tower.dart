@@ -113,28 +113,25 @@ class ItemStationTower extends StatelessWidget {
                           SizedBox(
                             height: Dimens.sixteen,
                           ),
-                          SizedBox(
-                            width: Dimens.eighty,
-                            child: Text(
-                              data.open
-                                  ? AppLocalizations.of(context)
-                                  .translate("Open")
-                                  .toUpperCase()
-                                  : AppLocalizations.of(context)
-                                  .translate("Close")
-                                  .toUpperCase(),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 11.0,
-                                  height: 1.5,
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w600,
-                                  color: data.open
-                                      ? primaryGreenColor
-                                      : Color(0xffF44336)),
-                            ),
+                          Text(
+                            data.open
+                                ? AppLocalizations.of(context)
+                                .translate("Open")
+                                .toUpperCase()
+                                : AppLocalizations.of(context)
+                                .translate("Close")
+                                .toUpperCase(),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 11.0,
+                                height: 1.5,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w600,
+                                color: data.open
+                                    ? primaryGreenColor
+                                    : Color(0xffF44336)),
                           ),
                         ],
                       ),
@@ -198,7 +195,7 @@ class ItemStationTower extends StatelessWidget {
                                 SizedBox(
                                   width: Dimens.fifteen,
                                 ),
-                                SvgPicture.asset('assets/images/star_small.svg'),
+                                SvgPicture.asset('assets/images/star_small.svg',color: Color(0xFF54DF6C),),
                                 SizedBox(
                                   width: Dimens.seven,
                                 ),

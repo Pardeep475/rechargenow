@@ -31,7 +31,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-
     loadShredPref();
   }
 
@@ -90,75 +89,75 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget bodyUI_WithApi_listView(BuildContext context) {
-    return Expanded(
-      child: ListView.builder(
-          itemCount: historyList.length,
-          padding: EdgeInsets.zero,
-          itemBuilder: (context, index) {
-            //Datum datum = eventList.data[index];
-            return Container(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {},
-                  child: index == 0 || index == 6
-                      ? Container(
-                          padding: EdgeInsets.only(
-                              left: screenPadding,
-                              top: 10,
-                              right: screenPadding),
-                          child: Text(
-                              index == 0 ? "MARCH 2020" : "FEBRUARY 2020",
-                              style: historyTitleTextStyle),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: screenPadding, right: screenPadding),
-                              child: Divider(
-                                color: Colors.grey.withOpacity(0.3),
-                                thickness: 1,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: screenPadding, right: screenPadding),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "19 March",
-                                    style: appBarTitleStyle,
-                                  ),
-                                  Text(
-                                    "0,00 Rs",
-                                    style: appBarTitleStyle,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: screenPadding, right: screenPadding),
-                              child: Text(
-                                "18-15 18-15",
-                                style: addBtnTextStyle,
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ),
-            );
-          }),
-    );
-  }
+  // Widget bodyUI_WithApi_listView(BuildContext context) {
+  //   return Expanded(
+  //     child: ListView.builder(
+  //         itemCount: historyList.length,
+  //         padding: EdgeInsets.zero,
+  //         itemBuilder: (context, index) {
+  //           //Datum datum = eventList.data[index];
+  //           return Container(
+  //             child: Material(
+  //               color: Colors.transparent,
+  //               child: InkWell(
+  //                 onTap: () {},
+  //                 child: index == 0 || index == 6
+  //                     ? Container(
+  //                         padding: EdgeInsets.only(
+  //                             left: screenPadding,
+  //                             top: 10,
+  //                             right: screenPadding),
+  //                         child: Text(
+  //                             index == 0 ? "MARCH 2020" : "FEBRUARY 2020",
+  //                             style: historyTitleTextStyle),
+  //                       )
+  //                     : Column(
+  //                         mainAxisAlignment: MainAxisAlignment.start,
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Padding(
+  //                             padding: EdgeInsets.only(
+  //                                 left: screenPadding, right: screenPadding),
+  //                             child: Divider(
+  //                               color: Colors.grey.withOpacity(0.3),
+  //                               thickness: 1,
+  //                             ),
+  //                           ),
+  //                           Padding(
+  //                             padding: EdgeInsets.only(
+  //                                 left: screenPadding, right: screenPadding),
+  //                             child: Row(
+  //                               mainAxisSize: MainAxisSize.max,
+  //                               mainAxisAlignment:
+  //                                   MainAxisAlignment.spaceBetween,
+  //                               children: [
+  //                                 Text(
+  //                                   "19 March",
+  //                                   style: appBarTitleStyle,
+  //                                 ),
+  //                                 Text(
+  //                                   "0,00 Rs",
+  //                                   style: appBarTitleStyle,
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                           ),
+  //                           Padding(
+  //                             padding: EdgeInsets.only(
+  //                                 left: screenPadding, right: screenPadding),
+  //                             child: Text(
+  //                               "18-15 18-15",
+  //                               style: addBtnTextStyle,
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //               ),
+  //             ),
+  //           );
+  //         }),
+  //   );
+  // }
 
   stickyListView() {
     return Expanded(
@@ -186,6 +185,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         ),
         itemBuilder: (_, History element) {
+          debugPrint(
+              "testing_date_format_history:-    ${element.rentalDate}   ${dateConvertMainTitle(element.rentalDate)}    ${element.monthYear}");
           return InkWell(
             onTap: () {
               showBottomSheet(context, element);
@@ -238,7 +239,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String startTimeAndEndTime(String startDate, String endDate) {
     DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat targetFormat = new DateFormat("h:mm");
+    DateFormat targetFormat =
+        new DateFormat("HH:mm", prefs.getString('language_code'));
     DateTime dateStart = originalFormat.parse(startDate);
     DateTime dateEnd = originalFormat.parse(endDate);
     String formattedStartDate = targetFormat.format(dateStart.toLocal());
@@ -249,7 +251,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String dateConvertMainTitle(String value) {
     DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat targetFormat = new DateFormat("dd MMMM");
+    DateFormat targetFormat =
+        new DateFormat("dd MMMM", prefs.getString('language_code'));
     DateTime date = originalFormat.parse(value);
     String formattedDate = targetFormat.format(date.toLocal());
     return formattedDate;
@@ -257,7 +260,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String dateConvert(String value) {
     DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat targetFormat = new DateFormat("dd.MM.yyyy");
+    DateFormat targetFormat =
+        new DateFormat("dd.MM.yyyy", prefs.getString('language_code'));
     DateTime date = originalFormat.parse(value);
     String formattedDate = targetFormat.format(date.toLocal());
     return formattedDate;
@@ -265,10 +269,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String dateConvertStartEnd(String value) {
     DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat targetFormat = new DateFormat("h:mm a / MMM yyyy dd");
+    var language = prefs.getString('language_code');
+    DateFormat targetFormat = new DateFormat(
+        "HH:mm ${language == 'en' ? "hr" : "Uhr"} / dd. MMM yyyy ",
+        prefs.getString('language_code'));
     DateTime date = originalFormat.parse(value);
     String formattedDate = targetFormat.format(date.toLocal());
-    return formattedDate;
+    return formattedDate.replaceAll('3r', "hr");
   }
 
   void showBottomSheet(BuildContext context, History history) {
@@ -382,7 +389,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Start",
+                          AppLocalizations.of(context).translate('Start'),
                           style: TextStyle(
                               fontFamily: fontFamily,
                               fontWeight: FontWeight.w700,
@@ -404,7 +411,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "End",
+                          AppLocalizations.of(context).translate('End'),
                           style: TextStyle(
                               fontFamily: fontFamily,
                               fontWeight: FontWeight.w700,
@@ -443,7 +450,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         child: Row(
                           children: [
                             Text(
-                              "REND PERIOD",
+                              AppLocalizations.of(context)
+                                  .translate('RENT PERIOD')
+                                  .toUpperCase(),
                               style: sliderButtonTextStyle,
                             ),
                             Spacer(),
@@ -459,7 +468,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       height: Dimens.twelve,
                     ),
                     Text(
-                      "LOCATION",
+                      AppLocalizations.of(context).translate('LOCATION'),
                       style: TextStyle(
                           fontFamily: fontFamily,
                           fontWeight: FontWeight.w700,
@@ -482,7 +491,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Taken",
+                          AppLocalizations.of(context).translate('Taken'),
                           style: TextStyle(
                               fontFamily: fontFamily,
                               fontWeight: FontWeight.w700,
@@ -517,12 +526,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Abegegeben",
+                          AppLocalizations.of(context).translate('Submitted'),
                           style: TextStyle(
                               fontFamily: fontFamily,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF2F2F2F),
-
                               fontSize: Dimens.forteen,
                               height: 1.2),
                         ),
@@ -588,7 +596,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String dateConverGroupByDate(String value) {
     DateFormat originalFormat = new DateFormat("yyyy-MM-dd HH:mm:ss");
-    DateFormat targetFormat = new DateFormat("dd MMMM yyyy");
+    DateFormat targetFormat =
+        new DateFormat("dd MMMM yyyy", prefs.getString('language_code'));
     DateTime date = originalFormat.parse(value);
     String formattedDate = targetFormat.format(date.toLocal());
     return formattedDate;
@@ -596,7 +605,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   List<History> newHostry = [];
 
-  void groupByDate() {
+  void groupByDate() async {
+    if (prefs == null) prefs = await SharedPreferences.getInstance();
     historyList.forEach((element) {
       var transacion = dateConverGroupByDate(element.transactionDate);
       var arr = transacion.split(" ");
@@ -606,18 +616,5 @@ class _HistoryScreenState extends State<HistoryScreen> {
       newHostry.add(element);
     });
     setState(() {});
-    /*var groupByDate = groupBy(historyList, (obj) => obj['transactionDate'].substring(3, 10));
-    groupByDate.forEach((date, list) {
-      // Header
-      print('${date}:');
-
-      // Group
-      list.forEach((listItem) {
-        // List item
-        print('groupByDate${listItem.transactionDate}, ${listItem.locationName}');
-      });
-      // day section divider
-      print('\n');
-    });*/
   }
 }

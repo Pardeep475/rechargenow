@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:recharge_now/locale/AppLocalizations.dart';
 
 import 'TimerBloc.dart';
 
@@ -24,6 +25,7 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
   int minutes = 0;
   int _endMinutes = 0;
   int days = 0;
+
   // AnimationController _controller;
   TimerBloc _timerBloc;
   Timer _timer;
@@ -95,7 +97,7 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
               padding: EdgeInsets.only(top: 18, left: 12, right: 12, bottom: 2),
               child: Center(
                 child: Text(
-                  'Current Rental Time',
+                  AppLocalizations.of(context).translate('Current Rental Time'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 18.0,
@@ -112,8 +114,10 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
                 child: StreamBuilder<int>(
                   initialData: 0,
                   stream: _timerBloc.progressStream,
-                  builder: (context,snapshot){
-                    return Countdown(value: snapshot.data ?? 0,);
+                  builder: (context, snapshot) {
+                    return Countdown(
+                      value: snapshot.data ?? 0,
+                    );
                   },
                 ),
               ),
@@ -130,7 +134,9 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
                         ),
                         child: Center(
                           child: Text(
-                            'Days',
+                            AppLocalizations.of(context)
+                                .translate('Days')
+                                .toUpperCase(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 11.0,
@@ -148,7 +154,9 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
                   ),
                   child: Center(
                     child: Text(
-                      'Hours',
+                      AppLocalizations.of(context)
+                          .translate('Hours')
+                          .toUpperCase(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 11.0,
@@ -166,7 +174,9 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
                   ),
                   child: Center(
                     child: Text(
-                      'Minutes',
+                      AppLocalizations.of(context)
+                          .translate('Minutes')
+                          .toUpperCase(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 11.0,
@@ -189,16 +199,16 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-                    right: 34,
+                    right: 40,left: 40
                   ),
                   child: Center(
                     child: Text(
-                      'Rental Price',
-                      textAlign: TextAlign.center,
+                      AppLocalizations.of(context).translate('Rental Price'),
+                      textAlign: TextAlign.left,
                       style: TextStyle(
                           fontSize: 14.0,
                           height: 1.4,
@@ -208,14 +218,15 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
                     ),
                   ),
                 ),
+                Expanded(child: SizedBox()),
                 Padding(
                   padding: EdgeInsets.only(
-                    left: 34,
+                    left: 40,right: 40
                   ),
                   child: Center(
                     child: Text(
                       widget.rentalPrice,
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                           fontSize: 14.0,
                           height: 1.4,
@@ -237,16 +248,16 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-                    right: 34,
+                    right: 40,left: 40
                   ),
                   child: Center(
                     child: Text(
-                      'Wallet Credit',
-                      textAlign: TextAlign.center,
+                      AppLocalizations.of(context).translate('Wallet Credit'),
+                      textAlign: TextAlign.left,
                       style: TextStyle(
                           fontSize: 14.0,
                           height: 1.4,
@@ -256,9 +267,10 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
                     ),
                   ),
                 ),
+                Expanded(child: SizedBox()),
                 Padding(
                   padding: EdgeInsets.only(
-                    left: 34,
+                    left: 40,right: 40
                   ),
                   child: Center(
                     child: Text(
@@ -280,18 +292,14 @@ class _HomeTimerState extends State<HomeTimerBottomSheeet>
       ),
     );
   }
+
   _startTimer() {
     _timer = Timer.periodic(Duration(minutes: 1), (timer) {
       _timerBloc.progressSink.add(++minutes);
       debugPrint("increase_timing_1    $minutes");
     });
   }
-
-
-
 }
-
-
 
 class Countdown extends StatelessWidget {
   // Countdown({Key key, this.animation, this.arr})
