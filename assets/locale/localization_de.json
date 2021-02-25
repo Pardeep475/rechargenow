@@ -198,7 +198,7 @@
   "THANK YOU": "VIELEN DANK",
   "Open": "geöffnet",
   "Close": "GESCHLOSSEN",
-  "change language": "Verander taal",
+  "change language": "SPRACHEINSTELLUNGEN",
   "Skip": "Overspringen",
   "as soon as you rent": "Zodra u uw eerste Powerbank huurt, heeft u\n vindt u hier alle informatie over huren",
   "You can only borrow one Powerbank at a time": "Du kannst nur eine Powerbank zur Zeit ausleihen",
@@ -246,6 +246,8 @@
   "Days": "Tage",
   "Minutes": "Minuten",
   "Rental Price": "Mietgebühr",
-  "Wallet Credit": "Wallet Guthaben"
-
+  "Wallet Credit": "Wallet Guthaben",
+  "promo_error": "Ungültiger Promo-Code",
+  "german": "Deutsch",
+  "english": "Englisch"
 }

@@ -2,10 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:recharge_now/apiService/web_service.dart';
@@ -49,6 +46,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   callback: () {
                     Navigator.pop(context);
                   }),
+              SizedBox(height: 10,),
               historyList == null
                   ? Expanded(child: Center(child: CircularProgressIndicator()))
                   : historyList.length == 0
@@ -169,7 +167,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             value2.compareTo(value1),
         itemComparator: (History element1, History element2) =>
             element1.monthYear.compareTo(element2.monthYear),
-        floatingHeader: true,
+        floatingHeader: false,
+        stickyHeaderBackgroundColor: Colors.white,
+
         groupSeparatorBuilder: (History element) => Container(
           height: 50,
           child: Align(

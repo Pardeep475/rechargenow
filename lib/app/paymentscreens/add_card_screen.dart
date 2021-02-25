@@ -140,6 +140,7 @@ bool _isProgressBarVisible = false;
                   Form(
                       key: _formKey,
                       autovalidate: _validate,
+
                       child: Column(
                         children: <Widget>[
                           Align(
@@ -156,11 +157,13 @@ bool _isProgressBarVisible = false;
                             margin:
                                 EdgeInsets.symmetric(horizontal: screenPadding),
                             child: TextFormField(
+                              autofocus: true,
                               keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                               inputFormatters: [
                                 WhitelistingTextInputFormatter.digitsOnly,
                                 new LengthLimitingTextInputFormatter(19),
+
                                 new CardNumberInputFormatter(),
                               ],
                               style: addCardStyle,

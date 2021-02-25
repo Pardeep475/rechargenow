@@ -179,7 +179,7 @@
   "Map": "MAP",
   "List": "LIST",
   "promo code": "PROMO-CODE",
-  "promo code small": "Promo-code",
+  "promo code small": "Promo-Code",
   "scan code to activate location": "Scan the QR-Code at the station to release a Powerbank",
   "Card number": "Card number",
   "Card holder": "Card holder",
@@ -250,5 +250,8 @@
   "Days": "Days",
   "Minutes": "Minutes",
   "Rental Price": "Rental Price",
-  "Wallet Credit": "Wallet Credit"
+  "Wallet Credit": "Wallet Credit",
+  "promo_error": "Wrong Promo-Code",
+  "german": "German",
+  "english": "English"
 }

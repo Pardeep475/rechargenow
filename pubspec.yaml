@@ -70,6 +70,7 @@ dependencies:
   rxdart: any
   flutter_local_notifications: ^3.0.3
   devicelocale: ^0.3.3
+  keyboard_visibility: ^0.5.6
 #  qr_mobile_vision: ^2.0.0
 
 

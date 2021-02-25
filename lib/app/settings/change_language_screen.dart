@@ -71,7 +71,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                       width: 12,
                     ),
                     Text(
-                      'Deutsch',
+    AppLocalizations.of(context)
+        .translate('german'),
                       style: TextStyle(
                           color: Color(0xff2F2F2F),
                           fontWeight: FontWeight.w400,
@@ -108,7 +109,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                       width: 12,
                     ),
                     Text(
-                      'English',
+                      AppLocalizations.of(context)
+                          .translate('english'),
                       style: TextStyle(
                           color: Color(0xff2F2F2F),
                           fontWeight: FontWeight.w400,

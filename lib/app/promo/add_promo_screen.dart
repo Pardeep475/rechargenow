@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:recharge_now/apiService/web_service.dart';
 import 'package:recharge_now/app/promo/redeem_screen.dart';
 import 'package:recharge_now/common/myStyle.dart';
@@ -22,9 +23,30 @@ class _AddPromosScreen extends State<AddPromosScreen> {
   var isError = false;
   var errorMessage = "";
 
+// Add variable to top of class
+
+  ScrollController _scrollController = new ScrollController();
+
   @override
   void initState() {
     super.initState();
+    // KeyboardVisibilityNotification().addNewListener(
+    //   onChange: (bool visible) {
+    //     debugPrint(
+    //         "visible   $visible  ${_scrollController.initialScrollOffset}  ${_scrollController.position.minScrollExtent}");
+    //     if (visible) {
+    //       _scrollController.animateTo(
+    //           MediaQuery.of(context).size.height,
+    //           duration: Duration(milliseconds: 100),
+    //           curve: Curves.ease);
+    //     } else {
+    //       _scrollController.animateTo(
+    //           0,
+    //           duration: Duration(milliseconds: 100),
+    //           curve: Curves.ease);
+    //     }
+    //   },
+    // );
     loadShredPref();
   }
 
@@ -42,7 +64,7 @@ class _AddPromosScreen extends State<AddPromosScreen> {
 
   buildBodyUI() {
     return SingleChildScrollView(
-
+      controller: _scrollController,
       child: Container(
         height: MediaQuery.of(context).size.height,
         child: Column(
@@ -89,7 +111,8 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                         top: screenPadding,
                         right: screenPadding),
                     child: Text(
-                      AppLocalizations.of(context).translate('promo code small'),
+                      AppLocalizations.of(context)
+                          .translate('promo code small'),
                       style: TextStyle(
                           fontFamily: fontFamily,
                           fontWeight: FontWeight.w600,
@@ -102,7 +125,8 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                     margin: EdgeInsets.only(
                         left: screenPadding, top: 8, right: screenPadding),
                     child: Text(
-                      AppLocalizations.of(context).translate('enter your promocode here'),
+                      AppLocalizations.of(context)
+                          .translate('enter your promocode here'),
                       style: TextStyle(
                           fontFamily: fontFamily,
                           fontWeight: FontWeight.w400,
@@ -129,22 +153,21 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                     padding: EdgeInsets.only(left: 10, right: 10),
                     decoration: MyUtils.showRoundCornerDecoration(),
                     child: TextField(
-                      //autofocus: true,
+                      autofocus: true,
                       textAlign: TextAlign.start,
                       style: editTextStyle,
                       onChanged: (text) {
-                        if(isError){
-                          isError=false;
-                          setState(() {
-
-                          });
+                        if (isError) {
+                          isError = false;
+                          setState(() {});
                         }
                         promoCode = text;
                       },
                       textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: AppLocalizations.of(context).translate('Add Promo-Code here'),
+                          hintText: AppLocalizations.of(context)
+                              .translate('Add Promo-Code here'),
                           hintStyle: TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
@@ -182,7 +205,8 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                           left: screenPadding, top: 8, right: screenPadding),
                       child: Center(
                         child: Text(
-                          AppLocalizations.of(context).translate('YOU WOULD LIKE TO GET CREDIT'),
+                          AppLocalizations.of(context)
+                              .translate('YOU WOULD LIKE TO GET CREDIT'),
                           textAlign: TextAlign.center,
                           style: addCardTextStyle,
                         ),
@@ -195,7 +219,8 @@ class _AddPromosScreen extends State<AddPromosScreen> {
                             bottom: 65,
                             right: screenPadding),
                         child: buttonView(
-                            text: AppLocalizations.of(context).translate('REDEEM'),
+                            text: AppLocalizations.of(context)
+                                .translate('REDEEM'),
                             callback: () {
                               addPromosButtonClick();
                             })),
@@ -211,7 +236,9 @@ class _AddPromosScreen extends State<AddPromosScreen> {
 
   addPromosButtonClick() {
     if (promoCode.trim().length == 0) {
-      MyUtils.showAlertDialog(AppLocalizations.of(context).translate('enter your promocode here'), context);
+      MyUtils.showAlertDialog(
+          AppLocalizations.of(context).translate('enter your promocode here'),
+          context);
     } else {
       addPromos();
     }
@@ -242,20 +269,20 @@ class _AddPromosScreen extends State<AddPromosScreen> {
         } else if (jsonResponse['status'].toString() == "0") {
           isError = true;
           errorMessage = jsonResponse['message'].toString();
-          errorMessage = 'Unfortunately the promo code is incorrect';
+          errorMessage = AppLocalizations.of(context).translate('promo_error');
           notify();
           // MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
 
         } else if (jsonResponse['status'].toString() == "2") {
           isError = true;
           errorMessage = jsonResponse['message'].toString();
-          errorMessage = 'Unfortunately the promo code is incorrect';
+          errorMessage = AppLocalizations.of(context).translate('promo_error');
           notify();
           //   MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
         } else {
           isError = true;
           errorMessage = jsonResponse['message'].toString();
-          errorMessage = 'Unfortunately the promo code is incorrect';
+          errorMessage = AppLocalizations.of(context).translate('promo_error');
           notify();
           // MyUtils.showAlertDialog(jsonResponse['message'].toString(), context);
         }
